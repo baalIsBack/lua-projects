@@ -1,0 +1,36 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"workbench.colorTheme": "Dracula",
+		"[lua]": {
+			"editor.defaultFormatter": "sumneko.lua"
+		},
+		"lua.format.useTabs": true,
+		"lua.format.indentCount": 2,
+		"Lua.nameStyle.config": {
+	
+		},
+		"Lua.format.defaultConfig": {
+			"indent_style": "tab",
+			"indent_size": "2",
+			"tab_width": "2"
+		},
+		"editor.tabSize": 2,
+		"editor.insertSpaces": false,
+		"editor.detectIndentation": false,
+		"Lua.runtime.version": "Lua 5.1",
+		"editor.defaultFormatter": "sumneko.lua",
+		"editor.formatOnPaste": true,
+		"editor.formatOnSave": true,
+		"search.useIgnoreFiles": false
+	},
+	"extensions": {
+		"recommendations": [
+			"bschulte.love"
+		]
+	}
+}

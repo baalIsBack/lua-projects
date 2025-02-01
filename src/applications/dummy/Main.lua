@@ -14,10 +14,11 @@ function Self:init()
   local button, button_text
 
   self.timedmanager = require 'engine.TimedManager':new()
-  self.gamestate = require 'applications.dummy.Gamestate':new{main=self}
+  self.gamestate = require 'applications.dummy.Savemanager':new{main=self}
   
   self.currency1 = 0
   self.mails = require 'applications.dummy.Mails':new{main=self}
+  self.notes = require 'applications.dummy.Notes':new{main=self}
   self.terminal = require 'applications.dummy.Terminal':new{main=self}
   
 
@@ -27,7 +28,8 @@ function Self:init()
 
 
 
-  
+  local FONT_DEFAULT = love.graphics.newFont("submodules/lua-projects-private/font/spacecargo.ttf", 10)--love.graphics.newFont("submodules/lua-projects-private/font/Weiholmir Standard/Weiholmir_regular.ttf", 7*2)
+  love.graphics.setFont(FONT_DEFAULT)
 
 
 
@@ -40,7 +42,19 @@ function Self:init()
 end
 
 function Self:draw()
-  table.sort(self.contents.content_list, function(a, b) return (a.z) < (b.z) end)
+  table.sort(self.contents.content_list, function(a, b)
+    if a.alwaysOnTop and not b.alwaysOnTop then
+        return false
+    elseif not a.alwaysOnTop and b.alwaysOnTop then
+        return true
+    else
+        return a.z < b.z
+    end
+  end)
+  --sort self.content.content_list by z and ensure that if any node has the alwaysOnTop flag set it will be first
+  
+
+
   love.graphics.setBackgroundColor(32/255, 140/255, 112/255)
   self.contents:callall("draw")
   local x_dist = 32
@@ -54,10 +68,21 @@ function Self:draw()
 end
 
 function Self:update(dt)
-  table.sort(self.contents.content_list, function(a, b) return (a.z) > (b.z) end)
+  table.sort(self.contents.content_list, function(a, b)
+    if a.alwaysOnTop and not b.alwaysOnTop then
+        return false
+    elseif not a.alwaysOnTop and b.alwaysOnTop then
+        return true
+    else
+        return a.z < b.z
+    end
+  end)
+
+  
   self.contents:callall("update", dt)
   self.timedmanager:update(dt)
-  self.gamestate:update(dt)
+  --self.gamestate:update(dt)
+  self.mails:update(dt)
   --self.text_points:setText("Points: " .. self.points)
 end
 

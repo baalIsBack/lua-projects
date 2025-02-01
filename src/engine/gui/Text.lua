@@ -1,5 +1,5 @@
 local Super = require 'engine.gui.Node'
-local Self = Super:clone("Button")
+local Self = Super:clone("Text")
 
 local FONT_DEFAULT = love.graphics.newFont("submodules/lua-projects-private/font/spacecargo.ttf", 10)--love.graphics.newFont("submodules/lua-projects-private/font/Weiholmir Standard/Weiholmir_regular.ttf", 7*2)
 

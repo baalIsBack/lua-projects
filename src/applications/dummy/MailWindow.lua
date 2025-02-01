@@ -65,10 +65,11 @@ function Self:init(args)
     w = ((self.w/2 - 16*3/2 - 16*3/2) - (-self.w/2 + self.mail_list_width/2 +self.mail_list_width/2)),
     h = 16,
     visibleAndActive = false,
+    accepting_input = false,
   }
   self.reply_field.callbacks:register("onSubmit", function(selff, input)
     if self.openmail then
-      self.main.gamestate:replyMail(self.openmail, input)
+      self.main.mails:replyMail(self.openmail, input)
       selff.input = input
     end
   end)
@@ -79,7 +80,10 @@ function Self:init(args)
   self.reply_button:insert(text)
   self.reply_button.callbacks:register("onClicked", function()
     if self.openmail then
+      local input = self.openmail:getExpectedReply()
+      self.reply_field.input = input
       self.reply_field:submit()
+      self.openmail.reply = input
     end
   end)
   self:insert(self.reply_button)
@@ -112,7 +116,7 @@ function Self:addMailToList(mail)
   b.callbacks:register("onClicked", function(b)
     self.openmail = mail
     self.scroll_y = 0
-    self.main.gamestate:readMail(mail)
+    self.main.mails:readMail(mail)
     
     unread_marker.text = ""
     self.reply_field.input = mail.reply or ""
@@ -123,23 +127,40 @@ function Self:addMailToList(mail)
     else
       b:setColor(1, 1, 1)
     end
+
+    if mail.read then
+      if self.main.mails:canSolve(mail) then
+        if not mail.reply then
+          unread_marker.text = "?"
+          unread_marker.color = {0.3, 1, 0.0}
+        else
+          unread_marker.text = ""
+          unread_marker.color = {0, 0, 0}
+        end
+      else
+        unread_marker.text = ""
+        unread_marker.color = {0, 0, 0}
+      end
+    else
+      unread_marker.text = "!"
+      unread_marker.color = {1, 0, 0}
+    end
     
     self.reply_button.visibleAndActive = self.openmail
     self.reply_field.visibleAndActive = self.openmail
     if self.openmail then
-      local id = self.openmail and self.openmail.id or -1
-      
-      self.reply_button.enabled = not self.openmail.reply
-      self.reply_field.enabled = not self.openmail.reply
+      local hasNote = self.main.notes:checkNote(self.openmail:getExpectedReply())
+      self.reply_button.enabled = not self.openmail.reply and hasNote
+      self.reply_field.enabled = not self.openmail.reply and hasNote
       
     end
   end)
-  local sender = require 'engine.gui.Text':new{x = -37, y = -8, text = " "..GET_MAIL(mail, "sender"), color={0.4,0.4,0.4}}
+  local sender = require 'engine.gui.Text':new{x = -37, y = -8, text = " "..mail:getSender(), color={0.4,0.4,0.4}}
   sender:setAlignment("left")
   b:insert(sender)
   unread_marker:setAlignment("left")
   b:insert(unread_marker)
-  local subject = require 'engine.gui.Text':new{x = -37, y = 6, text = GET_MAIL(mail, "subject")}
+  local subject = require 'engine.gui.Text':new{x = -37, y = 6, text = mail:getSubject()}
   subject:setAlignment("left")
   b:insert(subject)
 end
@@ -171,12 +192,12 @@ function Self:draw()
     love.graphics.setStencilTest("greater", 0)
 
     love.graphics.translate(0, self.scroll_y)
-    love.graphics.print(GET_MAIL(self.openmail, "sender"), -self.w/2 + self.mail_list_width + 2, -self.h/2 + 6+16)
+    love.graphics.print(self.openmail:getSender(), -self.w/2 + self.mail_list_width + 2, -self.h/2 + 6+16)
     
     love.graphics.setColor(0,0,0)
-    love.graphics.print(GET_MAIL(self.openmail, "subject"), -self.w/2 + self.mail_list_width + 2, -self.h/2 + 24+16)
+    love.graphics.print(self.openmail:getSubject(), -self.w/2 + self.mail_list_width + 2, -self.h/2 + 24+16)
     
-    local width, wrappedText = FONT_DEFAULT:getWrap(GET_MAIL(self.openmail, "content"), self.w - self.mail_list_width - 4 - self.scrollbar.w/2)
+    local width, wrappedText = FONT_DEFAULT:getWrap(self.openmail:getContent(), self.w - self.mail_list_width - 4 - self.scrollbar.w/2)
     --love.graphics.print(self.openmail.content, -self.w/2 + self.mail_list_width + 2, -self.h/2 + 40)
     for i, v in ipairs(wrappedText) do
       love.graphics.print(v, -self.w/2 + self.mail_list_width + 2, -self.h/2 + 40 + i*10+16)

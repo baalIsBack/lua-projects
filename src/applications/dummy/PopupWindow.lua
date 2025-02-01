@@ -1,16 +1,19 @@
 local Super = require 'engine.gui.Window'
-local Self = Super:clone("DummyWindow")
+local Self = Super:clone("PopupWindow")
 
 local FONT_DEFAULT = love.graphics.newFont("submodules/lua-projects-private/font/spacecargo.ttf", 10)--love.graphics.newFont("submodules/lua-projects-private/font/Weiholmir Standard/Weiholmir_regular.ttf", 7*2)
 
 function Self:init(args)
-  args.w = 320
-  args.h = 240
-  args.title = "Dummy"
+  args.w = 32 * 2
+  args.h = 24 * 2
+  args.title = args.title or ""
   Super.init(self, args)
   
+  self.bar.color = {255/255, 30/255, 15/255}
 
-
+  
+  self.text = require 'engine.gui.Text':new{text = "WARNING", color={0,0,0}, x = 0, y = 0}
+  self:insert(self.text)
   
 
   return self

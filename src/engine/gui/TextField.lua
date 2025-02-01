@@ -14,7 +14,10 @@ function Self:init(args)
   self.cursor_position = 1
   self.cursor_timer = 0
   self.cursor_state_visible = true
-  self.accepting_input = true
+  self.accepting_input = args.accepting_input
+  if self.accepting_input == nil then
+    self.accepting_input = true
+  end
 
   self.callbacks:declare("onSubmit")
 
@@ -69,7 +72,7 @@ function Self:init(args)
     end
 
     self.cursor_timer = self.cursor_timer + dt
-    if self.cursor_timer > 0.5 then
+    if self.cursor_timer > 0.5 and self.accepting_input then
       self.cursor_timer = 0
       self.cursor_state_visible = not self.cursor_state_visible
     end

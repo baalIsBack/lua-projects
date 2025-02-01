@@ -1,10 +1,9 @@
 local Super = require 'engine.gui.Node'
-local Self = Super:clone("Bar")
+local Self = Super:clone("ProgressBar")
 
 function Self:init(args)
   Super.init(self, args)
 
-  self.color = args.color or {0/255, 0/255, 129/255}
   self.title = args.title or ""
   self.w = args.w
   self.h = 16
@@ -12,11 +11,14 @@ function Self:init(args)
   self.wasDown = false
   self.isDown = false
 
+  
+  self.progress = 0
+
   self.legalDrag = false
 
   --add small button 14 x 14 at the right end
   self.callbacks:register("onDragBegin", function(selff, x, y)
-    if self:getTopNode("Window"):isTopWindow(x, y) and self:isLeaf(x, y) then
+    if self:isLeaf(x, y) then
       self.legalDrag = true
     end
   end)
@@ -52,21 +54,41 @@ function Self:draw()
   love.graphics.translate(self.x, self.y)
 
   
-
+ 
   love.graphics.setLineWidth(2)
 
-  love.graphics.setColor(self.color)
+  --love.graphics.setColor(1/255, 0/255, 129/255)
+  love.graphics.setColor(192/255, 192/255, 192/255)
   love.graphics.rectangle("fill", math.floor( -(self.w/2) ), math.floor( -(self.h/2) ), self.w, self.h)
   --draw border like it is shaded
   love.graphics.setColor(128/255, 128/255, 128/255)
   love.graphics.rectangle("line", math.floor( -(self.w/2) ), math.floor( -(self.h/2) ), self.w, self.h)
   love.graphics.line(-self.w/2, self.h/2, self.w/2, self.h/2)
+
+  love.graphics.setColor(128/255, 128/255, 128/255)
+  love.graphics.rectangle("fill", math.floor( -(self.w/2)+2 ), math.floor( -(self.h/2)+2 ), (self.w-4)*1, self.h-4)
+  
+  love.graphics.setColor(1/255, 0/255, 129/255)
+  love.graphics.rectangle("fill", math.floor( -(self.w/2)+2 ), math.floor( -(self.h/2)+2 ), (self.w-4)*self.progress, self.h-4)
+  
+  love.graphics.setColor(1, 1, 1)
+  local font = love.graphics.getFont()
+  local str = string.format("%.0f%%", self.progress*100)
+  love.graphics.print(str, -font:getWidth(str)/2, -font:getHeight(str)/2)
   
   self.contents:callall("draw")
 
   love.graphics.pop()
 end
 
-
+function Self:setProgress(value)
+  self.progress = value
+  if self.progress < 0 then
+    self.progress = 0
+  end
+  if self.progress > 1 then
+    self.progress = 1
+  end  
+end
 
 return Self

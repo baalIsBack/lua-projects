@@ -1,7 +1,7 @@
 local Super = require 'engine.Prototype'
 local Self = Super:clone("Gamestate")
 local binser = require 'lib.binser'
-require 'src.applications.dummy.Mail'
+--require 'src.applications.dummy.Mail'
 
 function Self:init(args)
   self.hasCallbacks = true
@@ -21,8 +21,14 @@ function Self:resetValues()
   self.flags = {}
   self.mails = {}
   self.apps_installed = {}
+  self.notes = {}
   self.main.timedmanager.time = 0
 
+  self.mails_solved = {}
+
+  --unsaved
+  self.notesMap = {}
+  self.mailsMap = {}
 end
 
 function Self:emit(event, value)
@@ -41,23 +47,30 @@ local function tableToString(tbl, indent, visited)
   visited = visited or {}
   indent = indent or 0
   if visited[tbl] then
-    return "<circular reference>"
+    error_here()
+    return "?"--"<circular reference>"
   end
   visited[tbl] = true
 
   local indentStr = string.rep("  ", indent)
   local result = "{\n"
 
-  for key, value in pairs(tbl) do
-      local formattedKey = type(key) == "string" and string.format("[\"%s\"]", key) or string.format("[%s]", tostring(key))
+  
 
-      if type(value) == "table" then
-          result = result .. string.format("%s%s = %s,\n", indentStr .. "  ", formattedKey, tableToString(value, indent + 1, visited))
-      elseif type(value) == "string" then
-          result = result .. string.format("%s%s = \"%s\",\n", indentStr .. "  ", formattedKey, value)
-      else
-          result = result .. string.format("%s%s = %s,\n", indentStr .. "  ", formattedKey, tostring(value))
+  for key, value in pairs(tbl) do
+
+    local formattedKey = type(key) == "string" and string.format("[\"%s\"]", key) or string.format("[%s]", tostring(key))
+    if type(value) == "table" then
+      local t = value
+      if value.hasSerialization then
+        t = value:serialize()
       end
+      result = result .. string.format("%s%s = %s,\n", indentStr .. "  ", formattedKey, tableToString(t, indent + 1, visited))
+    elseif type(value) == "string" then
+      result = result .. string.format("%s%s = \"%s\",\n", indentStr .. "  ", formattedKey, value)
+    else
+      result = result .. string.format("%s%s = %s,\n", indentStr .. "  ", formattedKey, tostring(value))
+    end
   end
 
   result = result .. indentStr .. "}"
@@ -102,19 +115,35 @@ end
 
 
 function Self:addMailFromID(mail_prototype_id)
-  local mail = Mail(mail_prototype_id, self:getID(), false, false)
+  local mail = require 'applications.dummy.Mail':new({main=self.main})
+  mail.prototype_id = mail_prototype_id
+  mail.id = self:getID()
+  mail.read = false
+  mail.reply = false
+
   table.insert(self.mails, mail)
-  self.main.mails:makeMail(mail)
+  self.main.mails:addMail(mail)
   
   return mail
 end
 
+function Self:addNote(note)
+  if self.main.notes:isMemorable(note) then
+    table.insert(self.notes, note)
+    self.notesMap[note] = note
+  end
+  self.main.notes:addNote(note)
+  --self.notes[#self.notes+1] = note
+end
+
 function Self:addMail(mail)
   table.insert(self.mails, mail)
-  self.main.mails:makeMail(mail)
+  self.main.mails:addMail(mail)
+  self.mailsMap[mail.id] = mail
   
   return mail
 end
+
 
 function Self:installApp(app_id)
   if CONTAINS(self.apps_installed, app_id) then
@@ -157,8 +186,11 @@ function Self:save()
   dummy.id = self.id
   dummy.flags = self.flags
   dummy.mails = self.mails
+  show(self.mails)
+  print("DONE", self.mails.type_name)
   dummy.apps_installed = self.apps_installed
   dummy.time = self.main.timedmanager.time
+  dummy.notes = self.notes
   saveTableToFile("save.dat", dummy)
 end
 
@@ -179,11 +211,14 @@ function Self:load()
   self.flags = master.flags or self.flags
   self.main.timedmanager.time = master.time or self.main.timedmanager.time
   
-  for index, value in ipairs(master.apps_installed) do
+  for index, value in ipairs(master.notes or {}) do
+    self:addNote(value)
+  end
+  for index, value in ipairs(master.apps_installed or {}) do
     self:installApp(value)
   end
-  for index, value in ipairs(master.mails) do
-    self:addMail(Load_Mail(value))
+  for index, value in ipairs(master.mails or {}) do
+    self:addMail(require 'applications.dummy.Mail':new({main=self.main}):deserialize(value))-- Load_Mail(value))
   end
   return firstTime
 end

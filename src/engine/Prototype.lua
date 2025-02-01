@@ -56,6 +56,9 @@ function Prototype:init_modules(...)
   if self.hasJobs then
     self.jobs = require 'engine.modules.Jobmanager':new()
   end
+  if self.hasSerialization then
+    self.serialization = require 'engine.modules.Serializationmanager':new()
+  end
 	return self
 end
 

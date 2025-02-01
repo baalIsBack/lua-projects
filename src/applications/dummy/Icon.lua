@@ -1,27 +1,29 @@
 local Super = require 'engine.gui.Button'
-local Self = Super:clone("DesktopIcon")
+local Self = Super:clone("Icon")
 
 function Self:init(args)
   Super.init(self, args)
 
-  self.img = args.img or love.graphics.newImage("submodules/lua-projects-private/gfx/win_icons/w98_directory_closed.png")
+  self.pos_y = args.pos_y or 0
+  self.pos_x = args.pos_x or 0
+
   self.img = args.img or love.graphics.newImage("submodules/lua-projects-private/gfx/win_icons/w98_directory_closed.png")
   
-  self.name = args.name or "File"
+  self.name = args.name or ""
   
   self.z = -1
-  self.targetApp = args.targetApp
-  self.callbacks:register("onClicked", function(selff)
-    if not self.targetApp then
-      return
-    end
-    self.targetApp:activate()
-    self.targetApp:bringToFront()
-    self.targetApp:setFocus()
-  end)
+  
 
-  self:insert( require 'engine.gui.Image':new{img = self.img, x = 0, y = 0})
-  self:insert( require 'engine.gui.Text':new{text = self.name, color={1,1,1}, x = 0, y = 25})
+  self.image = require 'engine.gui.Image':new{img = self.img, x = 0, y = 0}
+  
+  self.text = require 'engine.gui.Text':new{text = self.name, color={1,1,1}, x = 0, y = 25}
+  local max_length_before_shortening = 8
+  if string.len(self.name) > max_length_before_shortening then
+    self.text:setText(string.sub(self.name, 1, max_length_before_shortening-3).."...")
+  end
+
+  self:insert( self.image )
+  self:insert( self.text )
   
 	return self
 end

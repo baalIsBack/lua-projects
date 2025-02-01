@@ -59,45 +59,35 @@ function Self:init(args)
   self.button_down:insert(arrow_down)
 
 
-  self.reply_field = require 'engine.gui.TextField':new{
-    x = -16 + ((self.w/2 - 16*3/2 - 16*3/2) + (-self.w/2 + self.mail_list_width/2 +self.mail_list_width/2)),
+  self.progressbar = require 'engine.gui.ProgressBar':new{
+    x = -16 + ((self.w/2 - 16*3/2) + (-self.w/2 + self.mail_list_width/2 +self.mail_list_width/2)),
     y = self.h/2 - 8,
-    w = ((self.w/2 - 16*3/2 - 16*3/2) - (-self.w/2 + self.mail_list_width/2 +self.mail_list_width/2)),
+    w = ((self.w/2) - (-self.w/2 + self.mail_list_width/2 +self.mail_list_width/2)),
     h = 16,
-    visibleAndActive = false,
   }
-  self.reply_field.callbacks:register("onSubmit", function(selff, input)
-    if self.openmail then
-      self.main.gamestate:replyMail(self.openmail, input)
-      selff.input = input
-    end
+  self:insert(self.progressbar)
+  self.progressbar.callbacks:register("update", function(selff, dt)
+    self.progressbar:setProgress(self.openmail.progress or 0)
   end)
-  self:insert(self.reply_field)
 
-  self.reply_button = require 'engine.gui.Button':new{x = self.w/2 - 16*3/2, y = self.h/2 - 8 , w=16*3, h=16, visibleAndActive = false,}
+  self.reply_button = require 'engine.gui.Button':new{x = self.w/2 - 16*3/2, y = self.h/2 - 8 -16, w=16*3, h=16, visibleAndActive = false,}
   local text = require 'engine.gui.Text':new{x = 0, y = 0, text = "Reply"}
   self.reply_button:insert(text)
   self.reply_button.callbacks:register("onClicked", function()
     if self.openmail then
-      self.reply_field:submit()
+      if self.openmail.progress < 1 then
+        self.openmail.progress = self.openmail.progress + 0.1
+        if self.openmail.progress >= 0.9999999 then
+          self.openmail.progress = 1
+          self.reply_button.enabled = false
+          self.main.mails:replyMail(self.openmail, "Thank you for your help!")
+        end
+      end
     end
   end)
   self:insert(self.reply_button)
 
-  self.scrollbar = require 'engine.gui.Scrollbar':new{x = self.w/2 - 8, y = 0, h = self.h-32}
-  self:insert(self.scrollbar)
-  self.scrollbar.visibleAndActive = (self.openmail)
-  self.scrollbar.callbacks:register("onUp", function()
-    self.scroll_y = self.scroll_y + (10)
-  end)
-  self.scrollbar.callbacks:register("onDown", function()
-    self.scroll_y = self.scroll_y - (10)
-  end)
-
-  self.callbacks:register("update", function(selff, dt)
-    self.scrollbar.visibleAndActive = (self.openmail)
-  end)
-
+  
   return self
 end
 
@@ -112,10 +102,9 @@ function Self:addMailToList(mail)
   b.callbacks:register("onClicked", function(b)
     self.openmail = mail
     self.scroll_y = 0
-    self.main.gamestate:readMail(mail)
+    self.main.mails:readMail(mail)
     
     unread_marker.text = ""
-    self.reply_field.input = mail.reply or ""
   end)
   b.callbacks:register("update", function(b)
     if self.openmail == mail then
@@ -123,23 +112,28 @@ function Self:addMailToList(mail)
     else
       b:setColor(1, 1, 1)
     end
+
+    if mail.progress >= 1 then
+      unread_marker.text = "v"
+      unread_marker:setColor(0.6, 0.9, 0.75)
+    end
     
     self.reply_button.visibleAndActive = self.openmail
-    self.reply_field.visibleAndActive = self.openmail
+    self.progressbar.visibleAndActive = self.openmail
     if self.openmail then
       local id = self.openmail and self.openmail.id or -1
       
-      self.reply_button.enabled = not self.openmail.reply
-      self.reply_field.enabled = not self.openmail.reply
+      self.reply_button.enabled = not (self.openmail.progress >= 1)
+      self.progressbar.enabled = not self.openmail.reply
       
     end
   end)
-  local sender = require 'engine.gui.Text':new{x = -37, y = -8, text = " "..GET_MAIL(mail, "sender"), color={0.4,0.4,0.4}}
+  local sender = require 'engine.gui.Text':new{x = -37, y = -8, text = " "..mail:getSender(), color={0.4,0.4,0.4}}
   sender:setAlignment("left")
   b:insert(sender)
   unread_marker:setAlignment("left")
   b:insert(unread_marker)
-  local subject = require 'engine.gui.Text':new{x = -37, y = 6, text = GET_MAIL(mail, "subject")}
+  local subject = require 'engine.gui.Text':new{x = -37, y = 6, text = mail:getSubject()}
   subject:setAlignment("left")
   b:insert(subject)
 end
@@ -171,12 +165,12 @@ function Self:draw()
     love.graphics.setStencilTest("greater", 0)
 
     love.graphics.translate(0, self.scroll_y)
-    love.graphics.print(GET_MAIL(self.openmail, "sender"), -self.w/2 + self.mail_list_width + 2, -self.h/2 + 6+16)
+    love.graphics.print(self.openmail:getSender(), -self.w/2 + self.mail_list_width + 2, -self.h/2 + 6+16)
     
     love.graphics.setColor(0,0,0)
-    love.graphics.print(GET_MAIL(self.openmail, "subject"), -self.w/2 + self.mail_list_width + 2, -self.h/2 + 24+16)
+    love.graphics.print(self.openmail:getSubject(), -self.w/2 + self.mail_list_width + 2, -self.h/2 + 24+16)
     
-    local width, wrappedText = FONT_DEFAULT:getWrap(GET_MAIL(self.openmail, "content"), self.w - self.mail_list_width - 4 - self.scrollbar.w/2)
+    local width, wrappedText = FONT_DEFAULT:getWrap(self.openmail:getContent(), self.w - self.mail_list_width - 4)
     --love.graphics.print(self.openmail.content, -self.w/2 + self.mail_list_width + 2, -self.h/2 + 40)
     for i, v in ipairs(wrappedText) do
       love.graphics.print(v, -self.w/2 + self.mail_list_width + 2, -self.h/2 + 40 + i*10+16)

@@ -4,16 +4,65 @@ local Self = Super:clone("DummyWindow")
 local FONT_DEFAULT = love.graphics.newFont("submodules/lua-projects-private/font/spacecargo.ttf", 10)--love.graphics.newFont("submodules/lua-projects-private/font/Weiholmir Standard/Weiholmir_regular.ttf", 7*2)
 
 function Self:init(args)
-  args.w = 320
+  args.w = 320+32+32
   args.h = 240
-  args.title = "Dummy"
+  args.title = "Files"
   Super.init(self, args)
   
-
-
+  self.icon_count_width = 5
+  self.icon_count_height = 3
   
+  self.y_scroll = 0
+
+  self.icons = {}
+
+  for i = 1, 3 do
+    self:addIcon()
+  end
+
+  --add scrollbar
+  self.scrollbar = require 'engine.gui.Scrollbar':new{x = args.w/2 - 8, y = 8, w = 16, h = 240-16, orientation = "vertical"}
+  self:insert(self.scrollbar)
+  self.scrollbar.callbacks:register("onUp", function()
+    self.y_scroll = self.y_scroll - 1
+  end)
+  self.scrollbar.callbacks:register("onDown", function()
+    self.y_scroll = self.y_scroll + 1
+  end)
+  
+  self.callbacks:register("update", function()
+    for i, v in ipairs(self.icons) do
+      if v.pos_y - self.y_scroll < 0 or v.pos_y - self.y_scroll >= self.icon_count_height then
+        v.visibleAndActive = false
+      else
+        v.visibleAndActive = true
+      end
+      v.y = (math.floor((i-1)/self.icon_count_width)-1)*(64) - (self.y_scroll*64)
+    end
+  end)
 
   return self
+end
+
+function Self:addIcon()
+  local pos = #self.icons
+  local pos_x = (pos)%(self.icon_count_width)
+  local pos_y = math.floor((pos)/self.icon_count_width)
+  local icon = require 'applications.dummy.Icon_Folder':new{
+    main = self.main,
+    x = ((pos_x)-2)*(64+4)-16,
+    y = (pos_y-1)*(64+4),
+    pos_x = pos_x,
+    pos_y = pos_y,
+    w = 64,
+    h = 64,
+    targetApp = self.app_calc,
+    name = require'engine.randomnoun'(),
+    --img = love.graphics.newImage("submodules/lua-projects-private/gfx/win_icons/w98_console_prompt.png"),
+  }
+  icon.text.color = {0, 0, 0}
+  self:insert(icon)
+  table.insert(self.icons, icon)
 end
 
 
@@ -34,18 +83,29 @@ function Self:draw()
   love.graphics.rectangle("line", math.floor( -(self.w/2) ), math.floor( -(self.h/2) ), self.w, self.h)
   love.graphics.line(-self.w/2, self.h/2, self.w/2, self.h/2)
 
+  love.graphics.setColor(0/255, 0/255, 0/255)
+  local w, h = 8, 8
+  love.graphics.rectangle("line", math.floor( -(self.w/2) + w/2 ), math.floor( -(self.h/2) + h/2 + 16 ), self.w - w - 16, self.h - h - 16)
+  
+  love.graphics.setColor(255/255, 255/255, 255/255)
+  love.graphics.rectangle("fill", math.floor( -(self.w/2) + w/2 ), math.floor( -(self.h/2) + h/2 + 16 ), self.w - w - 16, self.h - h - 16)
+  
+
   local previous_font = love.graphics.getFont()
   love.graphics.setFont(FONT_DEFAULT)
 
   
   love.graphics.setColor(1, 1, 1)
+  love.graphics.setColor(1, 0, 0)
   
   --love.graphics.print("> ", -self.w/2, -self.h/2 + 16 + 2)
   --
 
   love.graphics.setFont(previous_font)
 
+  
   self.contents:callall("draw")
+
 
   love.graphics.pop()
 end

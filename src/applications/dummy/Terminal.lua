@@ -25,12 +25,39 @@ APP_LIST["ressources"] = {
 }
 
 function Self:init(args)
+  self.hasSerialization = true
   Super.init(self)
   self.main = args.main
   self.window = nil
   self.log = {}
 
+  self.apps_installed = {}
 
+  return self
+end
+
+function Self:serialize()
+  local t = {
+    apps_installed = self.apps_installed
+  }
+  return t
+end
+
+function Self:deserialize(raw)
+  for index, value in ipairs(raw.apps_installed) do
+    self:install(value)
+  end
+  for index, value in ipairs({
+    "calc",
+    "terminal",
+    "mail",
+    "editor",
+    "files",
+    "processes",
+    "ressources"
+  }) do
+    self:install(value)
+  end
   return self
 end
 
@@ -82,7 +109,7 @@ function Self:initiateInstall(app_name)
     self:appendLog("Unknown program: " .. app_name)
     return
   end
-  if CONTAINS(self.main.gamestate.apps_installed, app_name) then
+  if CONTAINS(self.apps_installed, app_name) then
     self:appendLog(app_name .. " is already installed.")
     return
   end
@@ -90,7 +117,7 @@ function Self:initiateInstall(app_name)
   self.window.accepting_input = false
   local installTime = APP_LIST[app_name].installTime * math.random(0.9*10000, 1.4*10000)/10000
   self.main.timedmanager:after(installTime, function()
-    self.main.gamestate:installApp(app_name)
+    self:install(app_name)
     self.window.accepting_input = true
   end)
 end
@@ -100,10 +127,12 @@ function Self:install(app_name)
     self:appendLog("Unknown program: " .. app_name)
     return
   end
-  if not CONTAINS(self.main.gamestate.apps_installed, app_name) then
-    self:appendLog("Unknown program: " .. app_name)
+  if CONTAINS(self.apps_installed, app_name) then
+    self:appendLog("Error during installation.")
     return
   end
+  table.insert(self.apps_installed, app_name)
+  self.main["install_"..app_name](self.main, app_name)
   self:appendLog("Success! " .. app_name .. " was installed.")
 end
 
@@ -112,7 +141,7 @@ function Self:initiateUninstall(app_name)
     self:appendLog("Unknown program: " .. app_name)
     return
   end
-  if not CONTAINS(self.main.gamestate.apps_installed, app_name) then
+  if not CONTAINS(self.apps_installed, app_name) then
     self:appendLog("Unknown program: " .. app_name)
     return
   end
@@ -120,7 +149,7 @@ function Self:initiateUninstall(app_name)
   self.window.accepting_input = false
   local uninstallTime = APP_LIST[app_name].installTime * math.random(0.9*10000, 1.4*10000)/10000
   self.main.timedmanager:after(uninstallTime, function()
-    self.main.gamestate:uninstallApp(app_name)
+    self:uninstall(app_name)
     self.window.accepting_input = true
   end)
 end
@@ -130,10 +159,12 @@ function Self:uninstall(app_name)
     self:appendLog("Unknown program: " .. app_name)
     return
   end
-  if CONTAINS(self.main.gamestate.apps_installed, app_name) then
-    self:appendLog("Unknown program: " .. app_name)
+  if not CONTAINS(self.apps_installed, app_name) then
+    self:appendLog("Error during deinstallation.")
     return
   end
+  REMOVE(self.apps_installed, app_name)
+  self.main["uninstall_"..app_name](self.main, app_name)
   self:appendLog("Success! " .. app_name .. " was uninstalled.")
 end
 

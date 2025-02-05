@@ -6,6 +6,7 @@ function Self:init()
   Super.init(self)
 
   self.points = 0
+  
 
   require 'engine.Screen':setScale(1, 1)
 
@@ -17,23 +18,26 @@ function Self:init()
   self.gamestate = require 'applications.dummy.Savemanager':new{main=self}
   
   self.currency1 = 0
-  self.mails = require 'applications.dummy.Mails':new{main=self}
-  self.notes = require 'applications.dummy.Notes':new{main=self}
-  self.terminal = require 'applications.dummy.Terminal':new{main=self}
+  self.values = require 'src.applications.dummy.system.Values':new{main=self}
+  self.flags = require 'src.applications.dummy.system.Flags':new{main=self}
+  self.files = require 'src.applications.dummy.system.Files':new{main=self}
+  self.mails = require 'src.applications.dummy.system.Mails':new{main=self}
+  self.notes = require 'src.applications.dummy.system.Notes':new{main=self}
+  self.terminal = require 'src.applications.dummy.system.Terminal':new{main=self}
+  self.filemanager = require 'src.applications.dummy.system.FileManager':new{main=self}
   
-
+  
   
   --self:install_calc()
 
 
 
 
-  local FONT_DEFAULT = love.graphics.newFont("submodules/lua-projects-private/font/spacecargo.ttf", 10)--love.graphics.newFont("submodules/lua-projects-private/font/Weiholmir Standard/Weiholmir_regular.ttf", 7*2)
   love.graphics.setFont(FONT_DEFAULT)
 
 
 
-  local osbar = require 'src.applications.dummy.OSBar':new{y = 480-16+4, color = {0/255, 1/255, 129/255}, main=self,}
+  local osbar = require 'src.applications.dummy.gui.elements.OSBar':new{y = 480-16+4, color = {0/255, 1/255, 129/255}, main=self,}
   self:insert(osbar)
   self.gamestate:finalize()
   
@@ -112,7 +116,7 @@ function Self:getMaxRam()
 end
 
 function Self:install_calc()
-  self.app_calc = require 'applications.dummy.CalcWindow':new{
+  self.app_calc = require 'src.applications.dummy.gui.windows.CalcWindow':new{
     main = self,
     x = 300,
     y = 300,
@@ -120,14 +124,15 @@ function Self:install_calc()
   }
   self:insert(self.app_calc)
 
-  local icon = require 'applications.dummy.DesktopIcon':new{
+  local icon = require 'src.applications.dummy.gui.elements.Icon_Desktop':new{
     x = 32 + 0*(64),
     y = 32 + 6*(64),
     w = 64,
     h = 64,
     targetApp = self.app_calc,
     name = "Calc",
-    --img = love.graphics.newImage("submodules/lua-projects-private/gfx/win_icons/w98_console_prompt.png"),
+    img = love.graphics.newImage("submodules/lua-projects-private/gfx/win_icons_png/w98_calendar-1.png"),
+    --img = love.graphics.newImage("submodules/lua-projects-private/gfx/win_icons_png/w98_console_prompt.png"),
   }
   self:insert(icon)
   self.app_calc.desktop_icon = icon
@@ -140,7 +145,7 @@ function Self:uninstall_calc()
 end
 
 function Self:install_mail()
-  self.app_mail = require 'applications.dummy.MailWindow':new{
+  self.app_mail = require 'src.applications.dummy.gui.windows.MailWindow':new{
     main = self,
     x = 200,
     y = 200,
@@ -149,13 +154,13 @@ function Self:install_mail()
   }
   self:insert(self.app_mail)
 
-  local icon = require 'applications.dummy.DesktopIcon':new{
+  local icon = require 'src.applications.dummy.gui.elements.Icon_Desktop':new{
     x = 32 + 0*(64),
     y = 32 + 0*(64),
     w = 64, h = 64,
     targetApp = self.app_mail,
     name = "Mail",
-    img = love.graphics.newImage("submodules/lua-projects-private/gfx/win_icons/w98_computer_explorer.png"),
+    img = love.graphics.newImage("submodules/lua-projects-private/gfx/win_icons_png/w98_computer_explorer.png"),
   }
   self:insert(icon)
   self.app_mail.desktop_icon = icon
@@ -168,7 +173,7 @@ function Self:uninstall_mail()
 end
 
 function Self:install_terminal()
-  self.app_terminal = require 'applications.dummy.TerminalWindow':new{
+  self.app_terminal = require 'src.applications.dummy.gui.windows.TerminalWindow':new{
     main = self,
     terminal = self.terminal,
     x = 250,
@@ -179,14 +184,14 @@ function Self:install_terminal()
   
   self.terminal.window = self.app_terminal
 
-  local icon = require 'applications.dummy.DesktopIcon':new{
+  local icon = require 'src.applications.dummy.gui.elements.Icon_Desktop':new{
     x = 32 + 0*(64),
     y = 32 + 1*(64),
     w = 64,
     h = 64,
     targetApp = self.app_terminal,
     name = "Terminal",
-    img = love.graphics.newImage("submodules/lua-projects-private/gfx/win_icons/w98_console_prompt.png"),
+    img = love.graphics.newImage("submodules/lua-projects-private/gfx/win_icons_png/w98_console_prompt.png"),
   }
   self:insert(icon)
   self.app_terminal.desktop_icon = icon
@@ -200,7 +205,7 @@ end
 
 
 function Self:install_editor()
-  self.app_editor = require 'applications.dummy.TODO_EditorWindow':new{
+  self.app_editor = require 'src.applications.dummy.gui.windows.EditorWindow':new{
     main = self,
     x = 250,
     y = 250,
@@ -208,14 +213,14 @@ function Self:install_editor()
   }
   self:insert(self.app_editor)
 
-  local icon = require 'applications.dummy.DesktopIcon':new{
+  local icon = require 'src.applications.dummy.gui.elements.Icon_Desktop':new{
     x = 32 + 0*(64),
     y = 32 + 2*(64),
     w = 64,
     h = 64,
     targetApp = self.app_editor,
     name = "Editor",
-    img = love.graphics.newImage("submodules/lua-projects-private/gfx/win_icons/w98_computer_explorer.png"),
+    img = love.graphics.newImage("submodules/lua-projects-private/gfx/win_icons_png/w98_notepad-2.png"),
   }
   self:insert(icon)
   self.app_editor.desktop_icon = icon
@@ -228,7 +233,7 @@ function Self:uninstall_editor()
 end
 
 function Self:install_files()
-  self.app_files = require 'applications.dummy.TODO_FileManagerWindow':new{
+  self.app_files = require 'src.applications.dummy.gui.windows.FileManagerWindow':new{
     main = self,
     x = 250,
     y = 250,
@@ -236,14 +241,14 @@ function Self:install_files()
   }
   self:insert(self.app_files)
 
-  local icon = require 'applications.dummy.DesktopIcon':new{
+  local icon = require 'src.applications.dummy.gui.elements.Icon_Desktop':new{
     x = 32 + 0*(64),
     y = 32 + 3*(64),
     w = 64,
     h = 64,
     targetApp = self.app_files,
     name = "Files",
-    img = love.graphics.newImage("submodules/lua-projects-private/gfx/win_icons/w98_computer_explorer.png"),
+    img = love.graphics.newImage("submodules/lua-projects-private/gfx/win_icons_png/w2k_folder_open-4.png"),
   }
   self:insert(icon)
   self.app_files.desktop_icon = icon
@@ -256,7 +261,7 @@ function Self:uninstall_files()
 end
 
 function Self:install_processes()
-  self.app_processes = require 'applications.dummy.TODO_ProcessesWindow':new{
+  self.app_processes = require 'src.applications.dummy.gui.windows.TODO_ProcessesWindow':new{
     main = self,
     x = 250,
     y = 250,
@@ -264,14 +269,14 @@ function Self:install_processes()
   }
   self:insert(self.app_processes)
 
-  local icon = require 'applications.dummy.DesktopIcon':new{
+  local icon = require 'src.applications.dummy.gui.elements.Icon_Desktop':new{
     x = 32 + 0*(64),--9
     y = 32 + 4*(64),--6
     w = 64,
     h = 64,
     targetApp = self.app_processes,
     name = "Processes",
-    img = love.graphics.newImage("submodules/lua-projects-private/gfx/win_icons/w98_computer_explorer.png"),
+    img = love.graphics.newImage("submodules/lua-projects-private/gfx/win_icons_png/w98_computer_taskmgr-0.png"),
   }
   self:insert(icon)
   self.app_processes.desktop_icon = icon
@@ -284,7 +289,7 @@ function Self:uninstall_processes()
 end
 
 function Self:install_ressources()
-  self.app_ressources = require 'applications.dummy.TODO_ProcessesWindow':new{
+  self.app_ressources = require 'src.applications.dummy.gui.windows.TODO_ProcessesWindow':new{
     main = self,
     x = 250,
     y = 250,
@@ -292,14 +297,14 @@ function Self:install_ressources()
   }
   self:insert(self.app_ressources)
 
-  local icon = require 'applications.dummy.DesktopIcon':new{
+  local icon = require 'src.applications.dummy.gui.elements.Icon_Desktop':new{
     x = 32 + 0*(64),--9
     y = 32 + 5*(64),--6
     w = 64,
     h = 64,
     targetApp = self.app_ressources,
     name = "Ressources",
-    img = love.graphics.newImage("submodules/lua-projects-private/gfx/win_icons/w98_computer_explorer.png"),
+    img = love.graphics.newImage("submodules/lua-projects-private/gfx/win_icons_png/w98_hardware-4.png"),--w98_chip_ramdrive-2.png
   }
   self:insert(icon)
   self.app_ressources.desktop_icon = icon

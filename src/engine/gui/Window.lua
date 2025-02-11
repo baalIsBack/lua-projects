@@ -3,7 +3,8 @@ local Self = Super:clone("Window")
 
 function Self:init(args)
   Super.init(self, args)
-
+  
+  self.alwaysOnTop = args.alwaysOnTop
   self.w = args.w
   self.h = args.h
   self.z = args.z or MAX_Z
@@ -17,7 +18,7 @@ function Self:init(args)
   self.bar = require 'engine.gui.Bar':new{x = 0, y = -self.h/2 - 8+16 , w = self.w, h = 32, title = args.title}
   self:insert(self.bar)
   self.bar.close_button = require 'engine.gui.Button':new{x = self.bar.w/2 - 8, y = 0, w = 10, h = 10}
-  self.bar.close_button:insert(require 'engine.gui.Text':new{text = "x", color={0,0,0}, x = 1, y = -1})
+  self.bar.close_button:insert(require 'engine.gui.Text':new{text = "x", color={0,0,0}, x = 1, y = 0, font=FONTS["dialog"]})
   self.bar.close_button.callbacks:register("onClicked", function(x, y)
     self.visibleAndActive = false
     self:setFocus()
@@ -30,6 +31,9 @@ function Self:init(args)
       --self:setFocus()
     end
   end)
+
+  
+
 
 	return self
 end
@@ -69,8 +73,12 @@ end
 
 function Self:isTopWindow(x, y)
   for index, window in ipairs(self.main.contents.content_list) do
-    if window ~= self and window.visibleAndActive and window:hasPointCollision(x, y) and window.z >= self.z then
-      return false
+    if window.isWindow then
+      if window ~= self and window.visibleAndActive and window:hasPointCollision(x, y) then
+        if (window.z >= self.z and self.alwaysOnTop == window.alwaysOnTop) or (window.alwaysOnTop and not self.alwaysOnTop) then
+          return false
+        end
+      end
     end
   end
   return true

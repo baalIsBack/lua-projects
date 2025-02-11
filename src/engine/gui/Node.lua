@@ -4,10 +4,10 @@ local Self = Super:clone("Node")
 Self.FOCUS_LIST = {}
 
 function Self:init(args)
+  self.main = args.main
   self.hasCallbacks = true
   self.hasContents = true
   Super.init(self)
-  self.main = args.main
 
   self.callbacks:declare("onInsert")
   self.callbacks:declare("onDraw")
@@ -103,7 +103,9 @@ function Self:checkCallbacks()
   local wasStillDragging = self.isStillDragging
   local deltaColliding = isMouseColliding ~= self.isStillColliding
   local deltaClicking = isMouseDown ~= self.wasMouseDown
-  local isLeaf = self:isLeaf(mx, my) and self:getTopNode("Window"):isTopNode(mx, my)
+  local isTopNode = self:isTopNode(mx, my)
+  local isWindowTopNode = self:getTopNode("Window").isWindow and self:getTopNode("Window"):isTopWindow(mx, my)
+  local isLeaf = self:isLeaf(mx, my) and (isTopNode or isWindowTopNode)
   self.isStillColliding = self.isStillColliding and isMouseColliding and isLeaf
   self.isStillClicking = self.isStillClicking and isMouseDown
   self.isStillDragging = self.isStillDragging and isMouseDown
@@ -158,8 +160,10 @@ function Self:isTopNode(x, y)
     return false
   end
   for index, otherNode in ipairs(self.main.contents.content_list) do
-    if otherNode ~= self and otherNode.visibleAndActive and otherNode:hasPointCollision(x, y) and otherNode.z >= self.z then
-      return false
+    if otherNode ~= self and otherNode.visibleAndActive and otherNode:hasPointCollision(x, y) then
+      if (otherNode.z >= self.z and self.alwaysOnTop == otherNode.alwaysOnTop) or (otherNode.alwaysOnTop and not self.alwaysOnTop) then
+        return false
+      end
     end
   end
   return true
@@ -231,6 +235,9 @@ function Self:update(dt)
   end
   self.callbacks:call("update", {self, dt})
   self.contents:callall("update", dt)
+  if not self.enabled then
+    return
+  end
   self:checkCallbacks()
 end
 
@@ -269,7 +276,7 @@ function Self:hasPointCollision(x, y)
 end
 
 function Self:isLeaf(x, y)
-  return self:hasPointCollision(x, y) and (not self.contents:all("isLeaf", x, y) or self.contents:isEmpty())
+  return self:hasPointCollision(x, y) and (not self.contents:any("isLeaf", x, y) or self.contents:isEmpty())
 end
 
 function Self:bringToFront()

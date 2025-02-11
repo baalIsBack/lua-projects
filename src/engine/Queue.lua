@@ -1,4 +1,4 @@
-local Stack = require 'src.engine.Stack'
+local Stack = require 'engine.Stack'
 local Queue = Stack:clone("Queue")
 
 --- Queue implementation using Stack with modified index

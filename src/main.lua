@@ -3,6 +3,8 @@
 --ähnlich zu buckshot roulette
 --1-bit mit braungrauer farbe
 
+--buch mit "Die Leere" aber weitergeschrieben in ki zukunft cube
+
 
 if arg[2] == "debug" or os.getenv("LOCAL_LUA_DEBUGGER_VSCODE") == "1" then
 	require 'lldebugger'.start()
@@ -29,12 +31,8 @@ local scenemanager
 --Animation = require 'engine.Animation'
 
 
-
-
 function love.load()
-  math.randomseed(os.time())
-  FONT = love.graphics.newFont(16)--"Hyperdrift-private/assets/font/Weiholmir Standard/Weiholmir_regular.ttf"
-  FONT:setFilter("nearest", "nearest")
+  
 	--UI_FONT = love.graphics.newFont("Hyperdrift-private/assets/font/spacecargo.ttf", math.floor(2 * 5))
   --UI_FONT = love.graphics.newFont(math.floor(2 * 5))
 
@@ -42,8 +40,9 @@ function love.load()
 	--love.graphics.setFont(FONT)
 	scenemanager = require 'engine.Scenemanager':new()
 
-  scenemanager:register("Main", require'applications.dummy.Main':new())
-  scenemanager:switch("Main")
+  --scenemanager:register("Main", require'applications.dummy.Main':new())
+  scenemanager:register("Main_Hex", require'applications.hex.Main':new())
+  scenemanager:switch("Main_Hex")
 end
 
 function love.update(dt)

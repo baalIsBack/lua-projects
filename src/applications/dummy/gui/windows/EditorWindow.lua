@@ -1,29 +1,29 @@
-local Super = require 'engine.gui.Node'
-local Self = Super:clone("TextField")
+local Super = require 'engine.gui.Window'
+local Self = Super:clone("DummyWindow")
+
 
 function Self:init(args)
-  args.color = args.color or {205/255, 205/255, 192/255}
+  args.w = 320/2
+  args.h = 240
+  args.title = "Editor"
   Super.init(self, args)
-  
+
+  self.input = ""
+  self.accepting_input = true
+  self.cursor_position = 1
+  self.cursor_timer = 0
+  self.cursor_state_visible = true
+  self.maximum_visible_lines = 17
+
   self.sound_pool = {}
   for i=1, 5 do
     self.sound_pool[i] = love.audio.newSource("submodules/lua-projects-private/sfx/grace.wav", "static")
   end
-
-  self.input = ""
-  self.cursor_position = 1
-  self.cursor_timer = 0
-  self.cursor_state_visible = true
-  self.accepting_input = args.accepting_input
-  if self.accepting_input == nil then
-    self.accepting_input = true
-  end
-
-  self.callbacks:declare("onSubmit")
+  
 
   self.callbacks:register("keypressed", function(self, key, scancode, isrepeat)
     
-    if not self:hasFocus() or not self.accepting_input or not self.enabled then
+    if not self:hasFocus() or not self.accepting_input then
       return
     end
     for i, v in ipairs(self.sound_pool) do
@@ -38,7 +38,9 @@ function Self:init(args)
         self.cursor_position = math.max(1, self.cursor_position-1)
       end
     elseif key == "return" then
-      self:submit()
+      self.main.notes:addNote(self.input)
+      self.input = ""
+      self.cursor_position = 1
     elseif key == "left" then
       self.cursor_position = math.max(1, self.cursor_position-1)
     elseif key == "right" then
@@ -46,73 +48,30 @@ function Self:init(args)
     end
   end)
   self.callbacks:register("textinput", function(self, text)
-    if not self:hasFocus() or not self.accepting_input or not self.enabled then
+    if not self:hasFocus() or not self.accepting_input then
       return
     end
     self.input = self.input:sub(1, self.cursor_position-1) .. require 'engine.sstring'.toFirstLower(text) .. self.input:sub(self.cursor_position)
     self.cursor_position = self.cursor_position + 1
   end)
+
   self.callbacks:register("update", function(self, dt)
     if not self:hasFocus() then
       self.cursor_state_visible = false
-    end
-    --split text at cursor position into two strings
-    local left = self.input:sub(1, self.cursor_position-1) --draw first string
-    local middle = self.input:sub(self.cursor_position, self.cursor_position)
-    local right = self.input:sub(self.cursor_position+1) --draw second string
-    
-    if self.cursor_state_visible and self.enabled then
-      middle = "_"
-    end
-    self.text:setText(left .. middle .. right)
-    self.text2:setText("")--self.input
-
-    if not self:hasFocus() then
       return
     end
-
     self.cursor_timer = self.cursor_timer + dt
-    if self.cursor_timer > 0.5 and self.accepting_input then
+    if self.cursor_timer > 0.5 then
       self.cursor_timer = 0
       self.cursor_state_visible = not self.cursor_state_visible
     end
   end)
 
-  self.text = require 'engine.gui.Text':new{
-    main = self.main,
-    text = self.input,
-    color = {0, 0, 0},
-    x = -self.w/2 + 2,
-    y = 0,
-    alignment="left",
-    maxWidth = self.w - 4,
-  }
-  self:insert(self.text)
-
-  self.text2 = require 'engine.gui.Text':new{
-    main = self.main,
-    text = self.input,
-    color = {0, 0, 0},
-    x = -self.w/2 + 2,
-    y = 0,
-    alignment="left",
-    maxWidth = self.w - 4,
-  }
-  self:insert(self.text2)
-
-
-
   
 
-	return self
+  return self
 end
 
-function Self:submit()
-  local input = self.input
-  self.input = ""
-  self.cursor_position = 1
-  self.callbacks:call("onSubmit", {self, input})
-end
 
 function Self:draw()
   if not self.visibleAndActive then
@@ -122,22 +81,48 @@ function Self:draw()
   love.graphics.translate(self.x, self.y)
 
   love.graphics.setLineWidth(2)
-  
-  love.graphics.setColor(self.color)
-  local r, g, b, a = love.graphics.getColor( )
-  if not self.enabled then
-    love.graphics.setColor(r/1.2, g/1.2, b/1.2)
-  end
 
+  --c0c0c0 192/255
+  love.graphics.setColor(192/255, 192/255, 192/255)
   love.graphics.rectangle("fill", math.floor( -(self.w/2) ), math.floor( -(self.h/2) ), self.w, self.h)
+  --draw border like it is shaded
   love.graphics.setColor(128/255, 128/255, 128/255)
   love.graphics.rectangle("line", math.floor( -(self.w/2) ), math.floor( -(self.h/2) ), self.w, self.h)
   love.graphics.line(-self.w/2, self.h/2, self.w/2, self.h/2)
 
+  local previous_font = love.graphics.getFont()
+  love.graphics.setFont(FONT_DEFAULT)
+
+  
+  love.graphics.setColor(1, 1, 1)
+  love.graphics.rectangle("fill", math.floor( -(self.w/2)+2 ), math.floor( -(self.h/2)+2 ), self.w-4, self.h-4)
   
   
+
   
   
+  local x = -self.w/2 + 3
+  local y = -self.h/2 + (1)*12 + 16 + 5 + (0-1)*16
+  love.graphics.setColor(0, 0, 0)
+  for i, v in ipairs(self.main.notes.note_list) do
+    love.graphics.print(v, x, y + (i-1)*12)
+  end
+
+  love.graphics.print(self.input, x, y + (#self.main.notes.note_list)*12)
+  if self.cursor_state_visible then
+    --TODO adjust so this stays correct when wrapping text
+    local s = string.rep(" ", self.cursor_position-1)
+    local space = love.graphics.getFont():getWidth(s)--"  " .. string.rep(" ", self.cursor_position-1)
+    love.graphics.setColor(0, 0, 0)
+    --love.graphics.print("]", x + space, y + (#self.main.notes.note_list)*12)
+    love.graphics.print("_", x + space, y + (#self.main.notes.note_list)*12)
+    --love.graphics.print("*", x + space, y + (#self.main.notes.note_list)*12)
+
+    
+  end
+
+  love.graphics.setFont(previous_font)
+
   self.contents:callall("draw")
 
   love.graphics.pop()

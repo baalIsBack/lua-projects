@@ -29,29 +29,10 @@ local scenemanager
 --cron = require 'engine.cron'
 --Scenemanager = require 'engine.Scenemanager'
 --Animation = require 'engine.Animation'
-FONTS = {}
-FONTS["mono16"] = love.graphics.newImageFont("submodules/lua-projects-private/font/jasoco/font1.png", "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 :-!.,\"?>_#<{}()[]\\+/;%&='*", 1)
-FONTS["mono16"]:setLineHeight(1)
 
-FONTS["dialog"] = love.graphics.newImageFont("submodules/lua-projects-private/font/jasoco/font2.png", " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,!?-+/():;%&`_*#=[]'{}", 1)
-FONTS["dialog"]:setLineHeight(.6)
-
-FONTS["tiny"] = love.graphics.newImageFont("submodules/lua-projects-private/font/jasoco/font3.png", " 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-,!:()[]{}<>", 1)
-FONTS["tiny"]:setLineHeight(.8)
-
-FONTS["1980"] = love.graphics.newFont("submodules/lua-projects-private/font/1980/1980v23P03.ttf", 20)
-
-for i, v in ipairs(FONTS) do
-  v:setFilter("nearest", "nearest")
-end
 
 function love.load()
-  math.randomseed(os.time())
-  FONT_DEFAULT = love.graphics.newFont("submodules/lua-projects-private/font/spacecargo.ttf", 10)--love.graphics.newFont("submodules/lua-projects-private/font/Weiholmir Standard/Weiholmir_regular.ttf", 7*2)
-  FONT_DEFAULT = love.graphics.newFont("submodules/lua-projects-private/font/superpyxel/superpyxelreads.ttf", 10)
-  FONT_DEFAULT = FONTS["mono16"]
-  FONT = love.graphics.newFont(16)--"Hyperdrift-private/assets/font/Weiholmir Standard/Weiholmir_regular.ttf"
-  FONT:setFilter("nearest", "nearest")
+  
 	--UI_FONT = love.graphics.newFont("Hyperdrift-private/assets/font/spacecargo.ttf", math.floor(2 * 5))
   --UI_FONT = love.graphics.newFont(math.floor(2 * 5))
 
@@ -59,8 +40,9 @@ function love.load()
 	--love.graphics.setFont(FONT)
 	scenemanager = require 'engine.Scenemanager':new()
 
-  scenemanager:register("Main", require'applications.dummy.Main':new())
-  scenemanager:switch("Main")
+  --scenemanager:register("Main", require'applications.dummy.Main':new())
+  scenemanager:register("Main_Hex", require'applications.hex.Main':new())
+  scenemanager:switch("Main_Hex")
 end
 
 function love.update(dt)

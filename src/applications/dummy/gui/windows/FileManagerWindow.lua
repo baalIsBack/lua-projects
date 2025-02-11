@@ -48,7 +48,7 @@ function Self:reevaluateIcons()
   end
 end
 
-function Self:addIcon(icon_type)
+function Self:addIcon(icon_type, info)
   local pos = #self.icons
   local pos_x = (pos)%(self.icon_count_width)
   local pos_y = math.floor((pos)/self.icon_count_width)
@@ -67,19 +67,31 @@ function Self:addIcon(icon_type)
 
   local icon = nil
   local requiredFile = self.main.files:getRandomRequiredFile()
-
   if icon_type == "folder" then
-    icon = require 'src.applications.dummy.gui.elements.Icon_Folder':new(proto_t)
+    icon = require 'applications.dummy.gui.elements.Icon_Folder':new(proto_t)
     icon.text.color = {0, 0, 0}
     self:insert(icon)
-  elseif icon_type == "brick" or requiredFile == nil then
-    icon = require 'src.applications.dummy.gui.elements.Icon_Brick':new(proto_t)
+  elseif icon_type == "brick" then
+    icon = require 'applications.dummy.gui.elements.Icon_Brick':new(proto_t)
     icon.text.color = {0, 0, 0}
     self:insert(icon)
     icon.pos = pos
-  elseif icon_type == "file" then
-    proto_t.name = requiredFile
-    icon = require 'src.applications.dummy.gui.elements.Icon_File':new(proto_t)
+  elseif icon_type == "file_document" then
+    icon = require 'applications.dummy.gui.elements.Icon_File_Document':new(proto_t)
+    icon.text.color = {0, 0, 0}
+    self:insert(icon)
+    icon.pos = pos
+    if not info.generatedRequiredFile and requiredFile and math.random(0, 10-1) <= 0 then
+      icon:setName(requiredFile)
+      icon.text.color = {1, 0, 1}
+      icon.callbacks:register("onClicked", function(selff)
+        self.main.flags:set("file_opened_"..icon.name)
+        self.main.files:remove(icon.name)
+      end)
+      info.generatedRequiredFile = true
+    end
+  elseif icon_type == "file_image" then
+    icon = require 'applications.dummy.gui.elements.Icon_File_Image':new(proto_t)
     icon.text.color = {0, 0, 0}
     self:insert(icon)
     icon.pos = pos
@@ -103,14 +115,19 @@ end
 function Self:switchLocation()
   self.y_scroll = 0
   self:removeAllIcons()
+  self:generateIcons()
+  self:reevaluateIcons()
+end
+
+function Self:generateIcons()
   local loot = self.main.filemanager:determineContents()
   table.insert(loot, "folder")--has to be there or player gets stuck
   local table_shuffle = require 'lib.shuffle'
   table_shuffle(loot)
+  local info = {}
   for i, loot_type in ipairs(loot) do
-    self:addIcon(loot_type)
+    self:addIcon(loot_type, info)
   end
-  self:reevaluateIcons()
 end
 
 

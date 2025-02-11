@@ -1,7 +1,7 @@
 local Super = require 'engine.Prototype'
 local Self = Super:clone("Savemanager")
 local binser = require 'lib.binser'
---require 'src.applications.dummy.Mail'
+--require 'applications.dummy.Mail'
 
 function Self:init(args)
   self.main = args.main

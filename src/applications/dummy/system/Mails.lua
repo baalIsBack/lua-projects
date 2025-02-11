@@ -71,12 +71,13 @@ end
 function Self:canSolve(mail)
   return self.main.flags:checkList(mail:getRequiredSolveFlags())
   and self.main.notes:checkList(mail:getRequiredSolveNotes())
+  and (mail:getRequiredSolveFunction()(mail, self.main))
 end
 
 function Self:deserialize(raw)
 --  self.mails = raw.mails
   for i, mail in ipairs(raw.mails) do
-    self:addMail(require 'src.applications.dummy.system.Mail':new({main=self.main}):deserialize(mail))
+    self:addMail(require 'applications.dummy.system.Mail':new({main=self.main}):deserialize(mail))
   end
   self.unsent_mails_ids = raw.unsent_mails_ids or raw.unsent_mails
   return self
@@ -137,9 +138,9 @@ function Self:loadFollowMails(mail)
 end
 
 function Self:isUnlockable(mail_prototype_id)
-  print(mail_prototype_id)
   local target_mail = MAILS[mail_prototype_id]
   local sum = 0
+  print(mail_prototype_id)
   for _, id in ipairs(target_mail.source_quests) do
     local source_quest_mail = self.mailsMap[id]
     if (source_quest_mail and source_quest_mail:isRedeemed()) then
@@ -181,7 +182,7 @@ function Self:addMail(mail)
 end
 
 function Self:addMailFromID(mail_prototype_id)
-  local mail = require 'src.applications.dummy.system.Mail':new({main=self.main})
+  local mail = require 'applications.dummy.system.Mail':new({main=self.main})
   mail.prototype_id = mail_prototype_id
   mail.id = self:getID()
   mail.read = false

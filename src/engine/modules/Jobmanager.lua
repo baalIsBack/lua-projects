@@ -28,12 +28,12 @@ function Self:insert(job)
 end
 
 function Self:after(time, f, ...)
-	local cron = require 'src.lib.cron'
+	local cron = require 'lib.cron'
 	self:insert(cron.after(time, f, ...))
 end
 
 function Self:every(time, f, ...)
-	local cron = require 'src.lib.cron'
+	local cron = require 'lib.cron'
 	self:insert(cron.every(time, f, ...))
 end
 

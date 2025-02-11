@@ -16,7 +16,7 @@ function Self:init(args)
   self.mail_list = require 'engine.gui.List':new{x = -self.w/2 + self.mail_list_width/2, y = -1+16, w = self.mail_list_width, h = self.h - 32}
   self:insert(self.mail_list)
 
-  self.scroll_y = 0
+  self.scroll_y = -40
 
   
   self.mails.callbacks:register("onMailAdded", function(mail)
@@ -108,42 +108,54 @@ end
 function Self:addMailToList(mail)
   local b = require 'engine.gui.Button':new{x = 0, y = 0, w = self.mail_list_width, h =32}
   self.mail_list:insert(b, 1)
-  local unread_marker = require 'engine.gui.Text':new{x = -37, y = -8, mail_id = mail.id, text = "!", color={1, 0, 0}}
-  if mail.read then
-    unread_marker.text = ""
-  end
   
   b.callbacks:register("onClicked", function(b)
     self.openmail = mail
-    self.scroll_y = 0
+    self.scroll_y = -28
     self.main.mails:readMail(mail)
     
-    unread_marker.text = ""
     self.reply_field.input = mail.reply or ""
   end)
+  local sender_text = require 'engine.gui.Text':new{x = -37, y = -10, text = "", lineHeight = 1.4, font = FONTS["mono16"]}
+  
+  local sender_text_color = {0.3, 0.3, 0.3,1}
+  local subject_text_color = {0, 0, 0,1}
+  b:insert(sender_text)
+
+  local function create_base_button_text()
+    return {
+      sender_text_color, ""..mail:getSender(),
+      subject_text_color, "\n"..mail:getSubject(),
+    }
+  end
+  sender_text:setColoredText(create_base_button_text())
   b.callbacks:register("update", function(b)
     if self.openmail == mail then
       b:setColor(0.8, 0.8, 0)
     else
       b:setColor(1, 1, 1)
     end
-
+    local temporary_text = create_base_button_text()
     if mail.read then
       if self.main.mails:canSolve(mail) then
         if not mail.onReply_called then--unread
-          unread_marker.text = "*"
-          unread_marker.color = {0.7, 1, 0.0}
+          table.insert(temporary_text, 1, {0.7, 1, 0.0})
+          table.insert(temporary_text, 2, "*")
+          sender_text:setColoredText(temporary_text)
         else--solved
-          unread_marker.text = ""
-          unread_marker.color = {0, 0, 0}
+          table.insert(temporary_text, 1, {0, 0, 0})
+          table.insert(temporary_text, 2, "")
+          sender_text:setColoredText(temporary_text)
         end
       else--unsolved
-        unread_marker.text = "?"
-        unread_marker.color = {0, 0.5, 1}
+        table.insert(temporary_text, 1, {0, 0.5, 1})
+        table.insert(temporary_text, 2, "?")
+        sender_text:setColoredText(temporary_text)
       end
     else--unread
-      unread_marker.text = "!"
-      unread_marker.color = {1, 0, 0}
+      table.insert(temporary_text, 1, {1, 0, 0})
+      table.insert(temporary_text, 2, "!")
+      sender_text:setColoredText(temporary_text)
     end
     
     self.reply_button.visibleAndActive = self.openmail
@@ -154,14 +166,7 @@ function Self:addMailToList(mail)
       self.reply_field.enabled = not self.openmail.reply and canReply
     end
   end)
-  local sender = require 'engine.gui.Text':new{x = -37, y = -8, text = " "..mail:getSender(), color={0.4,0.4,0.4}}
-  sender:setAlignment("left")
-  b:insert(sender)
-  unread_marker:setAlignment("left")
-  b:insert(unread_marker)
-  local subject = require 'engine.gui.Text':new{x = -37, y = 6, text = mail:getSubject()}
-  subject:setAlignment("left")
-  b:insert(subject)
+  sender_text:setAlignment("left")
 end
 
 
@@ -183,7 +188,7 @@ function Self:draw()
   love.graphics.line(-self.w/2, self.h/2, self.w/2, self.h/2)
 
   local previous_font = love.graphics.getFont()
-  love.graphics.setFont(FONT_DEFAULT)
+  love.graphics.setFont(FONTS["mono16"])
   if self.openmail then
     --love.graphics.setColor(0.4,0.4,0.4)
     love.graphics.push()
@@ -191,15 +196,24 @@ function Self:draw()
     love.graphics.setStencilTest("greater", 0)
 
     love.graphics.translate(0, self.scroll_y)
-    love.graphics.print(self.openmail:getSender(), -self.w/2 + self.mail_list_width + 2, -self.h/2 + 6+16)
+    local a = 1
+    love.graphics.scale(1/a, 1/a)
+    local content = {}
+
+    table.insert(content, {0.8, 0.8, 0.8, 1})
+    table.insert(content, self.openmail:getSender() .. "\n\n")
+    table.insert(content, {0.8, 0.8, 0.8, 1})
+    table.insert(content, self.openmail:getSubject() .. "\n\n\n")
+    table.insert(content, {0, 0, 0, 1})
+    table.insert(content, self.openmail:getContent())
     
-    love.graphics.setColor(0,0,0)
-    love.graphics.print(self.openmail:getSubject(), -self.w/2 + self.mail_list_width + 2, -self.h/2 + 24+16)
     
-    local width, wrappedText = FONT_DEFAULT:getWrap(self.openmail:getContent(), self.w - self.mail_list_width - 4 - self.scrollbar.w/2)
-    for i, v in ipairs(wrappedText) do
-      love.graphics.print(v, -self.w/2 + self.mail_list_width + 2, -self.h/2 + 40 + i*10+16)
-    end
+    
+    local wrapLimit = self.w - self.mail_list_width - 4 - self.scrollbar.w/2
+    local x = a*(-self.w/2 + self.mail_list_width + 2)
+    local y = a*(-self.h/2 + 40 + 16)
+    love.graphics.printf(content, x, y, (wrapLimit-16)/a, "left", 0, 1, 1, 0, 0, 0, 0)
+    
     love.graphics.setStencilTest()
     love.graphics.pop()
   end

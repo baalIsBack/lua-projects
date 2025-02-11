@@ -3,15 +3,17 @@ local Self = Super:clone("PopupWindow")
 
 
 function Self:init(args)
-  args.w = 32 * 2
+  args.w = 32 * 2.5
   args.h = 24 * 2
   args.title = args.title or ""
   Super.init(self, args)
+
+  self.text_string = args.text or "WARNING"
   
   self.bar.color = {255/255, 30/255, 15/255}
 
   
-  self.text = require 'engine.gui.Text':new{text = "WARNING", color={0,0,0}, x = 0, y = 0}
+  self.text = require 'engine.gui.Text':new{text = self.text_string, color={0,0,0}, x = 0-8, y = 0}
   self:insert(self.text)
   
 

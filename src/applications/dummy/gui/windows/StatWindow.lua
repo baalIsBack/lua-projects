@@ -1,20 +1,36 @@
 local Super = require 'engine.gui.Window'
-local Self = Super:clone("PopupWindow")
+local Self = Super:clone("CalcWindow")
 
 
 function Self:init(args)
-  args.w = 32 * 2
-  args.h = 24 * 2
-  args.title = args.title or ""
+  args.w = 320
+  args.h = 240
+  args.title = "Stat"
   Super.init(self, args)
   
-  self.bar.color = {255/255, 30/255, 15/255}
 
-  
-  self.text = require 'engine.gui.Text':new{text = "WARNING", color={0,0,0}, x = 0, y = 0}
-  self:insert(self.text)
-  
+  self.list = require 'engine.gui.List':new{
+    x = 0-8,
+    y = 0+8,
+    w = self.w-16-16,
+    h = self.h-16-16,
+    items = {}
+  }
+  self:insert(self.list)
+  self.scrollbar = require 'engine.gui.Scrollbar':new{
+    x = self.w/2-16+8,
+    y = 8,
+    h = self.h-16,
+    orientation = "vertical"
+  }
+  self:insert(self.scrollbar)
 
+  self.scrollbar.callbacks:register("onUp", function() print(self.list.first_item_id) self.list:up() end)
+  self.scrollbar.callbacks:register("onDown", function() print(self.list.first_item_id) self.list:down() end)
+  
+  
+  
+  --self.list:insert(t)
   return self
 end
 
@@ -27,6 +43,8 @@ function Self:draw()
   love.graphics.translate(self.x, self.y)
 
   love.graphics.setLineWidth(2)
+  local previous_font = love.graphics.getFont()
+  love.graphics.setFont(FONT_DEFAULT)
 
   --c0c0c0 192/255
   love.graphics.setColor(192/255, 192/255, 192/255)
@@ -36,13 +54,11 @@ function Self:draw()
   love.graphics.rectangle("line", math.floor( -(self.w/2) ), math.floor( -(self.h/2) ), self.w, self.h)
   love.graphics.line(-self.w/2, self.h/2, self.w/2, self.h/2)
 
-  local previous_font = love.graphics.getFont()
-  love.graphics.setFont(FONT_DEFAULT)
 
   
-  love.graphics.setColor(1, 1, 1)
   
-  --
+  
+  
 
   love.graphics.setFont(previous_font)
 

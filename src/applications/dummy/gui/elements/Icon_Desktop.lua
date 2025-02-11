@@ -1,4 +1,4 @@
-local Super = require 'src.applications.dummy.gui.elements.Icon'
+local Super = require 'applications.dummy.gui.elements.Icon'
 local Self = Super:clone("Icon_Desktop")
 
 function Self:init(args)
@@ -7,6 +7,7 @@ function Self:init(args)
   
   
   self.targetApp = args.targetApp
+  
   self.callbacks:register("onClicked", function(selff)
     if not self.targetApp then
       return

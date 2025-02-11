@@ -24,6 +24,10 @@ APP_LIST["ressources"] = {
   installTime = 0.1,
 }
 
+APP_LIST["stat"] = {
+  installTime = 0.1,
+}
+
 function Self:init(args)
   self.main = args.main
   self.hasSerialization = true
@@ -89,6 +93,16 @@ function Self:execute(command)
     self:initiateUninstall(command_parts[2])
   elseif command_parts[1] == "save" then
     self.main.gamestate:save()
+  elseif command_parts[1] == "popup" then
+    local newPopupWindow = require 'applications.dummy.gui.windows.PopupWindow':new{
+      main = self.main,
+      title = "ERROR",
+      text = command_parts[2] or "",
+      width = 200,
+      height = 100,
+      x = 50, y = 50,
+    }
+    self.main:insert(newPopupWindow)
   elseif command_parts[1] == "reset" then
     self.main.gamestate:resetSave()
   elseif command_parts[1] == "debugmail" then

@@ -114,9 +114,9 @@ function Self:draw()
     local s = string.rep(" ", self.cursor_position-1)
     local space = love.graphics.getFont():getWidth(s)--"  " .. string.rep(" ", self.cursor_position-1)
     love.graphics.setColor(0, 0, 0)
-    love.graphics.print("]", x + space, y + (#self.main.notes.note_list)*12)
-    love.graphics.print("B", x + space, y + (#self.main.notes.note_list)*12)
-    love.graphics.print("*", x + space, y + (#self.main.notes.note_list)*12)
+    --love.graphics.print("]", x + space, y + (#self.main.notes.note_list)*12)
+    love.graphics.print("_", x + space, y + (#self.main.notes.note_list)*12)
+    --love.graphics.print("*", x + space, y + (#self.main.notes.note_list)*12)
 
     
   end

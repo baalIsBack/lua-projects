@@ -21,6 +21,8 @@ function Self:init(args)
   self:setName(self.name)
   self:insert( self.image )
   self:insert( self.text )
+
+  
   
 	return self
 end
@@ -50,8 +52,24 @@ function Self:draw()
   end
   
   self.contents:callall("draw")
+  if self.hasBeenOpened then
+    love.graphics.setColor(0.5, 0.5, 0.5, 0.3)
+    love.graphics.rectangle("fill", math.floor( -(self.w/2) ), math.floor( -(self.h/2) ), self.w, self.h)
+  end
+  
 
   love.graphics.pop()
+end
+
+function Self:open()
+  if not self.hasBeenOpened then
+    local id = "opened_" .. self:type()
+    local count = self.main.values:get(id) or 0
+    self.main.values:set(id, count + 1)
+    self.hasBeenOpened = true
+    return true
+  end
+  return false
 end
 
 return Self

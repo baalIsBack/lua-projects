@@ -26,6 +26,10 @@ function Self:init(args)
     self.sound_pool[i] = love.audio.newSource("submodules/lua-projects-private/sfx/grace.wav", "static")
   end
 
+  self.stencilFunction = function()
+    love.graphics.rectangle("fill", math.floor( -(self.w/2)-2 ), math.floor( -(self.h/2) ), self.w, self.h-4)
+  end
+
 
   self.callbacks:register("keypressed", function(self, key, scancode, isrepeat)
     
@@ -54,6 +58,7 @@ function Self:init(args)
     end
   end)
   self.callbacks:register("textinput", function(self, text)
+    local text = require 'engine.sstring'.sanitizeAscii(text)
     if not self:hasFocus() or not self.accepting_input then
       return
     end
@@ -74,6 +79,8 @@ function Self:init(args)
 
   return self
 end
+
+
 
 
 function Self:draw()
@@ -99,9 +106,12 @@ function Self:draw()
   
   love.graphics.setColor(self.font_color)
   
+  love.graphics.stencil(self.stencilFunction, "replace", 1)
+  love.graphics.setStencilTest("greater", 0)
+
   local logs = self.terminal:getLogs(self.maximum_visible_lines)
   for i, line in ipairs(logs) do
-    love.graphics.print(line, -self.w/2, -self.h/2 + (((#logs - i))*12) + 16 + 2)
+    love.graphics.print(line, -self.w/2 + 2, 2-self.h/2 + (((#logs - i))*12) + 16 + 2)
   end
 
   if self.accepting_input then
@@ -109,17 +119,18 @@ function Self:draw()
     local width, wrappedText = FONT_DEFAULT:getWrap(text, self.w - 4)
     
     --TODO look at next todo
-    love.graphics.print("> "..self.input, -self.w/2, -self.h/2 + (#logs)*12 + 16 + 2)
+    love.graphics.print("> "..self.input, -self.w/2 + 2, 2-self.h/2 + (#logs)*12 + 16 + 2)
     
     if self.cursor_state_visible then
       --TODO adjust so this stays correct when wrapping text
       local space = "  " .. string.rep(" ", self.cursor_position-1)
-      love.graphics.print(space.."]", -self.w/2, -self.h/2 + (#logs)*12 + 16 + 2 + (#wrappedText-1)*16)
-      love.graphics.print(space.."B", -self.w/2, -self.h/2 + (#logs)*12 + 16 + 2 + (#wrappedText-1)*16)
-      love.graphics.print(space.."*", -self.w/2, -self.h/2 + (#logs)*12 + 16 + 2 + (#wrappedText-1)*16)
+      --love.graphics.print(space.."]", -self.w/2, -self.h/2 + (#logs)*12 + 16 + 2 + (#wrappedText-1)*16)
+      love.graphics.print(space.."_", -self.w/2 + 2, 2-self.h/2 + (#logs)*12 + 16 + 2 + (#wrappedText-1)*16)
+      --love.graphics.print(space.."*", -self.w/2, -self.h/2 + (#logs)*12 + 16 + 2 + (#wrappedText-1)*16)
     end
   end
 
+  love.graphics.setStencilTest()
   love.graphics.setFont(previous_font)
 
   self.contents:callall("draw")

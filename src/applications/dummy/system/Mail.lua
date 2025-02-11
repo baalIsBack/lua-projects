@@ -81,6 +81,10 @@ function Self:getRequiredSolveNotes()
   return require 'applications.dummy.system.MailDefinitions'[self.prototype_id].required_solve_notes
 end
 
+function Self:getRequiredSolveFunction()
+  return require 'applications.dummy.system.MailDefinitions'[self.prototype_id].required_solve_function
+end
+
 function Self:getReward()
   return require 'applications.dummy.system.MailDefinitions'[self.prototype_id].reward
 end

@@ -1,6 +1,7 @@
 local Super = require 'engine.gui.Window'
 local Self = Super:clone("DummyWindow")
 
+Self.icon = love.graphics.newImage("submodules/lua-projects-private/gfx/win_icons_png/w98_calendar-1.png")
 
 function Self:init(args)
   args.w = 320

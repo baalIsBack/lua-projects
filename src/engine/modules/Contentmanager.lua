@@ -18,6 +18,10 @@ function Self:insert(obj, id)
   end
 end
 
+function Self:contains(element)
+  return CONTAINS(self.content_list, element)
+end
+
 function Self:remove(obj)
   if type(obj) == "number" then
     if #self.content_list >= obj then

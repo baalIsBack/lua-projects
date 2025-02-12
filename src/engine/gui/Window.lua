@@ -38,7 +38,20 @@ function Self:init(args)
 	return self
 end
 
+function Self:finalize()
+end
 
+function Self:open()
+  self.visibleAndActive = true
+end
+
+function Self:close()
+  self.visibleAndActive = false
+end
+
+function Self:execute(terminal, command)
+  terminal:appendLog("Unknown command: " .. (command or ""))
+end
 
 function Self:draw()
   if not self.visibleAndActive then

@@ -24,6 +24,9 @@ end
 local function tableToString(tbl, indent, visited)
   visited = visited or {}
   indent = indent or 0
+  if tbl.isPrototype then
+    error("Cant transform Prototype or similar to string. Try calling serialize() on it.")
+  end
   if visited[tbl] then
     error_here()
     return "?"--"<circular reference>"
@@ -104,6 +107,7 @@ function Self:save()
   dummy.terminal = self.main.terminal
   dummy.time = self.main.timedmanager.time
   dummy.notes = self.main.notes
+  dummy.apps = self.main.apps
   saveTableToFile("save.dat", dummy)
 end
 
@@ -123,6 +127,7 @@ function Self:load()
   self.flags = master.flags or self.flags
   self.files = master.files or self.files
   self.values = master.values or self.values
+  self.apps = master.apps or self.apps
   self.main.timedmanager.time = master.time or self.main.timedmanager.time
   
 
@@ -132,6 +137,7 @@ function Self:load()
   self.main.flags:deserialize(master.flags)
   self.main.files:deserialize(master.files)
   self.main.values:deserialize(master.values or {})
+  self.main.apps:deserialize(master.apps or {})
 
   return firstTime
 end
@@ -143,10 +149,9 @@ function Self:finalize()
   end
   print("first time")
 
-  self.main.terminal:install("terminal")
-  self.main.terminal:install("mail")
+  self.main.apps:install("terminal")
+  self.main.apps:install("mail")
   self.main.mails:addMailFromID(1)
-  self.main.terminal.log = {}
   
   self:save()
 end

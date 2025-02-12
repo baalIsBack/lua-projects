@@ -12,6 +12,7 @@ function Self:init(args)
   self.h = args.h
   self.numberOfShownElements = args.numberOfShownElements or 6
 
+
   self.wasDown = false
   self.isDown = false
 
@@ -46,10 +47,10 @@ function Self:recalculateChildPositions()
   local startPositionY = -self.h/2 + 16
   for i, v in ipairs(self.contents:getList()) do
     if i >= self.first_item_id and i < self.first_item_id+self.numberOfShownElements then
-      v.x = 0
+      --v.x = 0
       v.y = startPositionY + (i - self.first_item_id) * v.h
     else
-      v.x = 10000
+      --v.x = 10000
       v.y = 10000
     end
   end

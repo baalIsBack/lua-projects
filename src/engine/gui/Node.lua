@@ -65,6 +65,8 @@ function Self:init(args)
 
   self.x = args.x or 0
   self.y = args.y or 0
+  self.x_starting_value = self.x
+  self.y_starting_value = self.y
   self.w = args.w or 0
   self.h = args.h or 0
 

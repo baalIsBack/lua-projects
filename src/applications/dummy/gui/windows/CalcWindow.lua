@@ -2,11 +2,21 @@ local Super = require 'engine.gui.Window'
 local Self = Super:clone("CalcWindow")
 
 
+
 function Self:init(args)
   args.w = 320
   args.h = 240
   args.title = "Calc"
   Super.init(self, args)
+
+  self.icon = require 'applications.dummy.gui.elements.Icon_Calc':new{
+    x = 32 + 0*(64),
+    y = 32 + 6*(64),
+    w = 64,
+    h = 64,
+    name = "Calc",
+  }
+  self.icon:setTargetApp(self)
   
 
   self.button1 = require 'engine.gui.Button':new{x = -self.w/2 + 16 - 1, y = -self.h/2 + 16 + 16-2, w = 22, h = 22}

@@ -40,9 +40,9 @@ function love.load()
 	--love.graphics.setFont(FONT)
 	scenemanager = require 'engine.Scenemanager':new()
 
-  --scenemanager:register("Main", require'applications.dummy.Main':new())
+  scenemanager:register("Main", require'applications.dummy.Main':new())
   scenemanager:register("Main_Hex", require'applications.hex.Main':new())
-  scenemanager:switch("Main_Hex")
+  scenemanager:switch("Main")
 end
 
 function love.update(dt)

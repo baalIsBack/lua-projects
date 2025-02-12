@@ -1,20 +1,23 @@
 local Super = require 'engine.gui.Button'
 local Self = Super:clone("Icon")
 
+Self.NAME = "noname"
+Self.IMG = love.graphics.newImage("submodules/lua-projects-private/gfx/win_icons_png/w98_directory_closed.png")
+
 function Self:init(args)
   Super.init(self, args)
 
   self.pos_y = args.pos_y or 0
   self.pos_x = args.pos_x or 0
 
-  self.img = args.img or love.graphics.newImage("submodules/lua-projects-private/gfx/win_icons_png/w98_directory_closed.png")
   
-  self.name = args.name or ""
+  
+  self.name = args.name or self.NAME
   
   self.z = -1
   
-
-  self.image = require 'engine.gui.Image':new{img = self.img, x = 0, y = 0}
+  
+  self.image = require 'engine.gui.Image':new{img = args.img or self.IMG, x = 0, y = 0}
   self.text = require 'engine.gui.Text':new{text = self.name, color={1,1,1}, x = 0, y = 25}
   self.max_length_before_shortening = 8
   
@@ -63,9 +66,16 @@ end
 
 function Self:open()
   if not self.hasBeenOpened then
-    local id = "opened_" .. self:type()
-    local count = self.main.values:get(id) or 0
+    local id, count
+    id = "opened_" .. self:type()
+    count = self.main.values:get(id) or 0
     self.main.values:set(id, count + 1)
+
+    
+    id = "currently_collected_" .. self:type()
+    count = self.main.values:get(id) or 0
+    self.main.values:set(id, count + 1)
+
     self.hasBeenOpened = true
     return true
   end

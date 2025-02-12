@@ -35,28 +35,17 @@ function Self:init(args)
   self.window = nil
   self.log = {}
 
-  self.apps_installed = {}
-
   return self
 end
 
 function Self:serialize()
   local t = {
-    apps_installed = self.apps_installed
   }
   return t
 end
 
 function Self:deserialize(raw)
-  for index, value in ipairs(raw.apps_installed) do
-    self:install(value)
-  end
-  for index, value in ipairs({
-    "terminal",
-    "mail",
-  }) do
-    self:install(value)
-  end
+  
   return self
 end
 
@@ -91,6 +80,20 @@ function Self:execute(command)
     self:initiateInstall(command_parts[2])
   elseif command_parts[1] == "uninstall" then
     self:initiateUninstall(command_parts[2])
+  elseif command_parts[1] == "open" then
+    if self.main.apps:isInstalled(command_parts[2]) then
+      self.main.processes:getProcess(command_parts[2]):open()
+      self:appendLog("Opened " .. command_parts[2])
+    else
+      self:appendLog("Could not open program: " .. command_parts[2])
+    end
+  elseif command_parts[1] == "close" then
+    if self.main.apps:isInstalled(command_parts[2]) then
+      self.main.processes:getProcess(command_parts[2]):close()
+      self:appendLog("Opened " .. command_parts[2])
+    else
+      self:appendLog("Could not open program: " .. command_parts[2])
+    end
   elseif command_parts[1] == "save" then
     self.main.gamestate:save()
   elseif command_parts[1] == "popup" then
@@ -107,6 +110,8 @@ function Self:execute(command)
     self.main.gamestate:resetSave()
   elseif command_parts[1] == "debugmail" then
     self.main.timedmanager:after(0.2, function() self.main.gamestate:addMailFromID(3) end)
+  elseif self.main.processes:getProcess(command_parts[1]) then
+    self.main.processes:getProcess(command_parts[1]):execute(self, command_parts[2])
   else
     self:appendLog("Unknown command: " .. (command_parts[1] or ""))
   end
@@ -122,7 +127,7 @@ function Self:initiateInstall(app_name)
     self:appendLog("Unknown program: " .. app_name)
     return
   end
-  if CONTAINS(self.apps_installed, app_name) then
+  if self.main.apps:isInstalled(app_name) then
     self:appendLog(app_name .. " is already installed.")
     return
   end
@@ -140,13 +145,13 @@ function Self:install(app_name)
     self:appendLog("Unknown program: " .. app_name)
     return
   end
-  if CONTAINS(self.apps_installed, app_name) then
+  if self.main.apps:isInstalled(app_name) then
     self:appendLog("Error during installation.")
     return
   end
-  table.insert(self.apps_installed, app_name)
   self.main.flags:set("installed_"..app_name, true)
-  self.main["install_"..app_name](self.main, app_name)
+  self.main.apps:install(app_name)
+  --self.main["install_"..app_name](self.main, app_name)
   self:appendLog("Success! " .. app_name .. " was installed.")
 end
 
@@ -155,7 +160,7 @@ function Self:initiateUninstall(app_name)
     self:appendLog("Unknown program: " .. app_name)
     return
   end
-  if not CONTAINS(self.apps_installed, app_name) then
+  if not self.main.apps:isInstalled(app_name) then
     self:appendLog("Unknown program: " .. app_name)
     return
   end
@@ -173,12 +178,12 @@ function Self:uninstall(app_name)
     self:appendLog("Unknown program: " .. app_name)
     return
   end
-  if not CONTAINS(self.apps_installed, app_name) then
+  if not self.main.apps:isInstalled(app_name) then
     self:appendLog("Error during deinstallation.")
     return
   end
-  REMOVE(self.apps_installed, app_name)
-  self.main["uninstall_"..app_name](self.main, app_name)
+  self.main.apps:uninstall(app_name)
+  --self.main["uninstall_"..app_name](self.main, app_name)
   self:appendLog("Success! " .. app_name .. " was uninstalled.")
 end
 

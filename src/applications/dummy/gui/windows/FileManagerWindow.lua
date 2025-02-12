@@ -2,6 +2,7 @@ local Super = require 'engine.gui.Window'
 local Self = Super:clone("DummyWindow")
 
 
+
 function Self:init(args)
   args.w = 320+32+32
   args.h = 240

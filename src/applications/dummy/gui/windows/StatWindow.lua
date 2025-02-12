@@ -1,7 +1,6 @@
 local Super = require 'engine.gui.Window'
 local Self = Super:clone("CalcWindow")
 
-
 function Self:init(args)
   args.w = 320
   args.h = 240
@@ -28,10 +27,64 @@ function Self:init(args)
   self.scrollbar.callbacks:register("onUp", function() print(self.list.first_item_id) self.list:up() end)
   self.scrollbar.callbacks:register("onDown", function() print(self.list.first_item_id) self.list:down() end)
   
+  self.trackables = {}
+
   
+
+  
+
+  self.callbacks:register("update", function(self, dt)
+    for i, v in ipairs(self.trackables) do
+      v.node.text_node:setText("  " .. v.proto.NAME .. " x " .. self.main.values:get(v.value_id))
+    end
+  end)
   
   --self.list:insert(t)
   return self
+end
+
+function Self:finalize()
+  if self.main.values:get("opened_Icon_File_Image") > 0 then
+    self:addNewUniqueStat(require('applications.dummy.gui.elements.Icon_File_Image'), "currently_collected_Icon_File_Image")
+  end
+  if self.main.values:get("opened_Icon_Brick") > 0 then
+    self:addNewUniqueStat(require('applications.dummy.gui.elements.Icon_Brick'), "currently_collected_Icon_Brick")
+  end
+  if self.main.values:get("opened_Icon_File_Document") > 0 then
+    self:addNewUniqueStat(require('applications.dummy.gui.elements.Icon_File_Document'), "currently_collected_Icon_File_Document")
+  end
+end
+
+function Self:addNewUniqueStat(proto, value_id)
+  local node, t
+
+  for i, v in ipairs(self.trackables) do
+    if v.value_id == value_id then
+      return
+    end
+  end
+
+  node = require 'engine.gui.Node':new{
+    x = -110,
+    y = 0,
+    w = 100,
+    h = 36,
+  }
+  node:insert(require 'engine.gui.Image':new{
+    x = -16,
+    y = 0,
+    img = proto.IMG,
+  })
+  t = require 'engine.gui.Text':new{
+    x = 0,
+    y = 0,
+    text = " x 0",
+    alignment = "left",
+  }
+  node:insert(t)
+  node.text_node = t
+  self.list:insert(node)
+  table.insert(self.trackables, {node = node, value_id=value_id, proto=proto})
 end
 
 

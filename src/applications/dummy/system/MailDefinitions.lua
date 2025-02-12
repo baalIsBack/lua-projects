@@ -90,7 +90,7 @@ MAILS[4] = {
 MAILS[5] = {
   sender = "Company",
   subject = "New Job",
-  content = "Dear Worker, \n\nfor your next job we require you to send 5 image files. You can use the automatic reply generation system (args).\n\nYou will earn 0.50$.\n\n\nBest regards,\nHR",
+  content = "Dear Worker, \n\nfor your next job we require you to send 5 brick files. You can use the automatic reply generation system (args).\n\nYou will earn 0.50$.\n\n\nBest regards,\nHR",
   redeemable = 1,
   redeems_required_for_next_quest = 1,--redeemable+nö
   source_quests = {4},
@@ -99,7 +99,7 @@ MAILS[5] = {
   required_unlock_flags = {},
   expected_reply = "Here are the files:[...]",
   required_solve_function = function(self, main)
-    if (main.values:get("opened_Icon_File_Image") or 0) >= 5 then
+    if (main.values:get("currently_collected_Icon_Brick") or 0) >= 5 then
       return true
     end
     return false
@@ -107,7 +107,10 @@ MAILS[5] = {
   required_solve_flags = {},
   required_solve_notes = {},
   onRead = function(mail, main) end,
-  onReply = function(mail, main, text) end,
+  onReply = function(mail, main, text)
+    local val = main.values:get("currently_collected_Icon_Brick")
+    main.values:set("currently_collected_Icon_Brick", val -5)
+  end,
   reward = 0.5,
 }
 MAILS[6] = {
@@ -122,7 +125,7 @@ MAILS[6] = {
   required_unlock_flags = {},
   expected_reply = "Here are the files:[...]",
   required_solve_function = function(self, main)
-    if (main.values:get("opened_Icon_File_Image") or 0) >= 5 then
+    if (main.values:get("currently_collected_Icon_File_Document") or 0) >= 5 then
       return true
     end
     return false
@@ -130,7 +133,10 @@ MAILS[6] = {
   required_solve_flags = {},
   required_solve_notes = {},
   onRead = function(mail, main) end,
-  onReply = function(mail, main, text) end,
+  onReply = function(mail, main, text)
+    local val = main.values:get("currently_collected_Icon_File_Document")
+    main.values:set("currently_collected_Icon_File_Document", val -5)
+  end,
   reward = 0.5,
 }
 MAILS[7] = {
@@ -139,13 +145,13 @@ MAILS[7] = {
   content = "Dear Worker, \n\nfor your next job we require you to send 5 image files. You can use the automatic reply generation system (args).\n\nYou will earn 0.50$.\n\n\nBest regards,\nHR",
   redeemable = 1,
   redeems_required_for_next_quest = 1,--redeemable+nö
-  source_quests = {8},
+  source_quests = {4},
 --  source_quests_requirement_count = 0,
-  target_quests = {6},
+  target_quests = {8},
   required_unlock_flags = {},
   expected_reply = "Here are the files:[...]",
   required_solve_function = function(self, main)
-    if (main.values:get("opened_Icon_File_Image") or 0) >= 5 then
+    if (main.values:get("currently_collected_Icon_File_Image") or 0) >= 5 then
       return true
     end
     return false
@@ -153,7 +159,10 @@ MAILS[7] = {
   required_solve_flags = {},
   required_solve_notes = {},
   onRead = function(mail, main) end,
-  onReply = function(mail, main, text) end,
+  onReply = function(mail, main, text)
+    local val = main.values:get("currently_collected_Icon_File_Image")
+    main.values:set("currently_collected_Icon_File_Image", val -5)
+  end,
   reward = 0.5,
 }
 MAILS[8] = {
@@ -163,7 +172,7 @@ MAILS[8] = {
   redeemable = 1,
   redeems_required_for_next_quest = 1,--redeemable+nö
   source_quests = {4, 5, 6},
---  source_quests_requirement_count = 0,
+  source_quests_requirement_count = 2,
   target_quests = {},
   required_unlock_flags = {},
   expected_reply = "I quit!",

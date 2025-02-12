@@ -2,13 +2,15 @@ local Super = require 'engine.gui.Window'
 local Self = Super:clone("MailWindow")
 
 
+
 function Self:init(args)
   args.w = 320
   args.h = 240
   args.title = "Mail"
   Super.init(self, args)
 
-  self.mails = args.mails
+
+  self.mails = self.main.mails
   
   self.openmail = nil
 
@@ -137,16 +139,14 @@ function Self:addMailToList(mail)
     end
     local temporary_text = create_base_button_text()
     if mail.read then
-      if self.main.mails:canSolve(mail) then
-        if not mail.onReply_called then--unread
-          table.insert(temporary_text, 1, {0.7, 1, 0.0})
-          table.insert(temporary_text, 2, "*")
-          sender_text:setColoredText(temporary_text)
-        else--solved
-          table.insert(temporary_text, 1, {0, 0, 0})
-          table.insert(temporary_text, 2, "")
-          sender_text:setColoredText(temporary_text)
-        end
+      if mail.onReply_called then--solved
+        table.insert(temporary_text, 1, {0, 0, 0})
+        table.insert(temporary_text, 2, "")
+        sender_text:setColoredText(temporary_text)
+      elseif self.main.mails:canSolve(mail) then--unsolved but solvable
+        table.insert(temporary_text, 1, {0.7, 1, 0.0})
+        table.insert(temporary_text, 2, "*")
+        sender_text:setColoredText(temporary_text)
       else--unsolved
         table.insert(temporary_text, 1, {0, 0.5, 1})
         table.insert(temporary_text, 2, "?")

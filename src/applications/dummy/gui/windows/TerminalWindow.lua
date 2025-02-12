@@ -1,14 +1,12 @@
 local Super = require 'engine.gui.Window'
 local Self = Super:clone("TerminalWindow")
 
-
 function Self:init(args)
   args.w = 320
   args.h = 240
   args.title = "Terminal"
   Super.init(self, args)
-  self.terminal = args.terminal
-  self.main.terminal = self.terminal
+  self.terminal = self.main.terminal
   --self.terminal:appendLog("Welcome to the terminal!")
 
   self.input = ""

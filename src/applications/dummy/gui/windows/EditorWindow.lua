@@ -1,6 +1,5 @@
 local Super = require 'engine.gui.Window'
-local Self = Super:clone("DummyWindow")
-
+local Self = Super:clone("EditorWindow")
 
 function Self:init(args)
   args.w = 320/2

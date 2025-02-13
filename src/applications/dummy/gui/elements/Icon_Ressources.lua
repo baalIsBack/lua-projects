@@ -9,6 +9,7 @@ function Self:init(args)
   Super.init(self, args)
 
   
+  self:setTargetApp(self.main.processes.ressources)
 
 
   

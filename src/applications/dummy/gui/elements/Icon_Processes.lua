@@ -8,6 +8,7 @@ Self.NAME = "Processes"
 function Self:init(args)
   Super.init(self, args)
 
+  self:setTargetApp(self.main.processes.processes)
   
 	return self
 end

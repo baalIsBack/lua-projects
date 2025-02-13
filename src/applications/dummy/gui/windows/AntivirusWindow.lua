@@ -17,6 +17,17 @@ function Self:init(args)
     items = {}
   }
   self:insert(self.list)
+
+  self.virus_count_text = require 'engine.gui.Text':new{
+    main = self.main,
+    x = 0,
+    y = -self.h/2+8,
+    text = "Virus count: 0",
+    alignment = "center",
+  }
+  self.list:insert(self.virus_count_text)
+
+  --[[
   self.scrollbar = require 'engine.gui.Scrollbar':new{
     main=self.main,
     x = self.w/2-16+8,
@@ -28,17 +39,14 @@ function Self:init(args)
 
   self.scrollbar.callbacks:register("onUp", function() print(self.list.first_item_id) self.list:up() end)
   self.scrollbar.callbacks:register("onDown", function() print(self.list.first_item_id) self.list:down() end)
-  
-  self.trackables = {}
+  ]]
 
   
 
   
 
   self.callbacks:register("update", function(self, dt)
-    for i, v in ipairs(self.trackables) do
-      v.node.text_node:setText("  " .. v.proto.NAME .. " x " .. self.main.values:get(v.value_id))
-    end
+    self.virus_count_text:setText("Virus count: " .. self.main.values:get("virus_value"))
   end)
   
   --self.list:insert(t)

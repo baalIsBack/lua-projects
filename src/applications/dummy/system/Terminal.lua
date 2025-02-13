@@ -23,8 +23,13 @@ APP_LIST["processes"] = {
 APP_LIST["ressources"] = {
   installTime = 0.1,
 }
-
 APP_LIST["stat"] = {
+  installTime = 0.1,
+}
+APP_LIST["contacts"] = {
+  installTime = 0.1,
+}
+APP_LIST["antivirus"] = {
   installTime = 0.1,
 }
 
@@ -88,11 +93,11 @@ function Self:execute(command)
       self:appendLog("Could not open program: " .. command_parts[2])
     end
   elseif command_parts[1] == "close" then
-    if self.main.apps:isInstalled(command_parts[2]) then
+    if self.main.processes:isActive(command_parts[2]) then
       self.main.processes:getProcess(command_parts[2]):close()
-      self:appendLog("Opened " .. command_parts[2])
+      self:appendLog("Closed " .. command_parts[2])
     else
-      self:appendLog("Could not open program: " .. command_parts[2])
+      self:appendLog("Could not close program: " .. command_parts[2])
     end
   elseif command_parts[1] == "save" then
     self.main.gamestate:save()
@@ -110,7 +115,7 @@ function Self:execute(command)
     self.main.gamestate:resetSave()
   elseif command_parts[1] == "debugmail" then
     self.main.timedmanager:after(0.2, function() self.main.gamestate:addMailFromID(3) end)
-  elseif self.main.processes:getProcess(command_parts[1]) then
+  elseif self.main.processes:isActive(command_parts[1]) then
     self.main.processes:getProcess(command_parts[1]):execute(self, command_parts[2])
   else
     self:appendLog("Unknown command: " .. (command_parts[1] or ""))

@@ -34,6 +34,9 @@ function Self:loadApps()
   self.files = self:makeWindow('applications.dummy.gui.windows.FileManagerWindow', 250, 250)
   self.processes = self:makeWindow('applications.dummy.gui.windows.TODO_ProcessesWindow', 250, 250)
   self.ressources = self:makeWindow('applications.dummy.gui.windows.TODO_RessourcesWindow', 250, 250)
+  self.antivirus = self:makeWindow('applications.dummy.gui.windows.AntivirusWindow', 250, 250)
+  self.contacts = self:makeWindow('applications.dummy.gui.windows.ContactsWindow', 250, 250)
+
 
   self.main.terminal.window = self.terminal
 
@@ -47,8 +50,16 @@ function Self:loadApps()
   self.contents:insert(self.ressources)
 end
 
+function Self:isActive(name)
+  return self[name] ~= nil
+end
+
 function Self:getProcess(name)
   return self[name]
+end
+
+function Self:finalize()
+  self:finalizeWindows()
 end
 
 function Self:finalizeWindows()
@@ -60,6 +71,13 @@ function Self:finalizeWindows()
   self.files:finalize()
   self.processes:finalize()
   self.ressources:finalize()
+end
+
+function Self:makePopup(args)
+  args.main = self.main
+  args.alwaysOnTop = true
+  local popup = require('applications.dummy.gui.windows.PopupWindow'):new(args)
+  self.main:insert(popup)
 end
 
 function Self:update(dt)

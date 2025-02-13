@@ -1,40 +1,43 @@
 local Super = require 'engine.gui.Window'
-local Self = Super:clone("MailWindow")
+local Self = Super:clone("ContactsWindow")
 
 
 
 function Self:init(args)
   args.w = 320
   args.h = 240
-  args.title = "Mail"
+  args.title = "Contacts"
   Super.init(self, args)
 
 
+  self.contacts = self.main.contacts
   
-  self.openmail = nil
+  self.opencontact = nil
 
-  self.mail_list_width = 80
-  self.mail_list = require 'engine.gui.List':new{main=self.main, x = -self.w/2 + self.mail_list_width/2, y = -1+16, w = self.mail_list_width, h = self.h - 32}
-  self:insert(self.mail_list)
+  self.contact_list_width = 80
+  self.contact_list = require 'engine.gui.List':new{main=self.main, x = -self.w/2 + self.contact_list_width/2, y = -1+16, w = self.contact_list_width, h = self.h - 32}
+  self:insert(self.contact_list)
 
   self.scroll_y = -40
 
   
-  self.main.mails.callbacks:register("onMailAdded", function(mail)
-    self:addMailToList(mail)
+  self.main.contacts.callbacks:register("onContactAdded", function(contact)
+    self:addContactToList(contact)
   end)
-  for i, mail in ipairs(self.main.mails:getMails()) do
-    self:addMailToList(mail)
+  self.main.contacts:addContactFromID(1)
+  for i, contact in ipairs(self.main.contacts:getContacts()) do
+    self:addContactToList(contact)
   end
+  
 
   self.stencilFunction = function()
     love.graphics.rectangle("fill", math.floor( -(self.w/2) ), math.floor( -(self.h/2) ), self.w, self.h)
   end
 
 
-  self.button_up = require 'engine.gui.Button':new{main=self.main, x = -self.w/2 + self.mail_list_width/2, y = -self.h/2 + 8+16, w = self.mail_list_width, h = 16}
+  self.button_up = require 'engine.gui.Button':new{main=self.main, x = -self.w/2 + self.contact_list_width/2, y = -self.h/2 + 8+16, w = self.contact_list_width, h = 16}
   self:insert(self.button_up)
-  self.button_up.callbacks:register("onClicked", function() self.mail_list:up() end)
+  self.button_up.callbacks:register("onClicked", function() self.contact_list:up() end)
   local arrow_up = require 'engine.gui.Node':new{main=self.main, x = 0, y = 0}
   arrow_up.callbacks:register("onDraw", function(selff)
     love.graphics.setLineWidth(1)
@@ -45,9 +48,9 @@ function Self:init(args)
   end)
   self.button_up:insert(arrow_up)
 
-  self.button_down = require 'engine.gui.Button':new{main=self.main, x = -self.w/2 + self.mail_list_width/2, y = self.h/2 - 8, w = self.mail_list_width, h = 16}
+  self.button_down = require 'engine.gui.Button':new{main=self.main, x = -self.w/2 + self.contact_list_width/2, y = self.h/2 - 8, w = self.contact_list_width, h = 16}
   self:insert(self.button_down)
-  self.button_down.callbacks:register("onClicked", function() self.mail_list:down() end)
+  self.button_down.callbacks:register("onClicked", function() self.contact_list:down() end)
   local arrow_down = require 'engine.gui.Node':new{main=self.main, x = 0, y = 0}
   arrow_down.callbacks:register("onDraw", function(selff)
     love.graphics.setLineWidth(1)
@@ -61,17 +64,17 @@ function Self:init(args)
 
   self.reply_field = require 'engine.gui.TextField':new{
     main = self.main,
-    x = -16 + ((self.w/2 - 16*3/2 - 16*3/2) + (-self.w/2 + self.mail_list_width/2 +self.mail_list_width/2)),
+    x = -16 + ((self.w/2 - 16*3/2 - 16*3/2) + (-self.w/2 + self.contact_list_width/2 +self.contact_list_width/2)),
     y = self.h/2 - 8,
-    w = ((self.w/2 - 16*3/2 - 16*3/2) - (-self.w/2 + self.mail_list_width/2 +self.mail_list_width/2)),
+    w = ((self.w/2 - 16*3/2 - 16*3/2) - (-self.w/2 + self.contact_list_width/2 +self.contact_list_width/2)),
     h = 16,
     visibleAndActive = false,
     accepting_input = false,
   }
   self.reply_field.callbacks:register("onSubmit", function(selff, input)
-    if self.openmail then
-      local input = self.openmail:getExpectedReply()
-      self.main.mails:replyMail(self.openmail, input)
+    if self.opencontact then
+      local input = self.opencontact:getExpectedReply()
+      self.main.contacts:replycontact(self.opencontact, input)
       selff.input = input
     end
   end)
@@ -81,18 +84,18 @@ function Self:init(args)
   local text = require 'engine.gui.Text':new{main=self.main, x = 0, y = 0, text = "Reply"}
   self.reply_button:insert(text)
   self.reply_button.callbacks:register("onClicked", function()
-    if self.openmail then
-      local input = self.openmail:getExpectedReply()
+    if self.opencontact then
+      local input = self.opencontact:getExpectedReply()
       self.reply_field.input = input
       self.reply_field:submit()
-      self.openmail.reply = input
+      self.opencontact.reply = input
     end
   end)
   self:insert(self.reply_button)
 
   self.scrollbar = require 'engine.gui.Scrollbar':new{main=self.main, x = self.w/2 - 8, y = 0, h = self.h-32}
   self:insert(self.scrollbar)
-  self.scrollbar.visibleAndActive = (self.openmail)
+  self.scrollbar.visibleAndActive = (self.opencontact)
   self.scrollbar.callbacks:register("onUp", function()
     self.scroll_y = self.scroll_y + (10)
   end)
@@ -101,22 +104,21 @@ function Self:init(args)
   end)
 
   self.callbacks:register("update", function(selff, dt)
-    self.scrollbar.visibleAndActive = (self.openmail)
+    self.scrollbar.visibleAndActive = (self.opencontact)
   end)
 
   return self
 end
 
-function Self:addMailToList(mail)
-  local b = require 'engine.gui.Button':new{main=self.main, x = 0, y = 0, w = self.mail_list_width, h =32}
-  self.mail_list:insert(b, 1)
+function Self:addContactToList(contact)
+  local b = require 'engine.gui.Button':new{main=self.main, x = 0, y = 0, w = self.contact_list_width, h =32}
+  self.contact_list:insert(b, 1)
   
   b.callbacks:register("onClicked", function(b)
-    self.openmail = mail
+    self.opencontact = contact
     self.scroll_y = -28
-    self.main.mails:readMail(mail)
     
-    self.reply_field.input = mail.reply or ""
+    self.reply_field.input = contact.reply or ""
   end)
   local sender_text = require 'engine.gui.Text':new{main=self.main, x = -37, y = -10, text = "", lineHeight = 1.4, font = FONTS["mono16"]}
   
@@ -126,44 +128,25 @@ function Self:addMailToList(mail)
 
   local function create_base_button_text()
     return {
-      sender_text_color, ""..mail:getSender(),
-      subject_text_color, "\n"..mail:getSubject(),
+      sender_text_color, ""..contact:getName() ,
     }
   end
   sender_text:setColoredText(create_base_button_text())
   b.callbacks:register("update", function(b)
-    if self.openmail == mail then
+    if self.opencontact == contact then
       b:setColor(0.8, 0.8, 0)
     else
       b:setColor(1, 1, 1)
     end
     local temporary_text = create_base_button_text()
-    if mail.read then
-      if mail.onReply_called then--solved
-        table.insert(temporary_text, 1, {0, 0, 0})
-        table.insert(temporary_text, 2, "")
-        sender_text:setColoredText(temporary_text)
-      elseif self.main.mails:canSolve(mail) then--unsolved but solvable
-        table.insert(temporary_text, 1, {0.7, 1, 0.0})
-        table.insert(temporary_text, 2, "*")
-        sender_text:setColoredText(temporary_text)
-      else--unsolved
-        table.insert(temporary_text, 1, {0, 0.5, 1})
-        table.insert(temporary_text, 2, "?")
-        sender_text:setColoredText(temporary_text)
-      end
-    else--unread
-      table.insert(temporary_text, 1, {1, 0, 0})
-      table.insert(temporary_text, 2, "!")
-      sender_text:setColoredText(temporary_text)
-    end
     
-    self.reply_button.visibleAndActive = self.openmail
-    self.reply_field.visibleAndActive = self.openmail
-    if self.openmail then
-      local canReply = self.main.mails:canSolve(self.openmail)
-      self.reply_button.enabled = not self.openmail.reply and canReply
-      self.reply_field.enabled = not self.openmail.reply and canReply
+    
+    self.reply_button.visibleAndActive = self.opencontact
+    self.reply_field.visibleAndActive = self.opencontact
+    if self.opencontact then
+      local canReply = self.main.contacts:canSolve(self.opencontact)
+      self.reply_button.enabled = not self.opencontact.reply and canReply
+      self.reply_field.enabled = not self.opencontact.reply and canReply
     end
   end)
   sender_text:setAlignment("left")
@@ -189,7 +172,7 @@ function Self:draw()
 
   local previous_font = love.graphics.getFont()
   love.graphics.setFont(FONTS["mono16"])
-  if self.openmail then
+  if self.opencontact then
     --love.graphics.setColor(0.4,0.4,0.4)
     love.graphics.push()
     love.graphics.stencil(self.stencilFunction, "replace", 1)
@@ -201,16 +184,16 @@ function Self:draw()
     local content = {}
 
     table.insert(content, {0.8, 0.8, 0.8, 1})
-    table.insert(content, self.openmail:getSender() .. "\n\n")
+    table.insert(content, self.opencontact:getName() .. "\n\n")
     table.insert(content, {0.8, 0.8, 0.8, 1})
-    table.insert(content, self.openmail:getSubject() .. "\n\n\n")
+    table.insert(content, "self.opencontact:getSubject()" .. "\n\n\n")
     table.insert(content, {0, 0, 0, 1})
-    table.insert(content, self.openmail:getContent())
+    table.insert(content, "self.opencontact:getContent()")
     
     
     
-    local wrapLimit = self.w - self.mail_list_width - 4 - self.scrollbar.w/2
-    local x = a*(-self.w/2 + self.mail_list_width + 2)
+    local wrapLimit = self.w - self.contact_list_width - 4 - self.scrollbar.w/2
+    local x = a*(-self.w/2 + self.contact_list_width + 2)
     local y = a*(-self.h/2 + 40 + 16)
     love.graphics.printf(content, x, y, (wrapLimit-16)/a, "left", 0, 1, 1, 0, 0, 0, 0)
     

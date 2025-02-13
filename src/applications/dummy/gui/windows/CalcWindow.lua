@@ -9,21 +9,14 @@ function Self:init(args)
   args.title = "Calc"
   Super.init(self, args)
 
-  self.icon = require 'applications.dummy.gui.elements.Icon_Calc':new{
-    x = 32 + 0*(64),
-    y = 32 + 6*(64),
-    w = 64,
-    h = 64,
-    name = "Calc",
-  }
-  self.icon:setTargetApp(self)
+
   
 
-  self.button1 = require 'engine.gui.Button':new{x = -self.w/2 + 16 - 1, y = -self.h/2 + 16 + 16-2, w = 22, h = 22}
+  self.button1 = require 'engine.gui.Button':new{main=self.main, x = -self.w/2 + 16 - 1, y = -self.h/2 + 16 + 16-2, w = 22, h = 22}
   self:insert(self.button1)
   self.button1.callbacks:register("onClicked", function() print("oi") end)
   
-  self.button1:insert(require 'engine.gui.Image':new{img = love.graphics.newImage("submodules/lua-projects-private/gfx/oldschool95/icon_new_file.png")})
+  self.button1:insert(require 'engine.gui.Image':new{main=self.main, img = love.graphics.newImage("submodules/lua-projects-private/gfx/oldschool95/icon_new_file.png")})
 
   return self
 end

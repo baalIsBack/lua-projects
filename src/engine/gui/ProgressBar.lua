@@ -39,7 +39,7 @@ function Self:init(args)
     self.legalDrag = false
   end)
 
-  self:insert(require 'engine.gui.Text':new{x=0, y=0, text=self.title, color={1,1,1}, alignment="center"})
+  self:insert(require 'engine.gui.Text':new{main=self.main, x=0, y=0, text=self.title, color={1,1,1}, alignment="center"})
   
 
 	return self

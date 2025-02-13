@@ -13,19 +13,19 @@ function Self:init(args)
   self.legalDrag = false
 
 
-  self.text_time = require("engine.gui.Text"):new{x=self.w/2, y=0, text="", color={1,1,1}, alignment="right"}
+  self.text_time = require("engine.gui.Text"):new{main=self.main, x=self.w/2, y=0, text="", color={1,1,1}, alignment="right"}
   self:insert(self.text_time)
   
   self.callbacks:register("update", function(self, dt)
     self.text_time:setText(os.date("%H:%M:%S"))
   end)
 
-  self.text_currency = require("engine.gui.Text"):new{x=-self.w/2 + 2, y=0, text="0.00$", color={1,1,1}, alignment="left"}
+  self.text_currency = require("engine.gui.Text"):new{main=self.main, x=-self.w/2 + 2, y=0, text="0.00$", color={1,1,1}, alignment="left"}
   self:insert(self.text_currency)
   
 
   local ram_text = string.format("%.2f", self.main:getCurrentRam()) .. "MB/" .. string.format("%.2f", self.main:getMaxRam()) .. "MB"
-  self.text_ram = require("engine.gui.Text"):new{x=0, y=0, text=ram_text, color={1,1,1}, alignment="center"}
+  self.text_ram = require("engine.gui.Text"):new{main=self.main, x=0, y=0, text=ram_text, color={1,1,1}, alignment="center"}
   self:insert(self.text_ram)
 
 

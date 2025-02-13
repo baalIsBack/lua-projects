@@ -108,6 +108,7 @@ function Self:save()
   dummy.time = self.main.timedmanager.time
   dummy.notes = self.main.notes
   dummy.apps = self.main.apps
+  dummy.contacts = self.main.contacts
   saveTableToFile("save.dat", dummy)
 end
 
@@ -128,6 +129,7 @@ function Self:load()
   self.files = master.files or self.files
   self.values = master.values or self.values
   self.apps = master.apps or self.apps
+  self.contacts = master.contacts or self.contacts
   self.main.timedmanager.time = master.time or self.main.timedmanager.time
   
 
@@ -138,6 +140,7 @@ function Self:load()
   self.main.files:deserialize(master.files)
   self.main.values:deserialize(master.values or {})
   self.main.apps:deserialize(master.apps or {})
+  self.main.contacts:deserialize(master.contacts or {})
 
   return firstTime
 end

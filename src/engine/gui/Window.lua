@@ -3,6 +3,7 @@ local Self = Super:clone("Window")
 
 function Self:init(args)
   Super.init(self, args)
+
   
   self.alwaysOnTop = args.alwaysOnTop
   self.w = args.w
@@ -14,13 +15,12 @@ function Self:init(args)
 
   self.wasDown = false
   self.isDown = false
-
-  self.bar = require 'engine.gui.Bar':new{x = 0, y = -self.h/2 - 8+16 , w = self.w, h = 32, title = args.title}
+  self.bar = require 'engine.gui.Bar':new{main=args.main,x = 0, y = -self.h/2 - 8+16 , w = self.w, h = 32, title = args.title}
   self:insert(self.bar)
-  self.bar.close_button = require 'engine.gui.Button':new{x = self.bar.w/2 - 8, y = 0, w = 10, h = 10}
-  self.bar.close_button:insert(require 'engine.gui.Text':new{text = "x", color={0,0,0}, x = 1, y = 0, font=FONTS["dialog"]})
+  self.bar.close_button = require 'engine.gui.Button':new{main=self.main,x = self.bar.w/2 - 8, y = 0, w = 10, h = 10}
+  self.bar.close_button:insert(require 'engine.gui.Text':new{main=self.main,text = "x", color={0,0,0}, x = 1, y = 0, font=FONTS["dialog"]})
   self.bar.close_button.callbacks:register("onClicked", function(x, y)
-    self.visibleAndActive = false
+    self:deactivate()
     self:setFocus()
   end)
   self.bar:insert(self.bar.close_button)
@@ -41,13 +41,6 @@ end
 function Self:finalize()
 end
 
-function Self:open()
-  self.visibleAndActive = true
-end
-
-function Self:close()
-  self.visibleAndActive = false
-end
 
 function Self:execute(terminal, command)
   terminal:appendLog("Unknown command: " .. (command or ""))

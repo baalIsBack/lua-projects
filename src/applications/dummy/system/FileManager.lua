@@ -14,10 +14,13 @@ function Self:init(args)
   self.currentcontents = nil
 
   self.lootTable = {}
-  table.insert(self.lootTable, makeLoot("folder", 50, 1, 1))
-  table.insert(self.lootTable, makeLoot("file_document", 50*5, 0, 1))
-  table.insert(self.lootTable, makeLoot("brick", 25*10, 1, 1))
-  table.insert(self.lootTable, makeLoot("file_image", 25*10, 1, 1))
+  table.insert(self.lootTable, makeLoot("Icon_Folder", 500, 1, 1))
+  table.insert(self.lootTable, makeLoot("Icon_File_Document", 2500, 0, 1))
+  table.insert(self.lootTable, makeLoot("Icon_Brick", 2500, 1, 1))
+  table.insert(self.lootTable, makeLoot("Icon_File_Image", 2500, 1, 1))
+  table.insert(self.lootTable, makeLoot("Icon_Mail", 10, 1, 1))
+  table.insert(self.lootTable, makeLoot("Icon_Terminal", 10, 1, 1))
+  table.insert(self.lootTable, makeLoot("Icon_Program", 1000, 1, 1))
 
   self.alias_table = nil
 
@@ -26,10 +29,14 @@ function Self:init(args)
   return self
 end
 
+function Self:determineContentQuantity()
+  return math.random(0, self.main.values:get("files_icon_quantity"))
+end
+
 function Self:determineContents()
   self:reloadAliasTable()
   self.currentcontents = {}
-  for i=1, 10, 1 do
+  for i=1, self:determineContentQuantity(), 1 do
     local lootID = self.alias_table()
     local content = self.lootTable[lootID].content
     local amount = math.random(self.lootTable[lootID].amountMin, self.lootTable[lootID].amountMax)

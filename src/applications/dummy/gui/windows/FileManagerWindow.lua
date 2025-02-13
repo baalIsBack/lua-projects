@@ -16,10 +16,9 @@ function Self:init(args)
 
   self.icons = {}
 
-  self:switchLocation()
 
   --add scrollbar
-  self.scrollbar = require 'engine.gui.Scrollbar':new{x = args.w/2 - 8, y = 8, w = 16, h = 240-16, orientation = "vertical"}
+  self.scrollbar = require 'engine.gui.Scrollbar':new{main=self.main, x = args.w/2 - 8, y = 8, w = 16, h = 240-16, orientation = "vertical"}
   self:insert(self.scrollbar)
   self.scrollbar.callbacks:register("onUp", function()
     self.y_scroll = self.y_scroll - 1
@@ -31,6 +30,8 @@ function Self:init(args)
   self.callbacks:register("update", function()
     self:reevaluateIcons()
   end)
+
+  self:switchLocation()
 
   return self
 end
@@ -68,38 +69,30 @@ function Self:addIcon(icon_type, info)
 
   local icon = nil
   local requiredFile = self.main.files:getRandomRequiredFile()
-  if icon_type == "folder" then
-    icon = require 'applications.dummy.gui.elements.Icon_Folder':new(proto_t)
+  icon = require('applications.dummy.gui.elements.' .. icon_type):new(proto_t)
+  
+  if icon then
     icon.text.color = {0, 0, 0}
-    self:insert(icon)
-  elseif icon_type == "brick" then
-    icon = require 'applications.dummy.gui.elements.Icon_Brick':new(proto_t)
-    icon.text.color = {0, 0, 0}
-    self:insert(icon)
-    icon.pos = pos
-  elseif icon_type == "file_document" then
-    icon = require 'applications.dummy.gui.elements.Icon_File_Document':new(proto_t)
-    icon.text.color = {0, 0, 0}
-    self:insert(icon)
-    icon.pos = pos
-    if not info.generatedRequiredFile and requiredFile and math.random(0, 10-1) <= 0 then
+  end
+  if icon_type == "Icon_File_Document" then
+    if not info.generatedRequiredFile and requiredFile and math.random(0, 3-1) <= 0 then
       icon:setName(requiredFile)
-      icon.text.color = {1, 0, 1}
       icon.callbacks:register("onClicked", function(selff)
         self.main.flags:set("file_opened_"..icon.name)
         self.main.files:remove(icon.name)
       end)
       info.generatedRequiredFile = true
+      icon.text.color = {1, 0, 1}
     end
-  elseif icon_type == "file_image" then
-    icon = require 'applications.dummy.gui.elements.Icon_File_Image':new(proto_t)
-    icon.text.color = {0, 0, 0}
-    self:insert(icon)
-    icon.pos = pos
-  else
-    print("unknown icon type", icon_type)
+  elseif icon_type == "Icon_Mail" then
+    icon:setName("Mail")
+  elseif icon_type == "Icon_Terminal" then
+    icon:setName("Terminal")
   end
+
   if icon then
+    icon.pos = pos
+    self:insert(icon)
     table.insert(self.icons, icon)
   end
   
@@ -122,7 +115,7 @@ end
 
 function Self:generateIcons()
   local loot = self.main.filemanager:determineContents()
-  table.insert(loot, "folder")--has to be there or player gets stuck
+  table.insert(loot, "Icon_Folder")--has to be there or player gets stuck
   local table_shuffle = require 'lib.shuffle'
   table_shuffle(loot)
   local info = {}

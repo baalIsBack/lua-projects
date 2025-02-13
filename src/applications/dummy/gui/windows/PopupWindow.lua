@@ -3,8 +3,10 @@ local Self = Super:clone("PopupWindow")
 
 
 function Self:init(args)
-  args.w = 32 * 2.5
-  args.h = 24 * 2
+  args.w = args.w or (32 * 4)
+  args.h = args.h or (24 * 2.75)
+  args.x = args.x or math.random(0+args.w/2, 640-args.w/2)
+  args.y = args.y or math.random(0+args.h/2, 480-args.h/2)
   args.title = args.title or ""
   Super.init(self, args)
 
@@ -13,11 +15,27 @@ function Self:init(args)
   self.bar.color = {255/255, 30/255, 15/255}
 
   
-  self.text = require 'engine.gui.Text':new{text = self.text_string, color={0,0,0}, x = 0-8, y = 0}
+  self.text = require 'engine.gui.Text':new{main=self.main, text = self.text_string, color={0,0,0}, x = -self.w/2 +2, y = 16+6-self.h/2, wrapLimit = self.w-4, alignment = "left"}
   self:insert(self.text)
-  
+
+  if args.hasOkButton then
+    self:addOkButton()
+  end
 
   return self
+end
+
+function Self:addOkButton()
+  if not self.alreadyAddedOkButton then
+    self.alreadyAddedOkButton = true
+    local button = require 'engine.gui.Button':new{main=self.main, x = 0, y = self.h/2-4-8, w = 20, h = 14}
+    self:insert(button)
+    local text = require 'engine.gui.Text':new{main=self.main, text = "OK", color={0,0,0}, x = 0, y = -2, wrapLimit = 64, alignment = "center"}
+    button:insert(text)
+    button.callbacks:register("onClicked", function()
+      self:deactivate()
+    end)
+  end
 end
 
 

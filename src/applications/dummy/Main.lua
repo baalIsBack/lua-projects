@@ -6,7 +6,7 @@ function Self:init()
   Super.init(self)
 
   FONTS = {}
-  FONTS["mono16"] = love.graphics.newImageFont("submodules/lua-projects-private/font/jasoco/font1.png", "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 :-!.,\"?>_#<{}()[]\\+/;%&='*", 1)
+  FONTS["mono16"] = love.graphics.newImageFont("submodules/lua-projects-private/font/jasoco/font1.png", "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 :-!.,\"?>_#<{}()[]\\+/;%&='*", 0)
   FONTS["mono16"]:setLineHeight(1)
 
   FONTS["dialog"] = love.graphics.newImageFont("submodules/lua-projects-private/font/jasoco/font2.png", " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,!?-+/():;%&`_*#=[]'{}", 1)
@@ -44,12 +44,14 @@ function Self:init()
   self.values = require 'applications.dummy.system.Values':new{main=self}
   self.flags = require 'applications.dummy.system.Flags':new{main=self}
   self.files = require 'applications.dummy.system.Files':new{main=self}
+  self.contacts = require 'applications.dummy.system.Contacts':new{main=self}
   self.mails = require 'applications.dummy.system.Mails':new{main=self}
   self.notes = require 'applications.dummy.system.Notes':new{main=self}
   self.terminal = require 'applications.dummy.system.Terminal':new{main=self}
   self.filemanager = require 'applications.dummy.system.FileManager':new{main=self}
   self.processes = require 'applications.dummy.system.Processes':new{main=self}
   self.apps = require 'applications.dummy.system.Apps':new{main=self}
+  self.antivirus = require 'applications.dummy.system.Antivirus':new{main=self}
   
   --self:install_calc()
 
@@ -60,7 +62,7 @@ function Self:init()
 
 
 
-  local osbar = require 'applications.dummy.gui.elements.OSBar':new{y = 480-16+4, color = {0/255, 1/255, 129/255}, main=self,}
+  local osbar = require 'applications.dummy.gui.elements.OSBar':new{main=self.main, y = 480-16+4, color = {0/255, 1/255, 129/255}, main=self,}
   self:insert(osbar)
   self.gamestate:finalize()
   self.processes:finalizeWindows()

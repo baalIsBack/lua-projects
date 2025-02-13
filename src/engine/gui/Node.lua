@@ -4,6 +4,10 @@ local Self = Super:clone("Node")
 Self.FOCUS_LIST = {}
 
 function Self:init(args)
+  if not args.main then
+    asdf()
+  end
+  assert(args.main, "Node requires a main argument")
   self.main = args.main
   self.hasCallbacks = true
   self.hasContents = true
@@ -11,6 +15,9 @@ function Self:init(args)
 
   self.callbacks:declare("onInsert")
   self.callbacks:declare("onDraw")
+  
+  self.callbacks:declare("onActivate")
+  self.callbacks:declare("onDeactivate")
   
   self.callbacks:declare("onMouseEnter")
   self.callbacks:declare("onHover")
@@ -71,6 +78,13 @@ function Self:init(args)
   self.h = args.h or 0
 
 	return self
+end
+
+function Self:setPosition(x, y)
+  self.x = x
+  self.y = y
+  self.x_starting_value = self.x
+  self.y_starting_value = self.y
 end
 
 function Self:setColor(r, g, b, a)
@@ -173,10 +187,12 @@ end
 
 function Self:activate()
   self.visibleAndActive = true
+  self.callbacks:call("onActivate", {self})
 end
 
 function Self:deactivate()
   self.visibleAndActive = false
+  self.callbacks:call("onDeactivate", {self})
 end
 
 function Self:checkCallbacks_old()

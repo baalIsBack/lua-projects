@@ -15,13 +15,13 @@ function Self:init(args)
   self.callbacks:declare("onSet")
   self.callbacks:register("onSet", function(selff, name, value)
     if name == "currently_collected_Icon_File_Image" and value > 0 then
-      self.main.processes:getProcess("stat"):addNewUniqueStat(require('applications.dummy.gui.elements.Icon_File_Image').IMG, "currently_collected_Icon_File_Image")
+      self.main.processes:getProcess("stat"):addNewUniqueStat(require('applications.dummy.gui.elements.Icon_File_Image'), "currently_collected_Icon_File_Image")
     end
     if name == "currently_collected_Icon_File_Document" and value > 0 then
-      self.main.processes:getProcess("stat"):addNewUniqueStat(require('applications.dummy.gui.elements.Icon_File_Document').IMG, "currently_collected_Icon_File_Document")
+      self.main.processes:getProcess("stat"):addNewUniqueStat(require('applications.dummy.gui.elements.Icon_File_Document'), "currently_collected_Icon_File_Document")
     end
     if name == "currently_collected_Icon_Brick" and value > 0 then
-      self.main.processes:getProcess("stat"):addNewUniqueStat(require('applications.dummy.gui.elements.Icon_Brick').IMG, "currently_collected_Icon_Brick")
+      self.main.processes:getProcess("stat"):addNewUniqueStat(require('applications.dummy.gui.elements.Icon_Brick'), "currently_collected_Icon_Brick")
     end
   end)
 
@@ -52,6 +52,11 @@ function Self:get(name)
   return self.values[name]
 end
 
+function Self:inc(name, quant)
+  local previous_value = self:get(name)
+  self:set(name, previous_value + quant)
+end
+
 function Self:serialize()
   local t = self.values
   return t
@@ -64,10 +69,13 @@ function Self:setDefaults()
   self:setOnce("currently_collected_Icon_File_Image", 0)
   self:setOnce("currently_collected_Icon_Brick", 0)
   self:setOnce("currently_collected_Icon_File_Document", 0)
+  self:setOnce("currently_collected_Icon_Program", 0)
   self:setOnce("opened_Icon_File_Image", 0)
   self:setOnce("opened_Icon_Brick", 0)
   self:setOnce("opened_Icon_File_Document", 0)
-  
+  self:setOnce("opened_Icon_Program", 0)
+  self:setOnce("files_icon_quantity", 5)
+  self:setOnce("virus_value", 0)
   
   self.safe = false
 end

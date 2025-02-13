@@ -17,9 +17,9 @@ function Self:init(args)
   self.z = -1
   
   
-  self.image = require 'engine.gui.Image':new{img = args.img or self.IMG, x = 0, y = 0}
-  self.text = require 'engine.gui.Text':new{text = self.name, color={1,1,1}, x = 0, y = 25}
-  self.max_length_before_shortening = 8
+  self.image = require 'engine.gui.Image':new{main=self.main, img = args.img or self.IMG, x = 0, y = 0}
+  self.text = require 'engine.gui.Text':new{main=self.main, text = self.name, color={1,1,1}, x = 0, y = 25}
+  self.max_length_before_shortening = 10
   
   self:setName(self.name)
   self:insert( self.image )

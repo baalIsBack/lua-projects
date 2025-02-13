@@ -11,6 +11,7 @@ function Self:init(args)
   self.alignment = args.alignment or "center"
   self.color = args.color or {0, 0, 0, 1}
   self.lineHeight = args.lineHeight or 1
+  self.wrapLimit = args.wrapLimit or 10000
 
 	return self
 end
@@ -69,7 +70,7 @@ function Self:draw()
   love.graphics.setColor(1, 1, 1)
   local old_line_height = self.font:getLineHeight()
   self.font:setLineHeight(self.lineHeight)
-  love.graphics.printf(self.coloredText or {self.color, self.text}, x, y, 10000, "left", 0, 1, 1, 0, 0, 0, 0)
+  love.graphics.printf(self.coloredText or {self.color, self.text}, x, y, self.wrapLimit, "left", 0, 1, 1, 0, 0, 0, 0)
   self.font:setLineHeight(old_line_height)
   love.graphics.setColor(1, 1, 1)
   

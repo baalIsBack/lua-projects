@@ -54,7 +54,7 @@ return alias_table
 
 --[[ -- usage:
 alias_table = require"alias_table"
-sample = alias_table:new{10, 20, 15, 2, 2.3, 130} -- assign weights for 1, 2, 3, 4, 5, 6 etc.
+sample = alias_table:new{main=self.main, 10, 20, 15, 2, 2.3, 130} -- assign weights for 1, 2, 3, 4, 5, 6 etc.
 math.randomseed(os.time()); math.random(); math.random(); math.random();
 print(sample())
 print(sample())

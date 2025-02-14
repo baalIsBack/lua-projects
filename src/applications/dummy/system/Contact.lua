@@ -27,8 +27,20 @@ function Self:deserialize(raw_contact)
   return self
 end
 
+function Self:getEmployeeID()
+  return require 'applications.dummy.system.ContactDefinitions'[self.prototype_id].employee_id
+end
+
 function Self:getName()
   return require 'applications.dummy.system.ContactDefinitions'[self.prototype_id].name
+end
+
+function Self:getBirthday()
+  return require 'applications.dummy.system.ContactDefinitions'[self.prototype_id].birthday
+end
+
+function Self:getAddress()
+  return require 'applications.dummy.system.ContactDefinitions'[self.prototype_id].address
 end
 
 return Self

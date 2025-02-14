@@ -22,7 +22,7 @@ function Self:init(args)
 
   
   self.main.contacts.callbacks:register("onContactAdded", function(contact)
-    self:addContactToList(contact)
+    --self:addContactToList(contact)
   end)
   self.main.contacts:addContactFromID(1)
   for i, contact in ipairs(self.main.contacts:getContacts()) do
@@ -122,8 +122,8 @@ function Self:addContactToList(contact)
   end)
   local sender_text = require 'engine.gui.Text':new{main=self.main, x = -37, y = -10, text = "", lineHeight = 1.4, font = FONTS["mono16"]}
   
-  local sender_text_color = {0.3, 0.3, 0.3,1}
-  local subject_text_color = {0, 0, 0,1}
+  local sender_text_color = {0.3, 0.3, 0.3, 1}
+  local subject_text_color = {0, 0, 0, 1}
   b:insert(sender_text)
 
   local function create_base_button_text()
@@ -138,7 +138,6 @@ function Self:addContactToList(contact)
     else
       b:setColor(1, 1, 1)
     end
-    local temporary_text = create_base_button_text()
     
     
     self.reply_button.visibleAndActive = self.opencontact
@@ -183,12 +182,15 @@ function Self:draw()
     love.graphics.scale(1/a, 1/a)
     local content = {}
 
-    table.insert(content, {0.8, 0.8, 0.8, 1})
-    table.insert(content, self.opencontact:getName() .. "\n\n")
-    table.insert(content, {0.8, 0.8, 0.8, 1})
-    table.insert(content, "self.opencontact:getSubject()" .. "\n\n\n")
+    --table.insert(content, {0.8, 0.8, 0.8, 1})
     table.insert(content, {0, 0, 0, 1})
-    table.insert(content, "self.opencontact:getContent()")
+    table.insert(content, "Employee ID: ..." .. self.opencontact:getEmployeeID() .. "\n\n")
+    table.insert(content, {0, 0, 0, 1})
+    table.insert(content, "Name: ..." .. self.opencontact:getName() .. "\n\n")
+    table.insert(content, {0, 0, 0, 1})
+    table.insert(content, "Birthday: ..." .. self.opencontact:getBirthday() .. "\n\n")
+    table.insert(content, {0, 0, 0, 1})
+    table.insert(content, "Address: ..." .. self.opencontact:getAddress() .. "\n\n")
     
     
     

@@ -8,6 +8,12 @@ CONTACTS[1] = {
   name = "REDACTED",
   birthday = "REDACTED",
   address = "REDACTED",
+  requirements = {
+    ["Icon_Brick"] = 1,
+  },
+  rewards = {
+    ["Icon_File_Document"] = 10,
+  },
 }
 
 

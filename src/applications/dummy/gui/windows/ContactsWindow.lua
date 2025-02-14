@@ -62,33 +62,12 @@ function Self:init(args)
   self.button_down:insert(arrow_down)
 
 
-  self.reply_field = require 'engine.gui.TextField':new{
-    main = self.main,
-    x = -16 + ((self.w/2 - 16*3/2 - 16*3/2) + (-self.w/2 + self.contact_list_width/2 +self.contact_list_width/2)),
-    y = self.h/2 - 8,
-    w = ((self.w/2 - 16*3/2 - 16*3/2) - (-self.w/2 + self.contact_list_width/2 +self.contact_list_width/2)),
-    h = 16,
-    visibleAndActive = false,
-    accepting_input = false,
-  }
-  self.reply_field.callbacks:register("onSubmit", function(selff, input)
-    if self.opencontact then
-      local input = self.opencontact:getExpectedReply()
-      self.main.contacts:replycontact(self.opencontact, input)
-      selff.input = input
-    end
-  end)
-  self:insert(self.reply_field)
-
   self.reply_button = require 'engine.gui.Button':new{main=self.main, x = self.w/2 - 16*3/2, y = self.h/2 - 8 , w=16*3, h=16, visibleAndActive = false,}
   local text = require 'engine.gui.Text':new{main=self.main, x = 0, y = 0, text = "Reply"}
   self.reply_button:insert(text)
   self.reply_button.callbacks:register("onClicked", function()
     if self.opencontact then
-      local input = self.opencontact:getExpectedReply()
-      self.reply_field.input = input
-      self.reply_field:submit()
-      self.opencontact.reply = input
+      self.main.contacts:replycontact(self.opencontact)
     end
   end)
   self:insert(self.reply_button)
@@ -118,7 +97,7 @@ function Self:addContactToList(contact)
     self.opencontact = contact
     self.scroll_y = -28
     
-    self.reply_field.input = contact.reply or ""
+    --self.reply_field.input = contact.reply or ""
   end)
   local sender_text = require 'engine.gui.Text':new{main=self.main, x = -37, y = -10, text = "", lineHeight = 1.4, font = FONTS["mono16"]}
   
@@ -141,11 +120,11 @@ function Self:addContactToList(contact)
     
     
     self.reply_button.visibleAndActive = self.opencontact
-    self.reply_field.visibleAndActive = self.opencontact
+    --self.reply_field.visibleAndActive = self.opencontact
     if self.opencontact then
       local canReply = self.main.contacts:canSolve(self.opencontact)
       self.reply_button.enabled = not self.opencontact.reply and canReply
-      self.reply_field.enabled = not self.opencontact.reply and canReply
+      --self.reply_field.enabled = not self.opencontact.reply and canReply
     end
   end)
   sender_text:setAlignment("left")

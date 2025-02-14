@@ -59,22 +59,39 @@ function Self:deserialize(raw)
 end
 
 function Self:canSolve(contact)
-  print("cansolve not done")
-  return false
+  local requirements = contact:getRequirements()
+  local collected_value
+  for requirement, quantity in pairs(requirements) do
+    collected_value = self.main.values:get("currently_collected_" .. requirement)
+    if collected_value < quantity then
+      return false
+    end
+  end
+  return true
 end
 
 function Self:update(dt)
   
 end
 
-function Self:replycontact(contact, text)
-  print("replying to contact", contact, text)
+function Self:replycontact(contact)
+  if not self:canSolve(contact) then
+    return false
+  end
+  local requirements = contact:getRequirements()
+  local collected_value
+  for requirement, quantity in pairs(requirements) do
+    collected_value = self.main.values:inc("currently_collected_" .. requirement, -quantity)
+  end
+  self:giveRewards(contact)
+  return true
 end
 
-function Self:giveReward(contact)
-  local current_cash = self.main.values:get("cash")
-  local cash_gain = contact:getReward()
-  self.main.values:set("cash", current_cash + cash_gain)
+function Self:giveRewards(contact)
+  local rewards = contact:getRewards()
+  for reward, quantity in pairs(rewards) do
+    self.main.values:inc("currently_collected_" .. reward, quantity)
+  end
 end
 
 function Self:triggerUnlock(contact_prototype_id)
@@ -95,7 +112,7 @@ function Self:addContact(contact)
 end
 
 function Self:addContactFromID(contact_prototype_id)
-  local contact = require 'applications.dummy.system.contact':new({main=self.main})
+  local contact = require 'applications.dummy.system.Contact':new({main=self.main})
   contact.prototype_id = contact_prototype_id
 
   

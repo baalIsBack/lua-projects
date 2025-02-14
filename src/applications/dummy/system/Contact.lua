@@ -43,4 +43,12 @@ function Self:getAddress()
   return require 'applications.dummy.system.ContactDefinitions'[self.prototype_id].address
 end
 
+function Self:getRequirements()
+  return require 'applications.dummy.system.ContactDefinitions'[self.prototype_id].requirements
+end
+
+function Self:getRewards()
+  return require 'applications.dummy.system.ContactDefinitions'[self.prototype_id].rewards
+end
+
 return Self

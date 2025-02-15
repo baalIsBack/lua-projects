@@ -102,6 +102,14 @@ function Self:init(args)
 
   self.callbacks:register("update", function(selff, dt)
     self.scrollbar.visibleAndActive = (self.openmail)
+    
+    self.reply_button.visibleAndActive = self.openmail
+    self.reply_field.visibleAndActive = self.openmail
+    if self.openmail then
+      local canReply = self.main.mails:canSolve(self.openmail)
+      self.reply_button.enabled = not self.openmail.reply and canReply
+      self.reply_field.enabled = not self.openmail.reply and canReply
+    end
   end)
 
   return self
@@ -131,11 +139,11 @@ function Self:addMailToList(mail)
     }
   end
   sender_text:setColoredText(create_base_button_text())
-  b.callbacks:register("update", function(b)
+  b.callbacks:register("update", function(selff)
     if self.openmail == mail then
-      b:setColor(0.8, 0.8, 0)
+      b:setColor(200/255, 200/255, 200/255)
     else
-      b:setColor(1, 1, 1)
+      b:setColor(192/255, 192/255, 192/255)
     end
     local temporary_text = create_base_button_text()
     if mail.read then
@@ -156,14 +164,6 @@ function Self:addMailToList(mail)
       table.insert(temporary_text, 1, {1, 0, 0})
       table.insert(temporary_text, 2, "!")
       sender_text:setColoredText(temporary_text)
-    end
-    
-    self.reply_button.visibleAndActive = self.openmail
-    self.reply_field.visibleAndActive = self.openmail
-    if self.openmail then
-      local canReply = self.main.mails:canSolve(self.openmail)
-      self.reply_button.enabled = not self.openmail.reply and canReply
-      self.reply_field.enabled = not self.openmail.reply and canReply
     end
   end)
   sender_text:setAlignment("left")

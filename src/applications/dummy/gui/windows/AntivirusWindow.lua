@@ -8,24 +8,54 @@ function Self:init(args)
   Super.init(self, args)
   
 
-  self.list = require 'engine.gui.List':new{
-    main=self.main,
-    x = 0-8,
-    y = 0+8,
-    w = self.w-16-16,
-    h = self.h-16-16,
-    items = {}
-  }
-  self:insert(self.list)
 
   self.virus_count_text = require 'engine.gui.Text':new{
     main = self.main,
-    x = 0,
-    y = -self.h/2+8,
+    x = -self.w/2 +6,
+    y = -self.h/2+8 + 16,
     text = "Virus count: 0",
-    alignment = "center",
+    alignment = "left",
   }
-  self.list:insert(self.virus_count_text)
+  self:insert(self.virus_count_text)
+
+  self.progressbar = require 'engine.gui.ProgressBar':new{
+    main= self.main,
+    x = 0,
+    y = self.h/2-16,
+    w = self.w-16,
+    h = 16,
+    speed = self.main.values:get("virus_finder_speed")/100,
+  }
+  self.progressbar.callbacks:register("onFilled", function(selff)
+    if self.main.values:get("virus_value") > 0 then
+      self.main.values:inc("virus_value", -1)
+      self.main.values:inc("virus_found", 1)
+    end
+  end)
+  self:insert(self.progressbar)
+
+  self.callbacks:register("update", function(self, dt)
+    self.progressbar:setSpeed(self.main.values:get("virus_finder_speed")/100)
+  end)
+
+
+  local scan_button = require 'engine.gui.Button':new{
+    main = self.main,
+    x = 0,
+    y = self.h/2-32-8,
+    w = 32,
+    h = 16,
+    text = "Scan",
+  }
+  self:insert(scan_button)
+  scan_button.callbacks:register("onClicked", function(selff)
+    if not self.progressbar:isRunning() then
+      self.progressbar:setProgress(0)
+    end
+    self.progressbar:start()
+  end)
+
+
 
   --[[
   self.scrollbar = require 'engine.gui.Scrollbar':new{
@@ -46,60 +76,14 @@ function Self:init(args)
   
 
   self.callbacks:register("update", function(self, dt)
-    self.virus_count_text:setText("Virus count: " .. self.main.values:get("virus_value"))
+    self.virus_count_text:setText("Virus count: " .. self.main.values:get("virus_found"))
   end)
   
   --self.list:insert(t)
   return self
 end
 
-function Self:finalize()
-  if self.main.values:get("opened_Icon_File_Image") > 0 then
-    self:addNewUniqueStat(require('applications.dummy.gui.elements.Icon_File_Image'), "currently_collected_Icon_File_Image")
-  end
-  if self.main.values:get("opened_Icon_Brick") > 0 then
-    self:addNewUniqueStat(require('applications.dummy.gui.elements.Icon_Brick'), "currently_collected_Icon_Brick")
-  end
-  if self.main.values:get("opened_Icon_File_Document") > 0 then
-    self:addNewUniqueStat(require('applications.dummy.gui.elements.Icon_File_Document'), "currently_collected_Icon_File_Document")
-  end
-end
 
-function Self:addNewUniqueStat(proto, value_id)
-  local node, t
-
-  for i, v in ipairs(self.trackables) do
-    if v.value_id == value_id then
-      return
-    end
-  end
-
-  node = require 'engine.gui.Node':new{
-    main = self.main,
-    x = -110,
-    y = 0,
-    w = 100,
-    h = 36,
-  }
-  
-  node:insert(require 'engine.gui.Image':new{
-    main = self.main,
-    x = -16,
-    y = 0,
-    img = proto.IMG,
-  })
-  t = require 'engine.gui.Text':new{
-    main = self.main,
-    x = 0,
-    y = 0,
-    text = " x 0",
-    alignment = "left",
-  }
-  node:insert(t)
-  node.text_node = t
-  self.list:insert(node)
-  table.insert(self.trackables, {node = node, value_id=value_id, proto=proto})
-end
 
 
 function Self:draw()

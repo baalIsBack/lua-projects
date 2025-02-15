@@ -88,7 +88,11 @@ function Self:setPosition(x, y)
 end
 
 function Self:setColor(r, g, b, a)
-  self.color = {r, g, b, a}
+  if type(r) == "table" then
+    self.color = r
+  else
+    self.color = {r, g, b, a}
+  end    
 end
 
 function Self:draw()

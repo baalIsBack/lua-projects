@@ -17,8 +17,10 @@ function Self:init(args)
   self.isDown = false
   self.bar = require 'engine.gui.Bar':new{main=args.main,x = 0, y = -self.h/2 - 8+16 , w = self.w, h = 32, title = args.title}
   self:insert(self.bar)
-  self.bar.close_button = require 'engine.gui.Button':new{main=self.main,x = self.bar.w/2 - 8, y = 0, w = 10, h = 10}
-  self.bar.close_button:insert(require 'engine.gui.Text':new{main=self.main,text = "x", color={0,0,0}, x = 1, y = 0, font=FONTS["dialog"]})
+  self.bar.close_button = require 'engine.gui.Button':new{main=self.main,x = self.bar.w/2 - 8, y = 0, w = 10, h = 10, text = "x", text_color = {0,0,0}}
+  self.bar.close_button.text:setFont(FONTS["dialog"])
+  self.bar.close_button.text.x = 1
+  self.bar.close_button.text.y = -2
   self.bar.close_button.callbacks:register("onClicked", function(x, y)
     self:deactivate()
     self:setFocus()

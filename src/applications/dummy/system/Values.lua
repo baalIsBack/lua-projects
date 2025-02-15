@@ -14,14 +14,14 @@ function Self:init(args)
 
   self.callbacks:declare("onSet")
   self.callbacks:register("onSet", function(selff, name, value)
-    if name == "currently_collected_Icon_File_Image" and value > 0 then
-      self.main.processes:getProcess("stat"):addNewUniqueStat(require('applications.dummy.gui.elements.Icon_File_Image'), "currently_collected_Icon_File_Image")
+    if name == "currently_collected_Image" and value > 0 then
+      self.main.processes:getProcess("stat"):addNewUniqueStat(require('applications.dummy.gui.elements.Icon_File_Image'), "currently_collected_Image")
     end
-    if name == "currently_collected_Icon_File_Document" and value > 0 then
-      self.main.processes:getProcess("stat"):addNewUniqueStat(require('applications.dummy.gui.elements.Icon_File_Document'), "currently_collected_Icon_File_Document")
+    if name == "currently_collected_Document" and value > 0 then
+      self.main.processes:getProcess("stat"):addNewUniqueStat(require('applications.dummy.gui.elements.Icon_File_Document'), "currently_collected_Document")
     end
-    if name == "currently_collected_Icon_Brick" and value > 0 then
-      self.main.processes:getProcess("stat"):addNewUniqueStat(require('applications.dummy.gui.elements.Icon_Brick'), "currently_collected_Icon_Brick")
+    if name == "currently_collected_Brick" and value > 0 then
+      self.main.processes:getProcess("stat"):addNewUniqueStat(require('applications.dummy.gui.elements.Icon_Brick'), "currently_collected_Brick")
     end
   end)
 
@@ -66,16 +66,18 @@ function Self:setDefaults()
   self.safe = true
   self:setOnce("employee_id", math.random(45642, 99999))
   self:setOnce("cash", 0)
-  self:setOnce("currently_collected_Icon_File_Image", 0)
-  self:setOnce("currently_collected_Icon_Brick", 0)
-  self:setOnce("currently_collected_Icon_File_Document", 0)
-  self:setOnce("currently_collected_Icon_Program", 0)
-  self:setOnce("opened_Icon_File_Image", 0)
-  self:setOnce("opened_Icon_Brick", 0)
-  self:setOnce("opened_Icon_File_Document", 0)
-  self:setOnce("opened_Icon_Program", 0)
+  self:setOnce("currently_collected_Image", 0)
+  self:setOnce("currently_collected_Brick", 0)
+  self:setOnce("currently_collected_Document", 0)
+  self:setOnce("currently_collected_Program", 0)
+  self:setOnce("opened_Image", 0)
+  self:setOnce("opened_Brick", 0)
+  self:setOnce("opened_Document", 0)
+  self:setOnce("opened_Program", 0)
   self:setOnce("files_icon_quantity", 5)
-  self:setOnce("virus_value", 0)
+  self:setOnce("virus_value", 0)--viruses contracted but not noticed
+  self:setOnce("virus_found", 0)--viruses found by antivirus
+  self:setOnce("virus_finder_speed", 1)--takes val/100 seconds to find a virus
   
   self.safe = false
 end

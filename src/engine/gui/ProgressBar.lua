@@ -8,38 +8,23 @@ function Self:init(args)
   self.w = args.w
   self.h = 16
 
-  self.wasDown = false
-  self.isDown = false
 
   
   self.progress = 0
+  self.speed = args.speed or 0.1
+  self.running = args.running or false
+  self.loop = args.loop or false
 
-  self.legalDrag = false
-
-  --add small button 14 x 14 at the right end
-  self.callbacks:register("onDragBegin", function(selff, x, y)
-    if self:isLeaf(x, y) then
-      self.legalDrag = true
-    end
-  end)
-
-  self.callbacks:register("onDrag", function(selff, dx, dy)
-    local _x, _y = require 'engine.Screen':getMousePosition()
-    if self:isLeaf(_x-dx, _y-dy) then
-      if self.legalDrag then
-        self.parent.x = self.parent.x + dx
-        self.parent.y = self.parent.y + dy
-      end
-    else
-      self.legalDrag = false
-    end
-  end)
-
-  self.callbacks:register("onDragEnd", function(selff, x, y)
-    self.legalDrag = false
-  end)
+  self.callbacks:declare("onFilled")
+  
 
   self:insert(require 'engine.gui.Text':new{main=self.main, x=0, y=0, text=self.title, color={1,1,1}, alignment="center"})
+
+  self.callbacks:register("update", function(self, dt)
+    if self.running then
+      self:setProgress(self.progress + self.speed * dt)
+    end
+  end)
   
 
 	return self
@@ -88,7 +73,29 @@ function Self:setProgress(value)
   end
   if self.progress > 1 then
     self.progress = 1
+    self.callbacks:call("onFilled", {self})
+    if self.loop then
+      self.progress = 0
+    else
+      self:stop()
+    end
   end  
+end
+
+function Self:start()
+  self.running = true
+end
+
+function Self:stop()
+  self.running = false
+end
+
+function Self:setSpeed(speed)
+  self.speed = speed
+end
+
+function Self:isRunning()
+  return self.running
 end
 
 return Self

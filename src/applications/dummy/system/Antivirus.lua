@@ -38,7 +38,6 @@ function Self:doVirus()
         h = 70,
       })
     end
-    self:infect(-1)
   else
     self.main.processes:makePopup({
       title = "Virus Alert",
@@ -46,7 +45,6 @@ function Self:doVirus()
       hasOkButton = true,
       h = 100,
     })
-    self:infect(-1)
   end
 end
 

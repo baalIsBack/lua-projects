@@ -99,7 +99,7 @@ MAILS[5] = {
   required_unlock_flags = {},
   expected_reply = "Here are the files:[...]",
   required_solve_function = function(self, main)
-    if (main.values:get("currently_collected_Icon_Brick") or 0) >= 5 then
+    if (main.values:get("currently_collected_Brick") or 0) >= 5 then
       return true
     end
     return false
@@ -108,8 +108,8 @@ MAILS[5] = {
   required_solve_notes = {},
   onRead = function(mail, main) end,
   onReply = function(mail, main, text)
-    local val = main.values:get("currently_collected_Icon_Brick")
-    main.values:set("currently_collected_Icon_Brick", val -5)
+    local val = main.values:get("currently_collected_Brick")
+    main.values:set("currently_collected_Brick", val -5)
   end,
   reward = 0.5,
 }
@@ -125,7 +125,7 @@ MAILS[6] = {
   required_unlock_flags = {},
   expected_reply = "Here are the files:[...]",
   required_solve_function = function(self, main)
-    if (main.values:get("currently_collected_Icon_File_Document") or 0) >= 5 then
+    if (main.values:get("currently_collected_Document") or 0) >= 5 then
       return true
     end
     return false
@@ -134,8 +134,8 @@ MAILS[6] = {
   required_solve_notes = {},
   onRead = function(mail, main) end,
   onReply = function(mail, main, text)
-    local val = main.values:get("currently_collected_Icon_File_Document")
-    main.values:set("currently_collected_Icon_File_Document", val -5)
+    local val = main.values:get("currently_collected_Document")
+    main.values:set("currently_collected_Document", val -5)
   end,
   reward = 0.5,
 }
@@ -151,7 +151,7 @@ MAILS[7] = {
   required_unlock_flags = {},
   expected_reply = "Here are the files:[...]",
   required_solve_function = function(self, main)
-    if (main.values:get("currently_collected_Icon_File_Image") or 0) >= 5 then
+    if (main.values:get("currently_collected_Image") or 0) >= 5 then
       return true
     end
     return false
@@ -160,8 +160,11 @@ MAILS[7] = {
   required_solve_notes = {},
   onRead = function(mail, main) end,
   onReply = function(mail, main, text)
-    local val = main.values:get("currently_collected_Icon_File_Image")
-    main.values:set("currently_collected_Icon_File_Image", val -5)
+    local val = main.values:get("currently_collected_Image")
+    main.values:set("currently_collected_Image", val -5)
+    main.contacts:triggerUnlock(1)
+    main.contacts:triggerUnlock(2)
+    main.contacts:triggerUnlock(3)
   end,
   reward = 0.5,
 }

@@ -62,7 +62,7 @@ function Self:canSolve(contact)
   local requirements = contact:getRequirements()
   local collected_value
   for requirement, quantity in pairs(requirements) do
-    collected_value = self.main.values:get("currently_collected_" .. requirement)
+    collected_value = self.main.values:get("currently_collected_" .. requirement.NAME)
     if collected_value < quantity then
       return false
     end
@@ -81,7 +81,7 @@ function Self:replycontact(contact)
   local requirements = contact:getRequirements()
   local collected_value
   for requirement, quantity in pairs(requirements) do
-    collected_value = self.main.values:inc("currently_collected_" .. requirement, -quantity)
+    collected_value = self.main.values:inc("currently_collected_" .. requirement.NAME, -quantity)
   end
   self:giveRewards(contact)
   return true
@@ -90,12 +90,12 @@ end
 function Self:giveRewards(contact)
   local rewards = contact:getRewards()
   for reward, quantity in pairs(rewards) do
-    self.main.values:inc("currently_collected_" .. reward, quantity)
+    self.main.values:inc("currently_collected_" .. reward.NAME, quantity)
   end
 end
 
 function Self:triggerUnlock(contact_prototype_id)
-  print("undone triggerUnlock", contact_prototype_id)
+  self:addContactFromID(contact_prototype_id)
 end
 
 function Self:addContact(contact)

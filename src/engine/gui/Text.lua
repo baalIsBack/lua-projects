@@ -40,7 +40,9 @@ function Self:getColoredText()
   return self.coloredText
 end
 
-
+function Self:setFont(font)
+  self.font = font
+end
 
 
 

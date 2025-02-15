@@ -37,7 +37,7 @@ function Self:init(args)
 
   self.callbacks:register("update", function(self, dt)
     for i, v in ipairs(self.trackables) do
-      v.node.text_node:setText("  " .. v.proto.NAME .. " x " .. self.main.values:get(v.value_id))
+      v.node.text_node:setText("  " .. v.proto.NAME .. " x " .. self.main.values:get("currently_collected_"..v.value_id))
     end
   end)
   
@@ -46,14 +46,14 @@ function Self:init(args)
 end
 
 function Self:finalize()
-  if self.main.values:get("opened_Icon_File_Image") > 0 then
-    self:addNewUniqueStat(require('applications.dummy.gui.elements.Icon_File_Image'), "currently_collected_Icon_File_Image")
+  if self.main.values:get("opened_Image") > 0 then
+    self:addNewUniqueStat(require('applications.dummy.gui.elements.Icon_File_Image'))
   end
-  if self.main.values:get("opened_Icon_Brick") > 0 then
-    self:addNewUniqueStat(require('applications.dummy.gui.elements.Icon_Brick'), "currently_collected_Icon_Brick")
+  if self.main.values:get("opened_Brick") > 0 then
+    self:addNewUniqueStat(require('applications.dummy.gui.elements.Icon_Brick'))
   end
-  if self.main.values:get("opened_Icon_File_Document") > 0 then
-    self:addNewUniqueStat(require('applications.dummy.gui.elements.Icon_File_Document'), "currently_collected_Icon_File_Document")
+  if self.main.values:get("opened_Document") > 0 then
+    self:addNewUniqueStat(require('applications.dummy.gui.elements.Icon_File_Document'))
   end
 end
 
@@ -61,7 +61,7 @@ function Self:addNewUniqueStat(proto, value_id)
   local node, t
 
   for i, v in ipairs(self.trackables) do
-    if v.value_id == value_id then
+    if v.value_id == proto.NAME then
       return
     end
   end
@@ -90,7 +90,7 @@ function Self:addNewUniqueStat(proto, value_id)
   node:insert(t)
   node.text_node = t
   self.list:insert(node)
-  table.insert(self.trackables, {node = node, value_id=value_id, proto=proto})
+  table.insert(self.trackables, {node = node, value_id=proto.NAME, proto=proto})
 end
 
 

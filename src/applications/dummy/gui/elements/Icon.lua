@@ -67,12 +67,12 @@ end
 function Self:open()
   if not self.hasBeenOpened then
     local id, count
-    id = "opened_" .. self:type()
+    id = "opened_" .. self.NAME
     count = self.main.values:get(id) or 0
     self.main.values:set(id, count + 1)
 
     
-    id = "currently_collected_" .. self:type()
+    id = "currently_collected_" .. self.NAME
     count = self.main.values:get(id) or 0
     self.main.values:set(id, count + 1)
 

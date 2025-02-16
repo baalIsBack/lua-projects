@@ -18,6 +18,7 @@ function Self:init(args)
   self:insert(self.mail_list)
 
   self.scroll_y = -40
+  self.sending_reply = false
 
   
   self.main.mails.callbacks:register("onMailAdded", function(mail)
@@ -77,18 +78,19 @@ function Self:init(args)
   end)
   self:insert(self.reply_field)
 
-  self.reply_button = require 'engine.gui.Button':new{main=self.main, x = self.w/2 - 16*3/2, y = self.h/2 - 8 , w=16*3, h=16, visibleAndActive = false,}
-  local text = require 'engine.gui.Text':new{main=self.main, x = 0, y = 0, text = "Reply"}
-  self.reply_button:insert(text)
+
+  self.reply_button = require 'engine.gui.Button':new{main=self.main, x = self.w/2 - 16*3/2, y = self.h/2 - 8 , w=16*3, h=16, text = "Reply", visibleAndActive = false,}
   self.reply_button.callbacks:register("onClicked", function()
     if self.openmail then
-      local input = self.openmail:getExpectedReply()
-      self.reply_field.input = input
-      self.reply_field:submit()
-      self.openmail.reply = input
+      self.sending_reply = true
+      self.send_bar:start()
     end
   end)
   self:insert(self.reply_button)
+
+
+
+
 
   self.scrollbar = require 'engine.gui.Scrollbar':new{main=self.main, x = self.w/2 - 8, y = 0, h = self.h-32}
   self:insert(self.scrollbar)
@@ -102,14 +104,38 @@ function Self:init(args)
 
   self.callbacks:register("update", function(selff, dt)
     self.scrollbar.visibleAndActive = (self.openmail)
+
+    self.send_bar.visibleAndActive = self.sending_reply
     
     self.reply_button.visibleAndActive = self.openmail
     self.reply_field.visibleAndActive = self.openmail
     if self.openmail then
       local canReply = self.main.mails:canSolve(self.openmail)
-      self.reply_button.enabled = not self.openmail.reply and canReply
+      self.reply_button.enabled = not self.openmail.reply and canReply and not self.sending_reply
       self.reply_field.enabled = not self.openmail.reply and canReply
+
+      self:refreshButtonStates()
     end
+  end)
+
+
+  self.send_bar = require 'engine.gui.ProgressBar':new{
+    main=self.main,
+    x = -16 + ((self.w/2 - 16*3/2 - 16*3/2) + (-self.w/2 + self.mail_list_width/2 +self.mail_list_width/2)),
+    y = self.h/2 - 8,
+    w = ((self.w/2 - 16*3/2 - 16*3/2) - (-self.w/2 + self.mail_list_width/2 +self.mail_list_width/2)),
+    h = 16,
+  }
+  self:insert(self.send_bar)
+  self.send_bar.callbacks:register("onFilled", function()
+    --self.main.contacts:replycontact(self.opencontact)
+    self.send_bar:setProgress(0)
+    self.sending_reply = false
+
+    local input = self.openmail:getExpectedReply()
+    self.reply_field.input = input
+    self.reply_field:submit()
+    self.openmail.reply = input
   end)
 
   return self
@@ -222,6 +248,14 @@ function Self:draw()
   self.contents:callall("draw")
 
   love.graphics.pop()
+end
+
+function Self:refreshButtonStates()
+  --self.reply_button.enabled = self.opencontact and self.main.contacts:canSolve(self.opencontact) and not self.sending_reply
+  
+  for i, contact_button in ipairs(self.mail_list.contents:getList()) do
+    contact_button.enabled = self.openmail and not self.sending_reply
+  end
 end
 
 return Self

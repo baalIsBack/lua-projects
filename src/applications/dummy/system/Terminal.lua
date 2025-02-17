@@ -2,6 +2,7 @@ local Super = require 'engine.Prototype'
 local Self = Super:clone("Terminal")
 
 APP_LIST = {}
+remove app list in favor of values
 APP_LIST["calc"] = {
   installTime = 4,
 }

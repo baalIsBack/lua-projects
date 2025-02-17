@@ -78,7 +78,51 @@ function Self:setDefaults()
   self:setOnce("virus_value", 0)--viruses contracted but not noticed
   self:setOnce("virus_found", 0)--viruses found by antivirus
   self:setOnce("virus_finder_speed", 1)--takes val/100 seconds to find a virus
+  self:setOnce("mail_send_speed", 1)--takes val/100 seconds to send a mail
+  self:setOnce("contact_send_speed", 1)--takes val/100 seconds to send files to contact
+
+
+  self:setOnce("install_time_calc", 0.1)
+  self:setOnce("rom_usage_calc", 0.1)
+  self:setOnce("ram_usage_calc", 0.1)
+
+  self:setOnce("install_time_terminal", 0.1)
+  self:setOnce("rom_usage_terminal", 0.1)
+  self:setOnce("ram_usage_terminal", 0.1)
+
+  self:setOnce("install_time_mail", 0.1)
+  self:setOnce("rom_usage_mail", 0.1)
+  self:setOnce("ram_usage_mail", 0.1)
+
+  self:setOnce("install_time_editor", 0.1)
+  self:setOnce("rom_usage_editor", 0.1)
+  self:setOnce("ram_usage_editor", 0.1)
+
+  self:setOnce("install_time_files", 0.1)
+  self:setOnce("rom_usage_files", 0.1)
+  self:setOnce("ram_usage_files", 0.1)
+
+  self:setOnce("install_time_processes", 0.1)
+  self:setOnce("rom_usage_processes", 0.1)
+  self:setOnce("ram_usage_processes", 0.1)
+
+  self:setOnce("install_time_ressources", 0.1)
+  self:setOnce("rom_usage_ressources", 0.1)
+  self:setOnce("ram_usage_ressources", 0.1)
+
+  self:setOnce("install_time_stat", 0.1)
+  self:setOnce("rom_usage_stat", 0.1)
+  self:setOnce("ram_usage_stat", 0.1)
+
+  self:setOnce("install_time_contacts", 0.1)
+  self:setOnce("rom_usage_contacts", 0.1)
+  self:setOnce("ram_usage_contacts", 0.1)
   
+  self:setOnce("install_time_antivirus", 0.1)
+  self:setOnce("rom_usage_antivirus", 0.1)
+  self:setOnce("ram_usage_antivirus", 0.1)
+
+
   self.safe = false
 end
 
@@ -91,6 +135,18 @@ function Self:deserialize(raw)
   MailDefinitions[2].required_solve_notes = {""..self:get("employee_id"),}
   MailDefinitions[2].expected_reply = "My ID is: "..self:get("employee_id")
   return self
+end
+
+function Self:getVirusFinderSpeed()
+  return self:get("virus_finder_speed")/100
+end
+
+function Self:getMailSendSpeed()
+  return self:get("mail_send_speed")/100
+end
+
+function Self:getContactSendSpeed()
+  return self:get("contact_send_speed")/100
 end
 
 

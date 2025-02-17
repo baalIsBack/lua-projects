@@ -24,7 +24,7 @@ function Self:init(args)
     y = self.h/2-16,
     w = self.w-16,
     h = 16,
-    speed = self.main.values:get("virus_finder_speed")/100,
+    speed = self.main.values:getVirusFinderSpeed(),
   }
   self.progressbar.callbacks:register("onFilled", function(selff)
     if self.main.values:get("virus_value") > 0 then
@@ -35,7 +35,7 @@ function Self:init(args)
   self:insert(self.progressbar)
 
   self.callbacks:register("update", function(self, dt)
-    self.progressbar:setSpeed(self.main.values:get("virus_finder_speed")/100)
+    self.progressbar:setSpeed(self.main.values:getVirusFinderSpeed())
   end)
 
 

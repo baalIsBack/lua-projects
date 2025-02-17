@@ -97,13 +97,16 @@ function Self:init(args)
   self:insert(self.scrollbar)
   self.scrollbar.visibleAndActive = (self.opencontact)
   self.scrollbar.callbacks:register("onUp", function()
-    self.scroll_y = self.scroll_y + (10)
+    self.scroll_y = self.scroll_y + 10
   end)
   self.scrollbar.callbacks:register("onDown", function()
-    self.scroll_y = self.scroll_y - (10)
+    self.scroll_y = self.scroll_y - 10
   end)
 
   self.callbacks:register("update", function(selff, dt)
+    self.send_bar:setSpeed(self.main.values:getContactSendSpeed())
+
+
     self.scrollbar.visibleAndActive = self.opencontact
     self.reply_button.visibleAndActive = self.opencontact
     self.send_bar.visibleAndActive = self.opencontact

@@ -103,6 +103,9 @@ function Self:init(args)
   end)
 
   self.callbacks:register("update", function(selff, dt)
+    self.send_bar:setSpeed(self.main.values:getMailSendSpeed())
+
+
     self.scrollbar.visibleAndActive = (self.openmail)
 
     self.send_bar.visibleAndActive = self.sending_reply

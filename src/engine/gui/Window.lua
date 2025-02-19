@@ -22,8 +22,7 @@ function Self:init(args)
   self.bar.close_button.text.x = 1
   self.bar.close_button.text.y = -2
   self.bar.close_button.callbacks:register("onClicked", function(x, y)
-    self:deactivate()
-    self:setFocus()
+    self:close()
   end)
   self.bar:insert(self.bar.close_button)
   self.callbacks:register("onMousePressed", function(self)
@@ -36,11 +35,19 @@ function Self:init(args)
 
   
 
-
 	return self
 end
 
 function Self:finalize()
+end
+
+function Self:open()
+  self:activate()
+end
+
+function Self:close()
+  self:deactivate()
+  self:setFocus()
 end
 
 

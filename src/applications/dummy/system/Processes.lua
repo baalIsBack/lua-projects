@@ -32,8 +32,8 @@ function Self:loadApps()
   self.terminal = self:makeWindow('applications.dummy.gui.windows.TerminalWindow', 250, 250)
   self.editor = self:makeWindow('applications.dummy.gui.windows.EditorWindow', 250, 250)
   self.files = self:makeWindow('applications.dummy.gui.windows.FileManagerWindow', 250, 250)
-  self.processes = self:makeWindow('applications.dummy.gui.windows.TODO_ProcessesWindow', 250, 250)
-  self.ressources = self:makeWindow('applications.dummy.gui.windows.TODO_RessourcesWindow', 250, 250)
+  self.processes = self:makeWindow('applications.dummy.gui.windows.ProcessesWindow', 250, 250)
+  self.ressources = self:makeWindow('applications.dummy.gui.windows.RessourcesWindow', 250, 250)
   self.antivirus = self:makeWindow('applications.dummy.gui.windows.AntivirusWindow', 250, 250)
   self.contacts = self:makeWindow('applications.dummy.gui.windows.ContactsWindow', 250, 250)
 
@@ -48,6 +48,26 @@ function Self:loadApps()
   self.contents:insert(self.files)
   self.contents:insert(self.processes)
   self.contents:insert(self.ressources)
+end
+
+function Self:canOpenProcess(app_window)
+  local ram_current_used = self.main.values:get("ram_current_used")
+  local ram_usage = self.main.values:get("ram_usage_"..app_window.ID_NAME)
+  local ram_total_size = self.main.values:get("ram_total_size")
+  return (ram_current_used + ram_usage <= ram_total_size+0.0001)
+end
+
+function Self:openProcess(app_window)
+  --self.main.values:get("ram_current_used")
+  if self:canOpenProcess(app_window) then
+    self.main.values:inc("ram_current_used", self.main.values:get("ram_usage_"..app_window.ID_NAME))
+    return true
+  end
+  return false
+end
+
+function Self:closeProcess(app_window)
+  self.main.values:inc("ram_current_used", -self.main.values:get("ram_usage_"..app_window.ID_NAME))
 end
 
 function Self:isActive(name)
@@ -78,10 +98,6 @@ function Self:makePopup(args)
   args.alwaysOnTop = true
   local popup = require('applications.dummy.gui.windows.PopupWindow'):new(args)
   self.main:insert(popup)
-end
-
-function Self:update(dt)
-  
 end
 
 function Self:serialize()

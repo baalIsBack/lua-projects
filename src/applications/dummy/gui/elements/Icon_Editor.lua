@@ -1,6 +1,7 @@
 local Super = require 'applications.dummy.gui.elements.Icon_Desktop'
 local Self = Super:clone("Icon_Editor")
 
+Self.ID_NAME = "editor"
 Self.IMG = love.graphics.newImage("submodules/lua-projects-private/gfx/win_icons_png/w98_notepad-1.png")
 Self.NAME = "Editor"
 

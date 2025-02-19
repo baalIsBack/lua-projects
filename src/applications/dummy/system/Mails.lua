@@ -140,7 +140,6 @@ end
 function Self:isUnlockable(mail_prototype_id)
   local target_mail = MAILS[mail_prototype_id]
   local sum = 0
-  print(mail_prototype_id)
   for _, id in ipairs(target_mail.source_quests) do
     local source_quest_mail = self.mailsMap[id]
     if (source_quest_mail and source_quest_mail:isRedeemed()) then

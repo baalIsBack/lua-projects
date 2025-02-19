@@ -1,5 +1,8 @@
-local Super = require 'engine.gui.Window'
+local Super = require 'applications.dummy.gui.windows.Process'
 local Self = Super:clone("TerminalWindow")
+
+
+Self.ID_NAME = "terminal"
 
 function Self:init(args)
   args.w = 320

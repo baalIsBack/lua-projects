@@ -1,6 +1,7 @@
 local Super = require 'engine.gui.Button'
 local Self = Super:clone("Icon")
 
+Self.ID_NAME = "noid"
 Self.NAME = "noname"
 Self.IMG = love.graphics.newImage("submodules/lua-projects-private/gfx/win_icons_png/w98_directory_closed.png")
 

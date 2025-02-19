@@ -2,6 +2,7 @@ local Super = require 'engine.gui.Window'
 local Self = Super:clone("DummyWindow")
 
 
+Self.ID_NAME = "files"
 
 function Self:init(args)
   args.w = 320+32+32

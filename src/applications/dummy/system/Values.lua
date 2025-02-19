@@ -44,6 +44,10 @@ function Self:setOnce(name, value)
   self:set(name, value)
 end
 
+function Self:exists(name)
+  return self.values[name]
+end
+
 function Self:get(name)
   if self.values[name] == nil then
     print("Warning: Value "..name.." not found")
@@ -81,6 +85,11 @@ function Self:setDefaults()
   self:setOnce("mail_send_speed", 1)--takes val/100 seconds to send a mail
   self:setOnce("contact_send_speed", 1)--takes val/100 seconds to send files to contact
 
+  self:setOnce("ram_total_size", 0.3)
+  self:setOnce("rom_total_size", 10)
+
+  self:setOnce("ram_current_used", 0)
+  self:setOnce("rom_current_used", 0)
 
   self:setOnce("install_time_calc", 0.1)
   self:setOnce("rom_usage_calc", 0.1)
@@ -121,6 +130,10 @@ function Self:setDefaults()
   self:setOnce("install_time_antivirus", 0.1)
   self:setOnce("rom_usage_antivirus", 0.1)
   self:setOnce("ram_usage_antivirus", 0.1)
+
+
+
+  self:set("ram_current_used", 0) -- since all programs shut down each restart
 
 
   self.safe = false

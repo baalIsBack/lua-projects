@@ -8,7 +8,11 @@ function Self:init(args)
 
   
   self.callbacks:register("onClicked", function(selff)
-    self:openApp()
+    local canOpen = self.main.processes:canOpenProcess(self.targetApp)
+    if canOpen then
+      self:openApp()
+      self.main.processes:openProcess(self.targetApp)
+    end
   end)
 
   
@@ -22,6 +26,7 @@ function Self:openApp()
   self.targetApp:activate()
   self.targetApp:bringToFront()
   self.targetApp:setFocus()
+  return self.targetApp
 end
 
 function Self:setTargetApp(app)

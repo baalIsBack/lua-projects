@@ -70,6 +70,11 @@ end
 function Self:install(app_name)
   local icon = self:getIcon(app_name)
 
+  if self.main.values:get("rom_current_used") + self.main.values:get("rom_usage_"..app_name) > self.main.values:get("rom_total_size") then
+    return false
+  end
+  self.main.values:inc("rom_current_used", self.main.values:get("rom_usage_"..app_name))
+
   self.main:insert(self.main.processes[app_name])
   self.main:insert(icon)
   self.contents:insert(app_name)
@@ -78,10 +83,13 @@ function Self:install(app_name)
   icon.desktop_slot_id_for_removal = desktop_slot_id_for_removal
   self.usedDesktopSlots[desktop_slot_id_for_removal or -1] = true
   icon:setPosition(32 + x*(64), 32 + y*(64))
+
+  return true
 end
 
 function Self:uninstall(app_name)
   local icon = self:getIcon(app_name)
+  self.main.values:inc("rom_current_used", -self.main.values:get("rom_usage_"..app_name))
 
   self.main:remove(self.main.processes[app_name])
   self.main:remove(self:getIcon(app_name))

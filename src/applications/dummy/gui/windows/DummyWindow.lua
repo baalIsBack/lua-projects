@@ -1,4 +1,4 @@
-local Super = require 'engine.gui.Window'
+local Super = require 'applications.dummy.gui.windows.Process'
 local Self = Super:clone("DummyWindow")
 
 Self.icon = love.graphics.newImage("submodules/lua-projects-private/gfx/win_icons_png/w98_calendar-1.png")

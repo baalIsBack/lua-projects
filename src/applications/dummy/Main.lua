@@ -66,6 +66,10 @@ function Self:init()
   self:insert(osbar)
   self.gamestate:finalize()
   self.processes:finalizeWindows()
+
+
+  print(self.values:get("ram_current_used"))
+  self.values:set("ram_current_used", 0)
   
 
   return self
@@ -107,7 +111,7 @@ function Self:update(dt)
         return a.z < b.z
     end
   end)
-
+  
   
   self.contents:callall("update", dt)
   self.timedmanager:update(dt)

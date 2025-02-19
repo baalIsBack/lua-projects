@@ -1,15 +1,17 @@
-local Super = require 'engine.gui.Window'
+local Super = require 'applications.dummy.gui.windows.Process'
 local Self = Super:clone("DummyWindow")
 
+
+Self.ID_NAME = "processes"
 
 function Self:init(args)
   args.w = 320
   args.h = 240
-  args.title = "Dummy"
+  args.title = "Processes"
   Super.init(self, args)
   
 
-  
+  self.free_space_text = require ''
 
   return self
 end

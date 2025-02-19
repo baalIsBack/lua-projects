@@ -1,4 +1,4 @@
-local Super = require 'engine.gui.Window'
+local Super = require 'applications.dummy.gui.windows.Process'
 local Self = Super:clone("PopupWindow")
 
 

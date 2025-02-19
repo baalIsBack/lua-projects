@@ -2,7 +2,6 @@ local Super = require 'engine.Prototype'
 local Self = Super:clone("Terminal")
 
 APP_LIST = {}
-remove app list in favor of values
 APP_LIST["calc"] = {
   installTime = 4,
 }
@@ -93,6 +92,8 @@ function Self:execute(command)
     else
       self:appendLog("Could not open program: " .. command_parts[2])
     end
+  elseif command_parts[1] == "diskspace" then
+    self:appendLog(self.main.values:get("rom_current_used") .. "MB/" .. self.main.values:get("rom_total_size") .. "MB")
   elseif command_parts[1] == "close" then
     if self.main.processes:isActive(command_parts[2]) then
       self.main.processes:getProcess(command_parts[2]):close()
@@ -129,7 +130,7 @@ function Self:appendLog(msg)
 end
 
 function Self:initiateInstall(app_name)
-  if APP_LIST[app_name] == nil then
+  if not self.main.values:exists("install_time_" .. app_name) then
     self:appendLog("Unknown program: " .. app_name)
     return
   end
@@ -139,7 +140,7 @@ function Self:initiateInstall(app_name)
   end
   self:appendLog("Installing ".. app_name .."...")
   self.window.accepting_input = false
-  local installTime = APP_LIST[app_name].installTime * math.random(0.9*10000, 1.4*10000)/10000
+  local installTime = self.main.values:exists("install_time_" .. app_name) * math.random(0.9*10000, 1.4*10000)/10000
   self.main.timedmanager:after(installTime, function()
     self:install(app_name)
     self.window.accepting_input = true
@@ -147,7 +148,7 @@ function Self:initiateInstall(app_name)
 end
 
 function Self:install(app_name)
-  if APP_LIST[app_name] == nil then
+  if not self.main.values:exists("install_time_" .. app_name) then
     self:appendLog("Unknown program: " .. app_name)
     return
   end
@@ -162,7 +163,7 @@ function Self:install(app_name)
 end
 
 function Self:initiateUninstall(app_name)
-  if APP_LIST[app_name] == nil then
+  if not self.main.values:exists("install_time_" .. app_name) then
     self:appendLog("Unknown program: " .. app_name)
     return
   end
@@ -172,7 +173,7 @@ function Self:initiateUninstall(app_name)
   end
   self:appendLog("Uninstalling ".. app_name .."...")
   self.window.accepting_input = false
-  local uninstallTime = APP_LIST[app_name].installTime * math.random(0.9*10000, 1.4*10000)/10000
+  local uninstallTime = self.main.values:get("install_time_" .. app_name) * math.random(0.9*10000, 1.1*10000)/10000
   self.main.timedmanager:after(uninstallTime, function()
     self:uninstall(app_name)
     self.window.accepting_input = true
@@ -180,7 +181,7 @@ function Self:initiateUninstall(app_name)
 end
 
 function Self:uninstall(app_name)
-  if APP_LIST[app_name] == nil then
+  if not self.main.values:exists("install_time_" .. app_name) then
     self:appendLog("Unknown program: " .. app_name)
     return
   end

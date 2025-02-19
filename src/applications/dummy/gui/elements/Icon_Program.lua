@@ -1,6 +1,7 @@
 local Super = require 'applications.dummy.gui.elements.Icon'
 local Self = Super:clone("Icon_Program")
 
+Self.ID_NAME = "program"
 Self.IMG = love.graphics.newImage("submodules/lua-projects-private/gfx/win_icons_png/w98_executable-0.png")
 Self.NAME = "Program"
 

@@ -269,6 +269,12 @@ function Self:insert(child, id)
   self.callbacks:call("onInsert", {self, child, id})
 end
 
+function Self:remove(child)
+  self.contents:remove(child)
+  child.parent = nil
+  self.callbacks:call("onRemove", {self, child})
+end
+
 function Self:getX()
   if not self.parent then
     return self.x

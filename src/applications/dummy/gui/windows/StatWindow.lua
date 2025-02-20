@@ -44,7 +44,6 @@ function Self:init(args)
     end
   end)
   
-  --self.list:insert(t)
   return self
 end
 

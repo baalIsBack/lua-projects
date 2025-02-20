@@ -33,7 +33,7 @@ function Self:remove(obj)
   for i = #self.content_list, 1, -1 do
     if self.content_list[i] == obj then
       table.remove(self.content_list, i)
-      return true
+      return obj
     end
   end
   return false

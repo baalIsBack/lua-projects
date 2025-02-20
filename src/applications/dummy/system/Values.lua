@@ -85,7 +85,7 @@ function Self:setDefaults()
   self:setOnce("mail_send_speed", 1)--takes val/100 seconds to send a mail
   self:setOnce("contact_send_speed", 1)--takes val/100 seconds to send files to contact
 
-  self:setOnce("ram_total_size", 0.3)
+  self:setOnce("ram_total_size", 10)
   self:setOnce("rom_total_size", 10)
 
   self:setOnce("ram_current_used", 0)

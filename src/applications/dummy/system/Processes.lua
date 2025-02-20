@@ -7,9 +7,12 @@ function Self:init(args)
   self.main = args.main
   self.hasSerialization = true
   self.hasContents = true
+  self.hasCallbacks = true
   Super.init(self)
   
-  
+  self.callbacks:declare("onOpen")
+  self.callbacks:declare("onClose")
+
   self:loadApps()
 
 
@@ -23,6 +26,16 @@ function Self:makeWindow(window_type_name, x, y)
     y = y or math.random(100, 300),
     visibleAndActive = false
   }
+end
+
+function Self:getActiveProcesses()
+  local list = {}
+  for i, process in ipairs(self.contents.content_list) do
+    if process.visibleAndActive then
+      table.insert(list, process)
+    end
+  end
+  return list
 end
 
 function Self:loadApps()
@@ -61,6 +74,7 @@ function Self:openProcess(app_window)
   --self.main.values:get("ram_current_used")
   if self:canOpenProcess(app_window) then
     self.main.values:inc("ram_current_used", self.main.values:get("ram_usage_"..app_window.ID_NAME))
+    self.callbacks:call("onOpen", {self, app_window})
     return true
   end
   return false
@@ -68,6 +82,7 @@ end
 
 function Self:closeProcess(app_window)
   self.main.values:inc("ram_current_used", -self.main.values:get("ram_usage_"..app_window.ID_NAME))
+  self.callbacks:call("onClose", {self, app_window})
 end
 
 function Self:isActive(name)

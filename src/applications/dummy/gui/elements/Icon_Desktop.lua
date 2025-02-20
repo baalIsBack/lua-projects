@@ -31,6 +31,7 @@ end
 
 function Self:setTargetApp(app)
   self.targetApp = app
+  app.targetProcess = self
 end
 
 

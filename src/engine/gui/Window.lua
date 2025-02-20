@@ -9,13 +9,14 @@ function Self:init(args)
   self.w = args.w
   self.h = args.h
   self.z = args.z or MAX_Z
+  self.title = args.title
   if not args.z then
     MAX_Z = MAX_Z + 1
   end
 
   self.wasDown = false
   self.isDown = false
-  self.bar = require 'engine.gui.Bar':new{main=args.main,x = 0, y = -self.h/2 - 8+16 , w = self.w, h = 32, title = args.title}
+  self.bar = require 'engine.gui.Bar':new{main=args.main,x = 0, y = -self.h/2 - 8+16 , w = self.w, h = 32, title = self.title}
   self:insert(self.bar)
   self.bar.close_button = require 'engine.gui.Button':new{main=self.main,x = self.bar.w/2 - 8, y = 0, w = 10, h = 10, text = "x", text_color = {0,0,0}}
   self.bar.close_button.text:setFont(FONTS["dialog"])

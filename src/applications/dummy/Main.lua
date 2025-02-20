@@ -62,7 +62,7 @@ function Self:init()
 
 
 
-  local osbar = require 'applications.dummy.gui.elements.OSBar':new{main=self.main, y = 480-16+4, color = {0/255, 1/255, 129/255}, main=self,}
+  local osbar = require 'applications.dummy.gui.elements.OSBar':new{y = 480-16+4, color = {0/255, 1/255, 129/255}, main=self,}
   self:insert(osbar)
   self.gamestate:finalize()
   self.processes:finalizeWindows()

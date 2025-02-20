@@ -1,37 +1,6 @@
 local Super = require 'engine.Prototype'
 local Self = Super:clone("Terminal")
 
-APP_LIST = {}
-APP_LIST["calc"] = {
-  installTime = 4,
-}
-APP_LIST["terminal"] = {
-  installTime = 1,
-}
-APP_LIST["mail"] = {
-  installTime = 3,
-}
-APP_LIST["editor"] = {
-  installTime = 2,
-}
-APP_LIST["files"] = {
-  installTime = 2,
-}
-APP_LIST["processes"] = {
-  installTime = 5,
-}
-APP_LIST["ressources"] = {
-  installTime = 0.1,
-}
-APP_LIST["stat"] = {
-  installTime = 0.1,
-}
-APP_LIST["contacts"] = {
-  installTime = 0.1,
-}
-APP_LIST["antivirus"] = {
-  installTime = 0.1,
-}
 
 function Self:init(args)
   self.main = args.main

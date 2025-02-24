@@ -44,6 +44,9 @@ function Self:setFont(font)
   self.font = font
 end
 
+function Self:getWidth()
+  return self.w
+end
 
 
 function Self:draw()

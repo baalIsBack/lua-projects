@@ -3,6 +3,7 @@ local Self = Super:clone("TextField")
 
 function Self:init(args)
   args.color = args.color or {205/255, 205/255, 192/255}
+  args.h = args.h or 16
   Super.init(self, args)
   
   self.sound_pool = {}
@@ -83,7 +84,7 @@ function Self:init(args)
     text = self.input,
     color = {0, 0, 0},
     x = -self.w/2 + 2,
-    y = 0,
+    y = -2,
     alignment="left",
     maxWidth = self.w - 4,
   }
@@ -94,7 +95,7 @@ function Self:init(args)
     text = self.input,
     color = {0, 0, 0},
     x = -self.w/2 + 2,
-    y = 0,
+    y = -2,
     alignment="left",
     maxWidth = self.w - 4,
   }
@@ -125,7 +126,7 @@ function Self:draw()
   
   love.graphics.setColor(self.color)
   local r, g, b, a = love.graphics.getColor( )
-  if not self.enabled then
+  if not self.enabled or not self.accepting_input then
     love.graphics.setColor(r/1.2, g/1.2, b/1.2)
   end
 

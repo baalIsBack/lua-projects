@@ -130,6 +130,14 @@ function Self:setDefaults()
   self:setOnce("install_time_antivirus", 0.1)
   self:setOnce("rom_usage_antivirus", 0.1)
   self:setOnce("ram_usage_antivirus", 0.1)
+  
+  self:setOnce("install_time_network", 0.1)
+  self:setOnce("rom_usage_network", 0.1)
+  self:setOnce("ram_usage_network", 0.1)
+  
+  self:setOnce("install_time_popup", 0.1)
+  self:setOnce("rom_usage_popup", 0.1)
+  self:setOnce("ram_usage_popup", 0.1)
 
 
 

@@ -48,6 +48,7 @@ function Self:loadApps()
   self.processes = self:makeWindow('applications.dummy.gui.windows.ProcessesWindow', 250, 250)
   self.ressources = self:makeWindow('applications.dummy.gui.windows.RessourcesWindow', 250, 250)
   self.antivirus = self:makeWindow('applications.dummy.gui.windows.AntivirusWindow', 250, 250)
+  self.network = self:makeWindow('applications.dummy.gui.windows.NetworkWindow', 250, 250)
   self.contacts = self:makeWindow('applications.dummy.gui.windows.ContactsWindow', 250, 250)
 
 
@@ -71,10 +72,12 @@ function Self:canOpenProcess(app_window)
 end
 
 function Self:openProcess(app_window)
-  --self.main.values:get("ram_current_used")
-  if self:canOpenProcess(app_window) then
+  if self:canOpenProcess(app_window) and not app_window:isOpen() then
     self.main.values:inc("ram_current_used", self.main.values:get("ram_usage_"..app_window.ID_NAME))
     self.callbacks:call("onOpen", {self, app_window})
+    app_window:activate()
+    app_window:bringToFront()
+    app_window:setFocus()
     return true
   end
   return false
@@ -106,12 +109,16 @@ function Self:finalizeWindows()
   self.files:finalize()
   self.processes:finalize()
   self.ressources:finalize()
+  self.antivirus:finalize()
+  self.network:finalize()
 end
 
 function Self:makePopup(args)
   args.main = self.main
   args.alwaysOnTop = true
   local popup = require('applications.dummy.gui.windows.PopupWindow'):new(args)
+  popup.visibleAndActive = false
+  self:openProcess(popup)
   self.main:insert(popup)
 end
 

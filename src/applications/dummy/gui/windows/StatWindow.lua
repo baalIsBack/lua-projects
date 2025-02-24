@@ -7,7 +7,7 @@ Self.ID_NAME = "stat"
 function Self:init(args)
   args.w = 320
   args.h = 240
-  args.title = "Stat"
+  args.title = "Documents"
   Super.init(self, args)
   
 

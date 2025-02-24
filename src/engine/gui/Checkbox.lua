@@ -1,34 +1,49 @@
-local Super = require 'engine.gui.Node'
-local Self = Super:clone("Button")
+local Super = require 'engine.gui.Button'
+local Self = Super:clone("Checkbox")
 
 function Self:init(args)
-  args.color = args.color or {192/255, 192/255, 192/255, 1}
-  args.h = args.h or 16
-  local prior_w = args.w
   Super.init(self, args)
+  self.w = 14
+  self.h = 14
+  if self.text then
+    self.text.x = 10 + self.text:getWidth()/2
+  end
 
-  self.wasDown = false
-  self.isDown = false
-  if args.text then
-    self.text = require 'engine.gui.Text':new{
-      main = self.main,
-      x = 0,
-      y = -2,
-      text = args.text,
-      alignment = "center",
-    }
-    if args.text_color then
-      self.text:setColor(args.text_color)
+  self.text_checkmark = require 'engine.gui.Text':new{
+    main = self.main,
+    x = 0,
+    y = -2,
+    text = "x",
+    alignment = "center",
+  }
+  self.text_checkmark:setFont(FONTS["dialog"])
+  self.text_checkmark.x = 1
+  self.text_checkmark.y = -2
+  --self:insert(self.text_checkmark)
+
+  self.checked = args.checked or false
+
+  self.callbacks:register("onClicked", function(x, y)
+    if self:isChecked() then
+      self:uncheck()
+    else
+      self:check()
     end
-    self:insert(self.text)
-  end
-  --calculate width of button by taking self.text and the font
-  if self.text and not prior_w then
-    self.w = self.text:getWidth() + 6
-  end
-
+  end)
 
 	return self
+end
+
+function Self:isChecked()
+  return self.checked
+end
+
+function Self:check()
+  self.checked = true
+end
+
+function Self:uncheck()
+  self.checked = false
 end
 
 function Self:draw()
@@ -46,21 +61,24 @@ function Self:draw()
     love.graphics.setColor((r/1.2), (g/1.2), (b/1.2), a)
   end
   
-  
+  self.text_checkmark.visibleAndActive = self.checked
+  local pressedHeightDifference = 0
   if self.isStillClicking and self.enabled then
-    local pressedHeightDifference = 2
+    pressedHeightDifference = 2
     love.graphics.translate(0, pressedHeightDifference)
     love.graphics.rectangle("fill", math.floor( -(self.w/2) ), math.floor( -(self.h/2) ), self.w, self.h)
     love.graphics.setColor(128/255, 128/255, 128/255)
     love.graphics.rectangle("line", math.floor( -(self.w/2) ), math.floor( -(self.h/2) ), self.w, self.h)
+    
   else
     love.graphics.rectangle("fill", math.floor( -(self.w/2) ), math.floor( -(self.h/2) ), self.w, self.h)
     love.graphics.setColor(128/255, 128/255, 128/255)
     love.graphics.rectangle("line", math.floor( -(self.w/2) ), math.floor( -(self.h/2) ), self.w, self.h)
     love.graphics.line(-self.w/2, self.h/2, self.w/2, self.h/2)
   end
+  self.text_checkmark:draw()
 
-  
+  love.graphics.translate(0, -pressedHeightDifference)
   
   
   self.contents:callall("draw")

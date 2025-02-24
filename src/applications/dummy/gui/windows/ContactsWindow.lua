@@ -16,7 +16,7 @@ function Self:init(args)
   self.opencontact = nil
 
   self.contact_list_width = 80
-  self.contact_list = require 'engine.gui.List':new{main=self.main, x = -self.w/2 + self.contact_list_width/2, y = -1+16, w = self.contact_list_width, h = self.h - 32}
+  self.contact_list = require 'engine.gui.List':new{main=self.main, x = -self.w/2 + self.contact_list_width/2, y = -1+16, w = self.contact_list_width, h = self.h - 32, numberOfShownElements = 6}
   self:insert(self.contact_list)
 
   self.scroll_y = -40

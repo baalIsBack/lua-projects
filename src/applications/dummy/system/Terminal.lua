@@ -56,7 +56,8 @@ function Self:execute(command)
     self:initiateUninstall(command_parts[2])
   elseif command_parts[1] == "open" then
     if self.main.apps:isInstalled(command_parts[2]) then
-      self.main.processes:getProcess(command_parts[2]):open()
+      local target_process = self.main.processes:getProcess(command_parts[2])
+      self.main.processes:openProcess(target_process)
       self:appendLog("Opened " .. command_parts[2])
     else
       self:appendLog("Could not open program: " .. command_parts[2])
@@ -65,7 +66,8 @@ function Self:execute(command)
     self:appendLog(self.main.values:get("rom_current_used") .. "MB/" .. self.main.values:get("rom_total_size") .. "MB")
   elseif command_parts[1] == "close" then
     if self.main.processes:isActive(command_parts[2]) then
-      self.main.processes:getProcess(command_parts[2]):close()
+      local target_process = self.main.processes:getProcess(command_parts[2])
+      self.main.processes:closeProcess(target_process)
       self:appendLog("Closed " .. command_parts[2])
     else
       self:appendLog("Could not close program: " .. command_parts[2])

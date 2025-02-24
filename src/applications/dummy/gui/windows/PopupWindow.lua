@@ -1,13 +1,15 @@
 local Super = require 'applications.dummy.gui.windows.Process'
 local Self = Super:clone("PopupWindow")
 
+Self.ID_NAME = "popup"
+Self.IMG = love.graphics.newImage("submodules/lua-projects-private/gfx/win_icons_png/w98_msg_warning-0.png")
 
 function Self:init(args)
   args.w = args.w or (32 * 4)
   args.h = args.h or (24 * 2.75)
   args.x = args.x or math.random(0+args.w/2, 640-args.w/2)
   args.y = args.y or math.random(0+args.h/2, 480-args.h/2)
-  args.title = args.title or ""
+  args.title = args.title or "Popup"
   Super.init(self, args)
 
   self.text_string = args.text or "WARNING"
@@ -33,6 +35,7 @@ function Self:addOkButton()
     local text = require 'engine.gui.Text':new{main=self.main, text = "OK", color={0,0,0}, x = 0, y = -2, wrapLimit = 64, alignment = "center"}
     button:insert(text)
     button.callbacks:register("onClicked", function()
+      self.main.processes:closeProcess(self)
       self:deactivate()
     end)
   end

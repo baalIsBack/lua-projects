@@ -63,6 +63,9 @@ function Self:loadAppIcons()
   self.antivirus = self:makeIcon('applications.dummy.gui.elements.Icon_Antivirus', 0, 5)
   self.antivirus:setTargetApp(self.main.processes.antivirus)
 
+  self.network = self:makeIcon('applications.dummy.gui.elements.Icon_Network', 0, 5)
+  self.network:setTargetApp(self.main.processes.network)
+
   self.contacts = self:makeIcon('applications.dummy.gui.elements.Icon_Contacts', 0, 5)
   self.contacts:setTargetApp(self.main.processes.contacts)
 end

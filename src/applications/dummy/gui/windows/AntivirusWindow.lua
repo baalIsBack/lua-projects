@@ -1,12 +1,11 @@
 local Super = require 'applications.dummy.gui.windows.Process'
-local Self = Super:clone("CalcWindow")
+local Self = Super:clone("AntivirusWindow")
 
 Self.ID_NAME = "antivirus"
 
 function Self:init(args)
   args.w = 320
   args.h = 240
-  args.title = "Stat"
   Super.init(self, args)
   
 

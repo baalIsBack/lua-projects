@@ -14,6 +14,7 @@ function Self:init(args)
   Super.init(self)
 
   self.callbacks:declare("onInsert")
+  self.callbacks:declare("onRemove")
   self.callbacks:declare("onDraw")
   
   self.callbacks:declare("onActivate")
@@ -66,7 +67,11 @@ function Self:init(args)
 
   self._triggeredCallbackThisCycle = false
 
-  self.visibleAndActive = args.visibleAndActive or (args.visibleAndActive == nil and true)
+  if args.visibleAndActive ~= nil then
+    self.visibleAndActive = args.visibleAndActive
+  else
+    self.visibleAndActive = true
+  end
   self.enabled = args.enabled or (args.enabled == nil and true)
   self.debug = false
 

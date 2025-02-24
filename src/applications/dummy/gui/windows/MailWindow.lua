@@ -66,7 +66,7 @@ function Self:init(args)
     x = -16 + ((self.w/2 - 16*3/2 - 16*3/2) + (-self.w/2 + self.mail_list_width/2 +self.mail_list_width/2)),
     y = self.h/2 - 8,
     w = ((self.w/2 - 16*3/2 - 16*3/2) - (-self.w/2 + self.mail_list_width/2 +self.mail_list_width/2)),
-    h = 16,
+    --h = 16,
     visibleAndActive = false,
     accepting_input = false,
   }

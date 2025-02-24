@@ -85,7 +85,7 @@ function Self:addProcess(process)
     main = self.main,
     x = -16,
     y = 0,
-    img = process.targetProcess.IMG,
+    img = (process.targetProcess and process.targetProcess.IMG) or process.IMG,
   })
   t = require 'engine.gui.Text':new{
     main = self.main,
@@ -112,7 +112,6 @@ function Self:removeProcess(process)
   end
   if not foundHit then
     print("Could not remove process: " .. process.ID_NAME)
-    asdff()
   end
 end
 

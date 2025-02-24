@@ -46,6 +46,10 @@ function Self:open()
   self:activate()
 end
 
+function Self:isOpen()
+  return self.visibleAndActive
+end
+
 function Self:close()
   self:deactivate()
   self:setFocus()

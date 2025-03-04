@@ -9,7 +9,6 @@ function Self:init()
   self.callbacks:declare("enable")
   self.callbacks:declare(":deactivate")
 
-  self.visibleAndActive = false
 
   return self
 end
@@ -19,11 +18,11 @@ function Self:getContents()
 end
 
 function Self:activate()
-  self.visibleAndActive = true
+  self:setReal(true)
 end
 
 function Self:deactivate()
-  self.visibleAndActive = false
+  self:setReal(false)
 end
 
 function Self:draw() end

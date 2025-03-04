@@ -76,7 +76,7 @@ end
 
 
 function Self:draw()
-  if not self.visibleAndActive then
+  if not self:isReal()then
     return
   end
   love.graphics.push()

@@ -5,7 +5,7 @@ Self.ID_NAME = "undefined"
 
 function Self:init(args)
   args.title = args.title or "undefined"
-  args.visibleAndActive = false
+  args._isReal = false
   Super.init(self, args)
   
 

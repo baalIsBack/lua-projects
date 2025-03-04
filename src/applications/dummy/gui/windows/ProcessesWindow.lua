@@ -80,7 +80,7 @@ function Self:addProcess(process)
     w = 100,
     h = 36,
   }
-  
+
   node:insert(require 'engine.gui.Image':new{
     main = self.main,
     x = -16,
@@ -117,9 +117,10 @@ end
 
 
 function Self:draw()
-  if not self.visibleAndActive then
+  if not self:isReal() then
     return
   end
+  self:applySelectionColorTransformation()
   love.graphics.push()
   love.graphics.translate(self.x, self.y)
 

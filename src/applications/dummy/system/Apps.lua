@@ -66,12 +66,19 @@ function Self:loadAppIcons()
   self.network = self:makeIcon('applications.dummy.gui.elements.Icon_Network', 0, 5)
   self.network:setTargetApp(self.main.processes.network)
 
+  self.debug = self:makeIcon('applications.dummy.gui.elements.Icon_Debug', 0, 5)
+  self.debug:setTargetApp(self.main.processes.debug)
+
   self.contacts = self:makeIcon('applications.dummy.gui.elements.Icon_Contacts', 0, 5)
   self.contacts:setTargetApp(self.main.processes.contacts)
+
+  self.battle = self:makeIcon('applications.dummy.gui.elements.Icon_Battle', 0, 5)
+  self.battle:setTargetApp(self.main.processes.battle)
+  self.main:insert(self.main.processes[self.battle.ID_NAME])
+  self.contents:insert(self.battle.ID_NAME)
 end
 
 function Self:install(app_name)
-  local icon = self:getIcon(app_name)
 
   if self.main.values:get("rom_current_used") + self.main.values:get("rom_usage_"..app_name) > self.main.values:get("rom_total_size") then
     return false
@@ -79,8 +86,9 @@ function Self:install(app_name)
   self.main.values:inc("rom_current_used", self.main.values:get("rom_usage_"..app_name))
 
   self.main:insert(self.main.processes[app_name])
-  self.main:insert(icon)
   self.contents:insert(app_name)
+  local icon = self:getIcon(app_name)
+  self.main:insert(icon)
 
   local x, y, desktop_slot_id_for_removal = self:getFreeDesktopSlot()
   icon.desktop_slot_id_for_removal = desktop_slot_id_for_removal

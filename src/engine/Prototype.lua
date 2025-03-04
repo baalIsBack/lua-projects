@@ -46,6 +46,16 @@ function Prototype:new(...)
 	return self:clone():init(...)
 end
 
+
+local function serialization_getVal(serialization, key)
+  return serialization.serialization.vals[key]
+end
+
+local function serialization_setVal(serialization, key, value)
+  serialization.serialization.vals[key] = value
+  serialization.serialization._requiresSync = true
+end
+
 function Prototype:init_modules(...)
   if self.hasCallbacks then
     self.callbacks = require 'engine.modules.Callbackmanager':new()
@@ -58,6 +68,11 @@ function Prototype:init_modules(...)
   end
   if self.hasSerialization then
     self.serialization = require 'engine.modules.Serializationmanager':new()
+  end
+  if self.hasNetserialization then
+    self.serialization = require 'engine.modules.Netserializationmanager':new()
+    self.getVal = serialization_getVal
+    self.setVal = serialization_setVal
   end
 	return self
 end

@@ -68,7 +68,7 @@ function Self:init(args)
   self.button_down:insert(arrow_down)
 
 
-  self.reply_button = require 'engine.gui.Button':new{main=self.main, x = self.w/2 - 16*3/2, y = self.h/2 - 8 , w=16*3, h=16, text = "Reply", visibleAndActive = false,}
+  self.reply_button = require 'engine.gui.Button':new{main=self.main, x = self.w/2 - 16*3/2, y = self.h/2 - 8 , w=16*3, h=16, text = "Reply", _isReal = false,}
   self.reply_button.callbacks:register("onClicked", function()
     if self.opencontact then
       self.sending_reply = true
@@ -96,7 +96,7 @@ function Self:init(args)
 
   self.scrollbar = require 'engine.gui.Scrollbar':new{main=self.main, x = self.w/2 - 8, y = 0, h = self.h-32}
   self:insert(self.scrollbar)
-  self.scrollbar.visibleAndActive = (self.opencontact)
+  self.scrollbar._isReal = (self.opencontact)
   self.scrollbar.callbacks:register("onUp", function()
     self.scroll_y = self.scroll_y + 10
   end)
@@ -108,9 +108,9 @@ function Self:init(args)
     self.send_bar:setSpeed(self.main.values:getContactSendSpeed())
 
 
-    self.scrollbar.visibleAndActive = self.opencontact
-    self.reply_button.visibleAndActive = self.opencontact
-    self.send_bar.visibleAndActive = self.opencontact
+    self.scrollbar._isReal = self.opencontact
+    self.reply_button._isReal = self.opencontact
+    self.send_bar._isReal = self.opencontact
     if self.opencontact then
       self:refreshButtonStates()
     end
@@ -148,9 +148,10 @@ end
 
 
 function Self:draw()
-  if not self.visibleAndActive then
+  if not self:isReal() then
     return
   end
+  self:applySelectionColorTransformation()
   love.graphics.push()
   love.graphics.translate(self.x, self.y)
 

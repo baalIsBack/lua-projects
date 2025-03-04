@@ -2495,7 +2495,7 @@ end
 
 	Return: None.
 --]]
-function Slab.visibleAndActiveocks(List)
+function Slab._isRealocks(List)
 	Dock.Toggle(List, true)
 end
 

@@ -401,7 +401,7 @@ function FileSystem.IsAbsolute(Path)
 	end
 
 	if FFI.os == "Windows" then
-		return string.match(Path, "(.:-)\\") ~= nil
+		return string.match(Path, "(:-)\\") ~= nil
 	end
 
 	return string.sub(Path, 1, 1) == FileSystem.Separator()
@@ -424,10 +424,10 @@ function FileSystem.GetDrive(Path)
 	end
 
 	if FFI.os == "Windows" then
-		local Result = string.match(Path, "(.:-)\\")
+		local Result = string.match(Path, "(:-)\\")
 
 		if Result == nil then
-			Result = string.match(Path, "(.:-)" .. FileSystem.Separator())
+			Result = string.match(Path, "(:-)" .. FileSystem.Separator())
 		end
 
 		if Result ~= nil then

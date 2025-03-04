@@ -14,8 +14,8 @@ function Self:init(args)
   self.numberOfShownElements = args.numberOfShownElements or (self.elementSize and math.floor(self.h/self.elementSize)) or 6
 
 
-  self.wasDown = false
-  self.isDown = false
+  self._wasDown = false
+  self._isDown = false
 
   self.first_item_id = 1
 
@@ -27,9 +27,10 @@ end
 
 
 function Self:draw()
-  if not self.visibleAndActive then
+  if not self:isReal() then
     return
   end
+  self:applySelectionColorTransformation()
   love.graphics.push()
   love.graphics.translate(self.x, self.y)
 

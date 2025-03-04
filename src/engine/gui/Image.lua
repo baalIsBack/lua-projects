@@ -25,9 +25,10 @@ function Self:getImage()
 end
 
 function Self:draw()
-  if not self.visibleAndActive then
+  if not self:isReal() then
     return
   end
+  self:applySelectionColorTransformation()
   love.graphics.push()
   love.graphics.translate(self.x, self.y)
 

@@ -1462,10 +1462,10 @@ local function DrawInteraction()
 	Slab.NewLine()
 
 	for K, V in pairs(DrawInteraction_MouseCustomCursors) do
-		if Slab.CheckBox(V.visibleAndActive, K) then
-			V.visibleAndActive = not V.visibleAndActive
+		if Slab.CheckBox(V._isReal, K) then
+			V._isReal = not V._isReal
 
-			if V.visibleAndActive then
+			if V:isReal() then
 				Slab.SetCustomMouseCursor(K, V.Image, V.Quad)
 			else
 				Slab.ClearCustomMouseCursor(K)

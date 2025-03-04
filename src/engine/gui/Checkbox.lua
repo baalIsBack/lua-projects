@@ -47,9 +47,10 @@ function Self:uncheck()
 end
 
 function Self:draw()
-  if not self.visibleAndActive then
+  if not self:isReal() then
     return
   end
+  self:applySelectionColorTransformation()
   love.graphics.push()
   love.graphics.translate(self.x, self.y)
 
@@ -61,9 +62,9 @@ function Self:draw()
     love.graphics.setColor((r/1.2), (g/1.2), (b/1.2), a)
   end
   
-  self.text_checkmark.visibleAndActive = self.checked
+  self.text_checkmark._isReal = self.checked
   local pressedHeightDifference = 0
-  if self.isStillClicking and self.enabled then
+  if self._isStillClicking and self.enabled then
     pressedHeightDifference = 2
     love.graphics.translate(0, pressedHeightDifference)
     love.graphics.rectangle("fill", math.floor( -(self.w/2) ), math.floor( -(self.h/2) ), self.w, self.h)

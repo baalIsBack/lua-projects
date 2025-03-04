@@ -40,9 +40,10 @@ function Self:setName(name)
 end
 
 function Self:draw()
-  if not self.visibleAndActive then
+  if not self:isReal() then
     return
   end
+  self:applySelectionColorTransformation()
   love.graphics.push()
   love.graphics.translate(self.x, self.y)
 
@@ -50,7 +51,7 @@ function Self:draw()
   
   
   love.graphics.setColor(1, 1, 1)
-  if self.isStillClicking then
+  if self._isStillClicking then
     love.graphics.setColor(192/255, 192/255, 230/255, 0.4)
     love.graphics.rectangle("fill", math.floor( -(self.w/2) ), math.floor( -(self.h/2) ), self.w, self.h)
   end

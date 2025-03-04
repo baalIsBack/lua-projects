@@ -40,11 +40,11 @@ end
 function Self:reevaluateIcons()
   for i, v in ipairs(self.icons) do
     if v.pos_y - self.y_scroll < 0 or v.pos_y - self.y_scroll >= self.icon_count_height then
-      v.visibleAndActive = false
+      v:setReal(false)
     else
-      v.visibleAndActive = true
+      v:setReal(true)
     end
-    --v.visibleAndActive = true
+    --v:setReal(true)
     --v:setName(v.pos_y)
     v.x = ((v.pos_x)-2)*(64+4)-16
     v.y = (math.floor((i-1)/self.icon_count_width)-1)*(64) - (self.y_scroll*64)
@@ -127,9 +127,10 @@ end
 
 
 function Self:draw()
-  if not self.visibleAndActive then
+  if not self:isReal() then
     return
   end
+  self:applySelectionColorTransformation()
   love.graphics.push()
   love.graphics.translate(self.x, self.y)
 

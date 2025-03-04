@@ -11,7 +11,7 @@ function Self:init(args)
     self.sound_pool[i] = love.audio.newSource("submodules/lua-projects-private/sfx/grace.wav", "static")
   end
 
-  self.input = ""
+  self.input = args.input or ""
   self.cursor_position = 1
   self.cursor_timer = 0
   self.cursor_state_visible = true
@@ -116,9 +116,10 @@ function Self:submit()
 end
 
 function Self:draw()
-  if not self.visibleAndActive then
+  if not self:isReal() then
     return
   end
+  self:applySelectionColorTransformation()
   love.graphics.push()
   love.graphics.translate(self.x, self.y)
 

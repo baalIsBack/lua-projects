@@ -34,29 +34,47 @@ function Self:init(args)
     self.list:down()
   end)
 
-  local obj
+  local obj, b
   for i, v in ipairs(args.items) do
-    obj = require 'engine.gui.Text':new{
+
+    
+    b = require 'engine.gui.Button':new{
       main=args.main,
-      x = 12 - self.w/2,
+      x = 0,
       y = 0,
+      w = self.w-16,
+      h = 16,
       text = v,
-      alignment = "left",
+      _invisible = true,
     }
-    self.list:insert(obj)
+    b.text:setAlignment("left")
+    b.text.x = -self.w/2 + 12
+    b.callbacks:register("onClicked", function()
+      self:select(i)
+    end)
+    self.list:insert(b)
   end
   
   
+
+  self.selection = 1
   
 
 	return self
 end
 
+function Self:select(i)
+  print(i)
+
+  self.selection = i
+end
+
 
 function Self:draw()
-  if not self.visibleAndActive then
+  if not self:isReal() then
     return
   end
+  self:applySelectionColorTransformation()
   love.graphics.push()
   love.graphics.translate(self.x, self.y)
 
@@ -73,9 +91,13 @@ function Self:draw()
   love.graphics.line(-self.w/2, self.h/2, self.w/2, self.h/2)
 
   
-  
   self.contents:callall("draw")
 
+  love.graphics.setColor(192/255, 192/255, 230/255, 0.4)
+  local pos = (self.selection - self.list.first_item_id)
+  if pos >= 0 and pos < self.list.numberOfShownElements then
+    love.graphics.rectangle("fill", 2-self.w/2, 2-self.h/2 + 16*pos, self.w-4-16, 16-4)
+  end
   love.graphics.pop()
 end
 

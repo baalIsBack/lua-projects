@@ -41,8 +41,9 @@ function love.load()
 	scenemanager = require 'engine.Scenemanager':new()
 
   scenemanager:register("Main", require'applications.dummy.Main':new())
-  scenemanager:register("Main_Hex", require'applications.hex.Main':new())
-  scenemanager:switch("Main")
+  --scenemanager:register("Main", require'applications.hex.Main':new())
+  --scenemanager:register("Main", require'applications.space.Main':new())
+  
 end
 
 function love.update(dt)
@@ -65,6 +66,10 @@ function love.draw()
 end
 
 function love.quit()
+  if scenemanager.quit then
+    return scenemanager:quit()
+  end
+  
 	return false
 end
 

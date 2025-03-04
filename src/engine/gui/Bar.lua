@@ -9,8 +9,8 @@ function Self:init(args)
   self.w = args.w
   self.h = 16
 
-  self.wasDown = false
-  self.isDown = false
+  self._wasDown = false
+  self._isDown = false
 
   self.legalDrag = false
 
@@ -45,9 +45,10 @@ end
 
 
 function Self:draw()
-  if not self.visibleAndActive then
+  if not self:isReal() then
     return
   end
+  self:applySelectionColorTransformation()
   love.graphics.push()
   love.graphics.translate(self.x, self.y)
 

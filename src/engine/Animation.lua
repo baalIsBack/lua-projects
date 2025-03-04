@@ -10,7 +10,7 @@ function Self:init(fps, quads, loop)
   Super.init(self)
 	self.callbacks:declare("finish")
 
-	self.visibleAndActive = true
+	self:setReal(true)
 	self.loop = true
 	if loop ~= nil then
 		self.loop = loop
@@ -44,23 +44,23 @@ function Self:quadsFromSheet(img, frameW, frameH) --
 end
 
 function Self:stop()
-	self.visibleAndActive = false
+	self:setReal(false)
 	self.quad_id = 1
 	return self
 end
 
 function Self:pause()
-	self.visibleAndActive = false
+	self:setReal(false)
 	return self
 end
 
 function Self:play()
-	self.visibleAndActive = true
+	self:setReal(true)
 	return self
 end
 
 function Self:restart()
-	self.visibleAndActive = true
+	self:setReal(true)
 	self.quad_id = 1
 	return self
 end

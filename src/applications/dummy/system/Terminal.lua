@@ -49,7 +49,7 @@ function Self:execute(command)
     self.window.font_color = {tonumber(command_parts[2]) or 1, tonumber(command_parts[3]) or 1, tonumber(command_parts[4]) or 1}
   elseif command_parts[1] == "exit" then
     self:appendLog("Exiting terminal...")
-    self.window.visibleAndActive = false
+    self.window:setReal(false)
   elseif command_parts[1] == "install" then
     self:initiateInstall(command_parts[2])
   elseif command_parts[1] == "uninstall" then

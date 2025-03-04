@@ -57,12 +57,12 @@ end
 
 local function AlterOptions(Options)
 	Options = Options == nil and {} or Options
-	Options.visibleAndActive = Options.visibleAndActive == nil and true or Options.visibleAndActive
-	Options.IsSelectable = Options.visibleAndActive
-	Options.SelectOnHover = Options.visibleAndActive
+	Options._isReal = Options._isReal == nil and true or Options._isReal
+	Options.IsSelectable = Options._isReal
+	Options.SelectOnHover = Options._isReal
 	Options.PadH = Style.MenuItemPadH
 
-	if Options.visibleAndActive then
+	if Options:isReal() then
 		Options.Color = Style.TextColor
 	else
 		Options.Color = Style.TextDisabledColor
@@ -130,10 +130,10 @@ function Menu.BeginMenu(Label, Options)
 	local Win = Window.Top()
 
 	Options = AlterOptions(Options)
-	Options.IsSelected = Options.visibleAndActive and Win.Selected == Id
+	Options.IsSelected = Options._isReal and Win.Selected == Id
 
 	if IsMenuBar then
-		Options.IsSelectableTextOnly = Options.visibleAndActive
+		Options.IsSelectableTextOnly = Options._isReal
 		Options.Pad = Pad * 2
 		Options.PadH = Style.MenuPadH
 	else

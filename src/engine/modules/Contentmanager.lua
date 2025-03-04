@@ -47,7 +47,9 @@ end
 
 function Self:callall(f_name, ...)
   for i, v in ipairs(self.content_list) do
-    v[f_name](v, ...)
+    if v[f_name] then
+      v[f_name](v, ...)
+    end
   end
 end
 

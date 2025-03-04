@@ -4,9 +4,6 @@ local Self = Super:clone("Node")
 Self.FOCUS_LIST = {}
 
 function Self:init(args)
-  if not args.main then
-    asdf()
-  end
   assert(args.main, "Node requires a main argument")
   self.main = args.main
   self.hasCallbacks = true
@@ -52,37 +49,48 @@ function Self:init(args)
   --onDragBegin
   --onDrag
   --onDragEnd
-  self.isStillColliding = false
-  self.isStillClicking = false
-  self.isStillDragging = false
-  
-  self.focused = false
-
-  self.color = args.color or {1, 1, 1}
-
-  self.isDown = false
-  self.wasDown = false
-  self.drag_start_x = nil
-  self.drag_start_y = nil
-
+  self._isStillColliding = false
+  self._isStillClicking = false
+  self._isStillDragging = false
+  self._isDown = false
+  self._wasDown = false
+  self._dragStartX = nil
+  self._dragStartY = nil
   self._triggeredCallbackThisCycle = false
 
-  if args.visibleAndActive ~= nil then
-    self.visibleAndActive = args.visibleAndActive
+  self._hasFocus = false
+
+
+  if args._isReal ~= nil then--unreal nodes are not drawn or interacted with
+    self._isReal = args._isReal
   else
-    self.visibleAndActive = true
+    self._isReal = true
   end
-  self.enabled = args.enabled or (args.enabled == nil and true)
+  self.enabled = args.enabled or (args.enabled == nil and true) --special state that allows nodes to have disabled behavior and look like a button
+  self._invisible = args._invisible or false
+  self._selected = args._selected or false --hint used for coloration
+  
   self.debug = false
 
   self.x = args.x or 0
   self.y = args.y or 0
-  self.x_starting_value = self.x
-  self.y_starting_value = self.y
   self.w = args.w or 0
   self.h = args.h or 0
 
+
+  
+  
+
+  self.color = args.color or {1, 1, 1}
+
 	return self
+end
+
+function Self:applySelectionColorTransformation()
+  if self._selected then
+    local color = love.graphics.getColor()
+    love.graphics.setColor(color[1]*0.9, color[2]*0.9, color[3]*0.9)
+  end
 end
 
 function Self:setPosition(x, y)
@@ -100,8 +108,16 @@ function Self:setColor(r, g, b, a)
   end    
 end
 
+function Self:setReal(val)
+  self._isReal = val
+end
+
+function Self:isReal()
+  return self._isReal
+end
+
 function Self:draw()
-  if not self.visibleAndActive then
+  if not self:isReal() then
     return
   end
   love.graphics.push()
@@ -123,45 +139,45 @@ function Self:checkCallbacks()
   local mx, my = require 'engine.Screen':getMousePosition()
   local isMouseDown = love.mouse.isDown(1)
   local isMouseColliding = CHECK_COLLISION(mx, my, 0, 0, self:getX()-self.w/2, self:getY()-self.h/2, self.w, self.h)
-  local wasStillColliding = self.isStillColliding
-  local wasStillClicking = self.isStillClicking
-  local wasStillDragging = self.isStillDragging
-  local deltaColliding = isMouseColliding ~= self.isStillColliding
+  local wasStillColliding = self._isStillColliding
+  local wasStillClicking = self._isStillClicking
+  local wasStillDragging = self._isStillDragging
+  local deltaColliding = isMouseColliding ~= self._isStillColliding
   local deltaClicking = isMouseDown ~= self.wasMouseDown
   local isTopNode = self:isTopNode(mx, my)
   local isWindowTopNode = self:getTopNode("Window").isWindow and self:getTopNode("Window"):isTopWindow(mx, my)
   local isLeaf = self:isLeaf(mx, my) and (isTopNode or isWindowTopNode)
-  self.isStillColliding = self.isStillColliding and isMouseColliding and isLeaf
-  self.isStillClicking = self.isStillClicking and isMouseDown
-  self.isStillDragging = self.isStillDragging and isMouseDown
+  self._isStillColliding = self._isStillColliding and isMouseColliding and isLeaf
+  self._isStillClicking = self._isStillClicking and isMouseDown
+  self._isStillDragging = self._isStillDragging and isMouseDown
 
   if isMouseColliding and deltaColliding and isLeaf then
-    self.isStillColliding = true--begin collision tracking
+    self._isStillColliding = true--begin collision tracking
     self.callbacks:call("onMouseEnter", {self, mx, my})
   end
-  if self.isStillColliding then
+  if self._isStillColliding then
     self.callbacks:call("onHover", {self, mx, my})
   end
   if not isMouseColliding and deltaColliding then
-    self.isStillColliding = false--end collision tracking
+    self._isStillColliding = false--end collision tracking
     self.callbacks:call("onMouseExit", {self, mx, my})
   end
 
   if isMouseColliding and isMouseDown and deltaClicking and isLeaf then
-    self.isStillClicking = true--begin click
-    self.isStillDragging = true--begin drag
+    self._isStillClicking = true--begin click
+    self._isStillDragging = true--begin drag
     self.callbacks:call("onMousePressed", {self, mx, my})
     self.callbacks:call("onDragBegin", {self, mx, my})
-    self.drag_start_x = mx
-    self.drag_start_y = my
+    self._dragStartX = mx
+    self._dragStartY = my
   end
   
   if not isMouseDown and deltaClicking and isMouseColliding and wasStillClicking then
     self:setFocus()
     self.callbacks:call("onClicked", {self, mx, my})
   end
-  if ((not isMouseDown and deltaClicking) or (isMouseDown and deltaColliding)) and self.isStillClicking then
-    self.isStillClicking = false--end click
+  if ((not isMouseDown and deltaClicking) or (isMouseDown and deltaColliding)) and self._isStillClicking then
+    self._isStillClicking = false--end click
     self.callbacks:call("onMouseReleased", {self, mx, my})
   end
 
@@ -169,10 +185,10 @@ function Self:checkCallbacks()
     self.callbacks:call("onDragEnd", {self, mx, my})
   end
 
-  if self.isStillDragging then
-    self.callbacks:call("onDrag", {self, mx - self.drag_start_x, my - self.drag_start_y})
-    self.drag_start_x = mx
-    self.drag_start_y = my
+  if self._isStillDragging then
+    self.callbacks:call("onDrag", {self, mx - self._dragStartX, my - self._dragStartY})
+    self._dragStartX = mx
+    self._dragStartY = my
   end
 
 
@@ -185,7 +201,7 @@ function Self:isTopNode(x, y)
     return false
   end
   for index, otherNode in ipairs(self.main.contents.content_list) do
-    if otherNode ~= self and otherNode.visibleAndActive and otherNode:hasPointCollision(x, y) then
+    if otherNode ~= self and otherNode._isReal and otherNode:hasPointCollision(x, y) then
       if (otherNode.z >= self.z and self.alwaysOnTop == otherNode.alwaysOnTop) or (otherNode.alwaysOnTop and not self.alwaysOnTop) then
         return false
       end
@@ -195,53 +211,53 @@ function Self:isTopNode(x, y)
 end
 
 function Self:activate()
-  self.visibleAndActive = true
+  self:setReal(true)
   self.callbacks:call("onActivate", {self})
 end
 
 function Self:deactivate()
-  self.visibleAndActive = false
+  self:setReal(false)
   self.callbacks:call("onDeactivate", {self})
 end
-
+--[[
 function Self:checkCallbacks_old()
   local calledCallback = false
   local mx, my = require 'engine.Screen':getMousePosition()
   if love.mouse.isDown(1) then
     if CHECK_COLLISION(mx, my, 1, 1, self:getX()-self.w/2, self:getY()-self.h/2, self.w, self.h) then
-      if self.drag_start_x == nil then
-        self.drag_start_x = mx
-        self.drag_start_y = my
+      if self._dragStartX == nil then
+        self._dragStartX = mx
+        self._dragStartY = my
       end
-      if not self.wasDown then
-        self.isDown = true
+      if not self._wasDown then
+        self._isDown = true
         self.callbacks:call("onClick", {self, mx, my})
       end
     else
-      self.isDown = false
+      self._isDown = false
     end
-    if self.drag_start_x ~= nil then
-      self.callbacks:call("onDrag", {self, mx - self.drag_start_x, my - self.drag_start_y})
+    if self._dragStartX ~= nil then
+      self.callbacks:call("onDrag", {self, mx - self._dragStartX, my - self._dragStartY})
       calledCallback = true
-      self.drag_start_x = mx
-      self.drag_start_y = my
+      self._dragStartX = mx
+      self._dragStartY = my
     end
-    self.wasDown = true
+    self._wasDown = true
   else
-    if self.isDown and CHECK_COLLISION(mx, my, 1, 1, self:getX()-self.w/2, self:getY()-self.h/2, self.w, self.h) then
-      self.callbacks:call("onClicked", {self})
+    if self._isDown and CHECK_COLLISION(mx, my, 1, 1, self:getX()-self.w/2, self:getY()-self.h/2, self.w, self.h) then
+      self.callbacks:call("onClicked", {self, mx, my})
       calledCallback = true
     end
-    self.isDown = false
-    self.wasDown = false
-    self.drag_start_x = nil
-    self.drag_start_y = nil
+    self._isDown = false
+    self._wasDown = false
+    self._dragStartX = nil
+    self._dragStartY = nil
   end
   return calledCallback
-end
+end]]
 
 function Self:keypressed(key, scancode, isrepeat)
-  --if not self.visibleAndActive then
+  --if not self:isReal() then
   --  return
   --end
   self.callbacks:call("keypressed", {self, key, scancode, isrepeat})
@@ -249,7 +265,7 @@ function Self:keypressed(key, scancode, isrepeat)
 end
 
 function Self:textinput(text)
-  --if not self.visibleAndActive then
+  --if not self:isReal() then
   --  return
   --end
   self.callbacks:call("textinput", {self, text})
@@ -257,9 +273,10 @@ function Self:textinput(text)
 end
 
 function Self:update(dt)
-  if not self.visibleAndActive then
+  if not self:isReal() then
     return
   end
+  self:applySelectionColorTransformation()
   self.callbacks:call("update", {self, dt})
   self.contents:callall("update", dt)
   if not self.enabled then
@@ -319,15 +336,15 @@ function Self:bringToFront()
 end
 
 function Self:hasFocus()
-  return self.focused or self.contents:any("hasFocus")
+  return self._hasFocus or self.contents:any("hasFocus")
 end
 
 function Self:setFocus()
   for i, node in ipairs(self.FOCUS_LIST) do
-    node.focused = false
+    node._hasFocus = false
   end
   CLEAR(self.FOCUS_LIST)
-  self.focused = true
+  self._hasFocus = true
   table.insert(self.FOCUS_LIST, self)
 end
 

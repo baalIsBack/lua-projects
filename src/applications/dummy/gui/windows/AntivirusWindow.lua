@@ -58,39 +58,54 @@ function Self:init(args)
 
 
 
-  --[[
-  self.scrollbar = require 'engine.gui.Scrollbar':new{
-    main=self.main,
-    x = self.w/2-16+8,
-    y = 8,
-    h = self.h-16,
-    orientation = "vertical"
+
+  local remove_button = require 'engine.gui.Button':new{
+    main = self.main,
+    x = -64,
+    y = self.h/2-32-8,
+    h = 16,
+    text = "Remove",
   }
-  self:insert(self.scrollbar)
+  self:insert(remove_button)
+  remove_button.callbacks:register("onClicked", function(selff)
+    --print()
+    local virus_level, virus_amount = self.main.antivirus:getVirusHardness()
+    self.main.processes:openProcess(self.main.processes.battle)
+    self.main.processes.battle.battle:startBattle()
+    self.main.processes.battle:setVirusLevel(virus_level)
+    self.main.processes.battle:setVirusAmount(virus_amount)
 
-  self.scrollbar.callbacks:register("onUp", function() print(self.list.first_item_id) self.list:up() end)
-  self.scrollbar.callbacks:register("onDown", function() print(self.list.first_item_id) self.list:down() end)
-  ]]
+    
+    
+    --self.battle:startBattle()
+    --self:reloadText()
+    --attack_button.enabled = true
+    --defend_button.enabled = true
+    --regen_button.enabled = true
+  end)
+
+
+
 
   
 
   
-
-  self.callbacks:register("update", function(self, dt)
+  self.callbacks:register("update", function(self)
     self.virus_count_text:setText("Virus count: " .. self.main.values:get("virus_found"))
   end)
+  
   
   --self.list:insert(t)
   return self
 end
 
 
-
-
 function Self:draw()
-  if not self.visibleAndActive then
+  if not self:isReal() then
     return
   end
+  local a = self.main.antivirus:getVirusHardness()
+  self:applySelectionColorTransformation()
   love.graphics.push()
   love.graphics.translate(self.x, self.y)
 

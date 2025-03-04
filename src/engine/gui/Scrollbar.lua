@@ -13,7 +13,7 @@ function Self:init(args)
   
 
   --self:insert(require 'engine.gui.Text':new{main=self.main, x=0, y=0, text=self.title, color={1,1,1}, alignment="center"})
-  self.button_up = require 'engine.gui.Button':new{main=self.main, x=0, y=-self.h/2 + 8, w=16, h=16, visibleAndActive=true}
+  self.button_up = require 'engine.gui.Button':new{main=self.main, x=0, y=-self.h/2 + 8, w=16, h=16, _isReal=true}
   self:insert(self.button_up)
   local arrow_up = require 'engine.gui.Node':new{main=self.main, x = 0, y = 0}
   arrow_up.callbacks:register("onDraw", function(selff)
@@ -26,7 +26,7 @@ function Self:init(args)
   self.button_up:insert(arrow_up)
   self.button_up.callbacks:register("onClicked", function() self:up() end)
 
-  self.button_down = require 'engine.gui.Button':new{main=self.main, x=0, y=self.h/2 - 8, w=16, h=16, visibleAndActive=true}
+  self.button_down = require 'engine.gui.Button':new{main=self.main, x=0, y=self.h/2 - 8, w=16, h=16, _isReal=true}
   self:insert(self.button_down)
   local arrow_down = require 'engine.gui.Node':new{main=self.main, x = 0, y = 0}
   arrow_down.callbacks:register("onDraw", function(selff)
@@ -52,9 +52,10 @@ end
 
 
 function Self:draw()
-  if not self.visibleAndActive then
+  if not self:isReal() then
     return
   end
+  self:applySelectionColorTransformation()
   love.graphics.push()
   love.graphics.translate(self.x, self.y)
 

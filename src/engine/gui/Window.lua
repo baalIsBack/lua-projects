@@ -14,8 +14,8 @@ function Self:init(args)
     MAX_Z = MAX_Z + 1
   end
 
-  self.wasDown = false
-  self.isDown = false
+  self._wasDown = false
+  self._isDown = false
   self.bar = require 'engine.gui.Bar':new{main=args.main,x = 0, y = -self.h/2 - 8+16 , w = self.w, h = 32, title = self.title}
   self:insert(self.bar)
   self.bar.close_button = require 'engine.gui.Button':new{main=self.main,x = self.bar.w/2 - 8, y = 0, w = 10, h = 10, text = "x", text_color = {0,0,0}}
@@ -47,7 +47,7 @@ function Self:open()
 end
 
 function Self:isOpen()
-  return self.visibleAndActive
+  return self._isReal
 end
 
 function Self:close()
@@ -61,9 +61,10 @@ function Self:execute(terminal, command)
 end
 
 function Self:draw()
-  if not self.visibleAndActive then
+  if not self:isReal() then
     return
   end
+  self:applySelectionColorTransformation()
   love.graphics.push()
   love.graphics.translate(self.x, self.y)
 
@@ -84,7 +85,7 @@ end
 
 function Self:isOnlyWindow(x, y)
   for index, window in ipairs(self.main.contents.content_list) do
-    if window ~= self and window.visibleAndActive and window:hasPointCollision(x, y) then
+    if window ~= self and window._isReal and window:hasPointCollision(x, y) then
       return false
     end
   end
@@ -94,7 +95,7 @@ end
 function Self:isTopWindow(x, y)
   for index, window in ipairs(self.main.contents.content_list) do
     if window.isWindow then
-      if window ~= self and window.visibleAndActive and window:hasPointCollision(x, y) then
+      if window ~= self and window._isReal and window:hasPointCollision(x, y) then
         if (window.z >= self.z and self.alwaysOnTop == window.alwaysOnTop) or (window.alwaysOnTop and not self.alwaysOnTop) then
           return false
         end
@@ -108,42 +109,42 @@ function Self:checkCallbacks()
   local mx, my = require 'engine.Screen':getMousePosition()
   local isMouseDown = love.mouse.isDown(1)
   local isMouseColliding = CHECK_COLLISION(mx, my, 0, 0, self:getX()-self.w/2, self:getY()-self.h/2, self.w, self.h)
-  local wasStillColliding = self.isStillColliding
-  local wasStillClicking = self.isStillClicking
-  local wasStillDragging = self.isStillDragging
-  local deltaColliding = isMouseColliding ~= self.isStillColliding
+  local wasStillColliding = self._isStillColliding
+  local wasStillClicking = self._isStillClicking
+  local wasStillDragging = self._isStillDragging
+  local deltaColliding = isMouseColliding ~= self._isStillColliding
   local deltaClicking = isMouseDown ~= self.wasMouseDown
   local isLeaf = self:isLeaf(mx, my)
-  self.isStillColliding = self.isStillColliding and isMouseColliding
-  self.isStillClicking = self.isStillClicking and isMouseDown
-  self.isStillDragging = self.isStillDragging and isMouseDown
+  self._isStillColliding = self._isStillColliding and isMouseColliding
+  self._isStillClicking = self._isStillClicking and isMouseDown
+  self._isStillDragging = self._isStillDragging and isMouseDown
 
   if isMouseColliding and deltaColliding then
-    self.isStillColliding = true--begin collision tracking
+    self._isStillColliding = true--begin collision tracking
     self.callbacks:call("onMouseEnter", {self, mx, my})
   end
-  if self.isStillColliding then
+  if self._isStillColliding then
     self.callbacks:call("onHover", {self, mx, my})
   end
   if not isMouseColliding and deltaColliding then
-    self.isStillColliding = false--end collision tracking
+    self._isStillColliding = false--end collision tracking
     self.callbacks:call("onMouseExit", {self, mx, my})
   end
 
   if isMouseColliding and isMouseDown and deltaClicking then
-    self.isStillClicking = true--begin click
-    self.isStillDragging = true--begin drag
+    self._isStillClicking = true--begin click
+    self._isStillDragging = true--begin drag
     self.callbacks:call("onMousePressed", {self, mx, my})
     self.callbacks:call("onDragBegin", {self, mx, my})
-    self.drag_start_x = mx
-    self.drag_start_y = my
+    self._dragStartX = mx
+    self._dragStartY = my
   end
   if not isMouseDown and deltaClicking and isMouseColliding and wasStillClicking then
     if self:isTopWindow(mx, my) and not self:hasFocus() then self:setFocus() end
     self.callbacks:call("onClicked", {self, mx, my})
   end
   if (not isMouseDown and deltaClicking) or (isMouseDown and deltaColliding) then
-    self.isStillClicking = false--end click
+    self._isStillClicking = false--end click
     self.callbacks:call("onMouseReleased", {self, mx, my})
   end
 
@@ -151,10 +152,10 @@ function Self:checkCallbacks()
     self.callbacks:call("onDragEnd", {self, mx, my})
   end
 
-  if self.isStillDragging then
-    self.callbacks:call("onDrag", {self, mx - self.drag_start_x, my - self.drag_start_y})
-    self.drag_start_x = mx
-    self.drag_start_y = my
+  if self._isStillDragging then
+    self.callbacks:call("onDrag", {self, mx - self._dragStartX, my - self._dragStartY})
+    self._dragStartX = mx
+    self._dragStartY = my
   end
 
 

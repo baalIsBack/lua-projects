@@ -21,6 +21,7 @@ function Self:init(args)
   table.insert(self.lootTable, makeLoot("Icon_Mail", 10, 1, 1))
   table.insert(self.lootTable, makeLoot("Icon_Terminal", 10, 1, 1))
   table.insert(self.lootTable, makeLoot("Icon_Program", 1000, 1, 1))
+  table.insert(self.lootTable, makeLoot("Icon_Archive", 1000, 1, 1))
 
   self.alias_table = nil
 

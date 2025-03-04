@@ -61,7 +61,7 @@ local function GetInstance(Id)
 		Instance.IsTearing = false
 		Instance.Torn = false
 		Instance.CachedOptions = nil
-		Instance.visibleAndActive = true
+		Instance:setReal(true)
 		Instance.NoSavedSettings = false
 		Instances[Id] = Instance
 	end
@@ -99,7 +99,7 @@ local function DrawOverlay(Type)
 		return
 	end
 
-	if not Instance.visibleAndActive then
+	if not Instance:isReal() then
 		return
 	end
 
@@ -202,7 +202,7 @@ function Dock.AlterOptions(WinId, Options)
 	for Id, Instance in pairs(Instances) do
 		if Instance.Window == WinId then
 
-			if Instance.Torn or not Instance.visibleAndActive then
+			if Instance.Torn or not Instance:isReal() then
 				Instance.Window = nil
 				Utility.CopyValues(Options, Instance.CachedOptions)
 				Instance.CachedOptions = nil
@@ -320,7 +320,7 @@ function Dock.Toggle(List, Enabled)
 	for I, V in ipairs(List) do
 		if IsValid(V) then
 			local Instance = GetInstance(V)
-			Instance.visibleAndActive = Enabled
+			Instance._isReal = Enabled
 		end
 	end
 end

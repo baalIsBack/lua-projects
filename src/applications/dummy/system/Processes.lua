@@ -24,14 +24,14 @@ function Self:makeWindow(window_type_name, x, y)
     main = self.main,
     x = x or math.random(100, 300),
     y = y or math.random(100, 300),
-    visibleAndActive = false
+    _isReal = false,
   }
 end
 
 function Self:getActiveProcesses()
   local list = {}
   for i, process in ipairs(self.contents.content_list) do
-    if process.visibleAndActive then
+    if process:isReal() then
       table.insert(list, process)
     end
   end
@@ -49,7 +49,9 @@ function Self:loadApps()
   self.ressources = self:makeWindow('applications.dummy.gui.windows.RessourcesWindow', 250, 250)
   self.antivirus = self:makeWindow('applications.dummy.gui.windows.AntivirusWindow', 250, 250)
   self.network = self:makeWindow('applications.dummy.gui.windows.NetworkWindow', 250, 250)
+  self.debug = self:makeWindow('applications.dummy.gui.windows.DebugWindow', 250, 250)
   self.contacts = self:makeWindow('applications.dummy.gui.windows.ContactsWindow', 250, 250)
+  self.battle = self:makeWindow('applications.dummy.gui.windows.BattleWindow', 250, 250)
 
 
   self.main.terminal.window = self.terminal
@@ -62,6 +64,11 @@ function Self:loadApps()
   self.contents:insert(self.files)
   self.contents:insert(self.processes)
   self.contents:insert(self.ressources)
+  self.contents:insert(self.antivirus)
+  self.contents:insert(self.network)
+  self.contents:insert(self.debug)
+  self.contents:insert(self.contacts)
+  self.contents:insert(self.battle)
 end
 
 function Self:canOpenProcess(app_window)
@@ -111,13 +118,16 @@ function Self:finalizeWindows()
   self.ressources:finalize()
   self.antivirus:finalize()
   self.network:finalize()
+  self.debug:finalize()
+  self.contacts:finalize()
+  self.battle:finalize()
 end
 
 function Self:makePopup(args)
   args.main = self.main
   args.alwaysOnTop = true
   local popup = require('applications.dummy.gui.windows.PopupWindow'):new(args)
-  popup.visibleAndActive = false
+  popup:setReal(false)
   self:openProcess(popup)
   self.main:insert(popup)
 end

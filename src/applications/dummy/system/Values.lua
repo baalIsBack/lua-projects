@@ -84,6 +84,7 @@ function Self:setDefaults()
   self:setOnce("virus_finder_speed", 1)--takes val/100 seconds to find a virus
   self:setOnce("mail_send_speed", 1)--takes val/100 seconds to send a mail
   self:setOnce("contact_send_speed", 1)--takes val/100 seconds to send files to contact
+  self:setOnce("experience", 0)
 
   self:setOnce("ram_total_size", 10)
   self:setOnce("rom_total_size", 10)
@@ -135,9 +136,18 @@ function Self:setDefaults()
   self:setOnce("rom_usage_network", 0.1)
   self:setOnce("ram_usage_network", 0.1)
   
+  self:setOnce("install_time_debug", 0)
+  self:setOnce("rom_usage_debug", 0)
+  self:setOnce("ram_usage_debug", 0)
+  
   self:setOnce("install_time_popup", 0.1)
   self:setOnce("rom_usage_popup", 0.1)
   self:setOnce("ram_usage_popup", 0.1)
+
+  
+  self:setOnce("install_time_battle", 0.1)
+  self:setOnce("rom_usage_battle", 0.1)
+  self:setOnce("ram_usage_battle", 0.1)
 
 
 

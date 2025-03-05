@@ -12,6 +12,7 @@ function Self:init(args)
 
   self.callbacks:declare("onInsert")
   self.callbacks:declare("onRemove")
+  self.callbacks:declare("onDestroy")
   self.callbacks:declare("onDraw")
   
   self.callbacks:declare("onActivate")
@@ -84,6 +85,12 @@ function Self:init(args)
   self.color = args.color or {1, 1, 1}
 
 	return self
+end
+
+function Self:destroy()
+  self.contents:callall("destroy")
+  self.callbacks:call("onDestroy", {self})
+  self.contents:clear()
 end
 
 function Self:applySelectionColorTransformation()
@@ -210,6 +217,11 @@ function Self:isTopNode(x, y)
   return true
 end
 
+function Self:markForDeletion()
+  self.contents:callall("markForDeletion")
+  self._markedForDeletion = true
+end
+
 function Self:activate()
   self:setReal(true)
   self.callbacks:call("onActivate", {self})
@@ -279,6 +291,8 @@ function Self:update(dt)
   self:applySelectionColorTransformation()
   self.callbacks:call("update", {self, dt})
   self.contents:callall("update", dt)
+  self.contents:removeall(function(node) return node._markedForDeletion end)
+  
   if not self.enabled then
     return
   end

@@ -23,7 +23,7 @@ function Self:init(args)
   self.bar.close_button.text.x = 1
   self.bar.close_button.text.y = -2
   self.bar.close_button.callbacks:register("onClicked", function(x, y)
-    self:close()
+    self.main.processes:closeProcess(self)
   end)
   self.bar:insert(self.bar.close_button)
   self.callbacks:register("onMousePressed", function(self)
@@ -52,13 +52,12 @@ end
 
 function Self:close()
   self:deactivate()
-  self:setFocus()
+  if self:hasFocus() then
+    self:setFocus()
+  end
 end
 
 
-function Self:execute(terminal, command)
-  terminal:appendLog("Unknown command: " .. (command or ""))
-end
 
 function Self:draw()
   if not self:isReal() then

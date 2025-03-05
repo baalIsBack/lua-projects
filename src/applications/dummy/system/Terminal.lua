@@ -1,6 +1,8 @@
 local Super = require 'engine.Prototype'
 local Self = Super:clone("Terminal")
 
+local a = require 'applications.dummy.system.CommandDefinitions'
+local COMMANDS, PROGRAM_COMMANDS = a[1], a[2]
 
 function Self:init(args)
   self.main = args.main
@@ -23,76 +25,43 @@ function Self:deserialize(raw)
   return self
 end
 
-function Self:execute(command)
-  self:appendLog("> " .. command)
+function Self:execute(command, silent)
+  if not silent then
+    self:appendLog("> " .. command)
+  end
   local command_parts = {}
   for part in command:gmatch("%S+") do
     table.insert(command_parts, part)
   end
-  if command_parts[1] == "echo" or command_parts[1] == "print" then
-    self:appendLog(table.concat(command_parts, " ", 2))
-  elseif command_parts[1] == "clear" then
-    self.log = {}
-  elseif command_parts[1] == "help" then
-    self:appendLog("Available commands:")
-    self:appendLog("echo <text>")
-    self:appendLog("print <text>")
-    self:appendLog("clear")
-    self:appendLog("help")
-    self:appendLog("exit")
-  elseif command_parts[1] == "info" then
-    self:appendLog("Employee ID: " .. string.format("%05d", self.main.values:get("employee_id")))
-    self:appendLog("Employee Name: ..." .. "REDACTED")
-    self:appendLog("Employee Birthday: ..." .. "REDACTED")
-    self:appendLog("Employee Adress: ..." .. "REDACTED")
-  elseif command_parts[1] == "color" then
-    self.window.font_color = {tonumber(command_parts[2]) or 1, tonumber(command_parts[3]) or 1, tonumber(command_parts[4]) or 1}
-  elseif command_parts[1] == "exit" then
-    self:appendLog("Exiting terminal...")
-    self.window:setReal(false)
-  elseif command_parts[1] == "install" then
-    self:initiateInstall(command_parts[2])
-  elseif command_parts[1] == "uninstall" then
-    self:initiateUninstall(command_parts[2])
-  elseif command_parts[1] == "open" then
-    if self.main.apps:isInstalled(command_parts[2]) then
-      local target_process = self.main.processes:getProcess(command_parts[2])
-      self.main.processes:openProcess(target_process)
-      self:appendLog("Opened " .. command_parts[2])
-    else
-      self:appendLog("Could not open program: " .. command_parts[2])
+
+  for i, command in ipairs(COMMANDS) do
+    if command_parts[1] == command.command then
+      command.effect(self, command_parts)
+      return
     end
-  elseif command_parts[1] == "diskspace" then
-    self:appendLog(self.main.values:get("rom_current_used") .. "MB/" .. self.main.values:get("rom_total_size") .. "MB")
-  elseif command_parts[1] == "close" then
-    if self.main.processes:isActive(command_parts[2]) then
-      local target_process = self.main.processes:getProcess(command_parts[2])
-      self.main.processes:closeProcess(target_process)
-      self:appendLog("Closed " .. command_parts[2])
-    else
-      self:appendLog("Could not close program: " .. command_parts[2])
+    for j, alias in ipairs(command.aliases) do
+      if command_parts[1] == alias then
+        command.effect(self, command_parts)
+        return
+      end
     end
-  elseif command_parts[1] == "save" then
-    self.main.gamestate:save()
-  elseif command_parts[1] == "popup" then
-    local newPopupWindow = require 'applications.dummy.gui.windows.PopupWindow':new{
-      main = self.main,
-      title = "ERROR",
-      text = command_parts[2] or "",
-      width = 200,
-      height = 100,
-      x = 50, y = 50,
-    }
-    self.main:insert(newPopupWindow)
-  elseif command_parts[1] == "reset" then
-    self.main.gamestate:resetSave()
-  elseif command_parts[1] == "debugmail" then
-    self.main.timedmanager:after(0.2, function() self.main.gamestate:addMailFromID(3) end)
-  elseif self.main.processes:isActive(command_parts[1]) then
-    self.main.processes:getProcess(command_parts[1]):execute(self, command_parts[2])
-  else
-    self:appendLog("Unknown command: " .. (command_parts[1] or ""))
   end
+  if PROGRAM_COMMANDS[command_parts[1]] then
+    for i, command in ipairs(PROGRAM_COMMANDS[command_parts[1]]) do
+      if command_parts[2] == command.command then
+        command.effect(self, command_parts)
+        return
+      end
+      for j, alias in ipairs(command.aliases) do
+        if command_parts[2] == alias then
+          command.effect(self, command_parts)
+          return
+        end
+      end
+    end
+  end
+
+  self:appendLog("Unknown command: " .. (command or ""))
   
 end
 

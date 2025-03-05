@@ -94,7 +94,11 @@ function Self:init(args)
     self.virus_count_text:setText("Virus count: " .. self.main.values:get("virus_found"))
   end)
   
-  
+  self:insert(require 'applications.dummy.gui.elements.Virus':new{
+    main = self.main,
+    x = 0,
+    y = 0,
+  })
   --self.list:insert(t)
   return self
 end

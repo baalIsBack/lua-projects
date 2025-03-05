@@ -68,6 +68,10 @@ end
 
 function Self:setDefaults()
   self.safe = true
+
+  self:setOnce("terminal_register_1", math.random(0, 2000000))
+
+
   self:setOnce("employee_id", math.random(45642, 99999))
   self:setOnce("cash", 0)
   self:setOnce("currently_collected_Image", 0)

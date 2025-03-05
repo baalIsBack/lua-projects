@@ -8,6 +8,8 @@ Self.IMG = love.graphics.newImage("submodules/lua-projects-private/gfx/win_icons
 function Self:init(args)
   Super.init(self, args)
 
+  self.filetype = args.filetype or "unknown"
+
   self.pos_y = args.pos_y or 0
   self.pos_x = args.pos_x or 0
 

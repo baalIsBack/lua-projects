@@ -93,6 +93,7 @@ end
 function Self:closeProcess(app_window)
   self.main.values:inc("ram_current_used", -self.main.values:get("ram_usage_"..app_window.ID_NAME))
   self.callbacks:call("onClose", {self, app_window})
+  app_window:close()
 end
 
 function Self:isActive(name)

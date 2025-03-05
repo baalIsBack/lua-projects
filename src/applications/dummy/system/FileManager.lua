@@ -30,6 +30,27 @@ function Self:init(args)
   return self
 end
 
+function Self:determineType(content)
+  if content == "Icon_Folder" then
+    return "folder"
+  elseif content == "Icon_File_Document" then
+    return "document"
+  elseif content == "Icon_Brick" then
+    return "file"
+  elseif content == "Icon_File_Image" then
+    return "image"
+  elseif content == "Icon_Mail" then
+    return "program"
+  elseif content == "Icon_Terminal" then
+    return "program"
+  elseif content == "Icon_Program" then
+    return "program"
+  elseif content == "Icon_Archive" then
+    return "archive"
+  end
+  return "unknown"
+end
+
 function Self:determineContentQuantity()
   return math.random(0, self.main.values:get("files_icon_quantity"))
 end

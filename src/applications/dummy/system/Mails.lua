@@ -114,6 +114,9 @@ function Self:makeUnsentMail()
 end
 
 function Self:replyMail(mail, text)
+  if not self:canSolve(mail) then
+    return
+  end
   mail:setReply(text)
   if not mail.onReply_called then
     mail.onReply_called = true
@@ -197,6 +200,10 @@ function Self:getID()
   local id = self.id_counter
   id = id + 1
   return id
+end
+
+function Self:getMail(id)
+  return self.mails[id]
 end
 
 

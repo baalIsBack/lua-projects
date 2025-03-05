@@ -65,6 +65,7 @@ function Self:addIcon(icon_type, info)
     w = 64,
     h = 64,
     name = require'engine.randomnoun'(),
+    filetype = self.main.filemanager:determineType(icon_type),
     --img = love.graphics.newImage("submodules/lua-projects-private/gfx/win_icons_png/w98_console_prompt.png"),
   }
 

@@ -1,6 +1,15 @@
 local Super = require 'engine.Scene'
 local Self = Super:clone("Main")
 
+function left_pad(str, length, char)
+  char = char or " "  -- Default padding character is a space
+  local pad_size = length - #str
+  if pad_size > 0 then
+      return string.rep(char, pad_size) .. str
+  else
+      return str
+  end
+end
 
 function Self:init()
   Super.init(self)

@@ -82,10 +82,7 @@ function Self:init(args)
 
   self.reply_button = require 'engine.gui.Button':new{main=self.main, x = self.w/2 - 16*3/2, y = self.h/2 - 8 , w=16*3, h=16, text = "Reply", _isReal = false,}
   self.reply_button.callbacks:register("onClicked", function()
-    if self.openmail then
-      self.sending_reply = true
-      self.send_bar:start()
-    end
+    self:initiateReply()
   end)
   self:insert(self.reply_button)
 
@@ -145,16 +142,31 @@ function Self:init(args)
   return self
 end
 
+function Self:canInitiateReply()
+  return self.openmail and not self.sending_reply
+end
+
+function Self:initiateReply()
+  if self:canInitiateReply() then
+    self.sending_reply = true
+    self.send_bar:start()
+  end
+end
+
+function Self:openMail(mail)
+  self.openmail = mail
+  self.scroll_y = -28
+  self.main.mails:readMail(mail)
+  
+  self.reply_field.input = mail.reply or ""
+end
+
 function Self:addMailToList(mail)
   local b = require 'engine.gui.Button':new{main=self.main, x = 0, y = 0, w = self.mail_list_width, h =32}
   self.mail_list:insert(b, 1)
   
   b.callbacks:register("onClicked", function(b)
-    self.openmail = mail
-    self.scroll_y = -28
-    self.main.mails:readMail(mail)
-    
-    self.reply_field.input = mail.reply or ""
+    self:openMail(mail)
   end)
   local sender_text = require 'engine.gui.Text':new{main=self.main, x = -37, y = -10, text = "", lineHeight = 1.4, font = FONTS["mono16"]}
   

@@ -1,18 +1,87 @@
 local Super = require 'engine.Scene'
 local Self = Super:clone("Main")
 
+function folderreq(base_path, enable_prints)
+  local loaded = {}
+  
+  local function scan_dir(dir, req_path, current_table)
+    if enable_prints then print("Scanning dir:", dir) end  -- Debug print
+    local files = love.filesystem.getDirectoryItems(dir)
+    for _, file in ipairs(files) do
+      local file_path = dir .. "/" .. file
+      local info = love.filesystem.getInfo(file_path)
+      
+      if info then  -- Check if file exists
+        if enable_prints then print("Found:", file_path, info.type) end  -- Debug print
+        if info.type == "file" and file:match("%.lua$") then
+          local name = file:gsub("%.lua$", "")
+          local req = req_path .. "." .. name
+          if enable_prints then print("Requiring:", req) end  -- Debug print
+          current_table[name] = require(req)
+        elseif info.type == "directory" then
+          current_table[file] = {}
+          scan_dir(file_path, req_path .. "." .. file, current_table[file])
+        end
+      end
+    end
+  end
+  
+  -- Adjust path for love.filesystem
+  local dir = "applications/" .. base_path
+  scan_dir(dir, "applications." .. base_path, loaded)
+  return loaded
+end
+
+function flatten(t)
+  local flat = {}
+  local function _flatten(tab)
+    for _, v in pairs(tab) do
+      if type(v) == "table" then
+        _flatten(v)
+      else
+        table.insert(flat, v)
+      end
+    end
+  end
+  _flatten(t)
+  return flat
+end
+
 function left_pad(str, length, char)
   char = char or " "  -- Default padding character is a space
   local pad_size = length - #str
   if pad_size > 0 then
-      return string.rep(char, pad_size) .. str
+    return string.rep(char, pad_size) .. str
   else
-      return str
+    return str
+  end
+end
+
+function right_pad(str, length, char)
+  char = char or " "  -- Default padding character is a space
+  local pad_size = length - #str
+  if pad_size > 0 then
+    return str .. string.rep(char, pad_size)
+  else
+    return str
+  end
+end
+
+function mid_pad(str, length, char)
+  char = char or " "  -- Default padding character is a space
+  local pad_size = length - #str
+  if pad_size > 0 then
+    local pad_size1 = math.floor(pad_size/2)
+    local pad_size2 = pad_size - pad_size1
+    return string.rep(char, pad_size1) .. str .. string.rep(char, pad_size2)
+  else
+    return str
   end
 end
 
 function Self:init()
   Super.init(self)
+
 
   FONTS = {}
   FONTS["mono16"] = love.graphics.newImageFont("submodules/lua-projects-private/font/jasoco/font1.png", "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 :-!.,\"?>_#<{}()[]\\+/;%&='*", 0)
@@ -52,6 +121,8 @@ function Self:init()
   self.currency1 = 0
   self.values = require 'applications.dummy.system.Values':new{main=self}
   self.flags = require 'applications.dummy.system.Flags':new{main=self}
+
+
   self.files = require 'applications.dummy.system.Files':new{main=self}
   self.contacts = require 'applications.dummy.system.Contacts':new{main=self}
   self.mails = require 'applications.dummy.system.Mails':new{main=self}
@@ -61,24 +132,32 @@ function Self:init()
   self.processes = require 'applications.dummy.system.Processes':new{main=self}
   self.apps = require 'applications.dummy.system.Apps':new{main=self}
   self.antivirus = require 'applications.dummy.system.Antivirus':new{main=self}
+  self.patcher = require 'applications.dummy.system.Patcher':new{main=self}
   
   --self:install_calc()
 
-
-
+  -- Create plugin manager
+  self.pluginManager = require 'applications.dummy.system.PluginManager':new{main=self}
+  
+  -- Discover and load plugins
+  self.pluginManager:loadDiscoveredPlugins()
+  
+  -- Load and enable all plugins
+  self.pluginManager:loadAllPlugins()
+  self.pluginManager:enableAllPlugins()
 
   love.graphics.setFont(FONT_DEFAULT)
 
 
-
   local osbar = require 'applications.dummy.gui.elements.OSBar':new{y = 480-16+4, color = {0/255, 1/255, 129/255}, main=self,}
   self:insert(osbar)
+
   self.gamestate:finalize()
-  self.processes:finalizeWindows()
+  --self.processes:finalizeWindows()
 
 
-  print(self.values:get("ram_current_used"))
-  self.values:set("ram_current_used", 0)
+  self.values:set("ram_usage_current", 0)
+  
   
 
   return self
@@ -108,19 +187,26 @@ function Self:draw()
   for y = 0, 480-y_dist, y_dist do
     --love.graphics.line(0, y, 640, y)
   end
+
+  require 'engine.Mouse':draw()
+
 end
 
 function Self:update(dt)
   table.sort(self.contents.content_list, function(a, b)
     if a.alwaysOnTop and not b.alwaysOnTop then
-        return false
+      return false
     elseif not a.alwaysOnTop and b.alwaysOnTop then
-        return true
+      return true
     else
-        return a.z < b.z
+      return a.z < b.z
     end
   end)
   
+  -- Update plugins
+  if self.pluginManager then
+    self.pluginManager:update(dt)
+  end
   
   self.contents:callall("update", dt)
   self.timedmanager:update(dt)
@@ -137,9 +223,17 @@ function Self:textinput(text)
   self.contents:callall("textinput", text)
 end
 
+function Self:mousemoved( x, y, dx, dy, istouch )
+  require 'engine.Mouse':mousemoved(x, y, dx, dy, istouch)
+  self.contents:callall("mousemoved", x, y, dx, dy, istouch)
+end
+
 function Self:insert(node)
   self.contents:insert(node)
   node.main = self
+  if node:type() ~= node:super():type() then
+    ddd()
+  end
 end
 
 function Self:remove(node)
@@ -152,121 +246,6 @@ end
 
 function Self:getMaxRam()
   return 4
-end
-
-
-function Self:install_calc()
-  self:insert(self.app_calc)
-
-  
-  self:insert(icon)
-  self.app_calc.desktop_icon = icon
-end
-
-function Self:uninstall_calc()
-  self:remove(self.app_calc)
-  self:remove(self.app_calc.desktop_icon)
-  self.app_calc = nil
-end
-
-function Self:install_stat()
-  self:insert(self.app_stat)
-
-
-  self:insert(icon)
-  self.app_stat.desktop_icon = icon
-end
-
-function Self:uninstall_stat()
-  self:remove(self.app_stat)
-  self:remove(self.app_stat.desktop_icon)
-  self.app_stat = nil
-end
-
-function Self:install_mail()
-  self:insert(self.app_mail)
-
-
-  self:insert(icon)
-  self.app_mail.desktop_icon = icon
-end
-
-function Self:uninstall_mail()
-  self:remove(self.app_mail)
-  self:remove(self.app_mail.desktop_icon)
-  self.app_mail = nil
-end
-
-function Self:install_terminal()
-  self:insert(self.app_terminal)
-  self.terminal.window = self.app_terminal
-
-
-  self:insert(icon)
-  self.app_terminal.desktop_icon = icon
-end
-
-function Self:uninstall_terminal()
-  self:remove(self.app_terminal)
-  self:remove(self.app_terminal.desktop_icon)
-  self.app_terminal = nil
-end
-
-
-function Self:install_editor()
-  self:insert(self.app_editor)
-
-
-  self:insert(icon)
-  self.app_editor.desktop_icon = icon
-end
-
-function Self:uninstall_editor()
-  self:remove(self.app_editor)
-  self:remove(self.app_editor.desktop_icon)
-  self.app_editor = nil
-end
-
-function Self:install_files()
-  self:insert(self.app_files)
-
-
-  self:insert(icon)
-  self.app_files.desktop_icon = icon
-end
-
-function Self:uninstall_files()
-  self:remove(self.app_files)
-  self:remove(self.app_files.desktop_icon)
-  self.app_files = nil
-end
-
-function Self:install_processes()
-  self:insert(self.app_processes)
-
-
-  self:insert(icon)
-  self.app_processes.desktop_icon = icon
-end
-
-function Self:uninstall_processes()
-  self:remove(self.app_processes)
-  self:remove(self.app_processes.desktop_icon)
-  self.app_processes = nil
-end
-
-function Self:install_ressources()
-  self:insert(self.app_ressources)
-
-
-  self:insert(icon)
-  self.app_ressources.desktop_icon = icon
-end
-
-function Self:uninstall_ressources()
-  self:remove(self.app_ressources)
-  self:remove(self.app_ressources.desktop_icon)
-  self.app_ressources = nil
 end
 
 return Self

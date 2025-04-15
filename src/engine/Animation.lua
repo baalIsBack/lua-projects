@@ -10,18 +10,22 @@ function Self:init(fps, quads, loop)
   Super.init(self)
 	self.callbacks:declare("finish")
 
-	self:setReal(true)
+	self.running = true
 	self.loop = true
 	if loop ~= nil then
 		self.loop = loop
 	end
 	self.quads = quads
 	self.quad_id = 1
-	self.jobs:every(1 / fps, function(self)
-		if self.active then
+
+  self.fps = fps
+
+	self.jobs:every(1 / fps, function(selff)
+		if self.running then
 			if self.quad_id == #self.quads then
-				self.callbacks:call("finish", self)
+				self.callbacks:call("finish", {self})
 				if not self.loop then
+          self:pause() -- avoid infinite loop through callbacks
 					return
 				end
 			end
@@ -29,6 +33,22 @@ function Self:init(fps, quads, loop)
 		end
 	end, self)
 	return self
+end
+
+function Self:setFps(fps)
+  self.jobs:clear()
+  self.jobs:every(1 / fps, function(selff)
+		if self.running then
+			if self.quad_id == #self.quads then
+				self.callbacks:call("finish", {self})
+				if not self.loop then
+          self:pause() -- avoid infinite loop through callbacks
+					return
+				end
+			end
+			self.quad_id = (self.quad_id % #self.quads) + 1
+		end
+	end, self)
 end
 
 --[[
@@ -44,23 +64,23 @@ function Self:quadsFromSheet(img, frameW, frameH) --
 end
 
 function Self:stop()
-	self:setReal(false)
+	self.running = false
 	self.quad_id = 1
 	return self
 end
 
 function Self:pause()
-	self:setReal(false)
+	self.running = false
 	return self
 end
 
 function Self:play()
-	self:setReal(true)
+	self.running = true
 	return self
 end
 
 function Self:restart()
-	self:setReal(true)
+	self.running = true
 	self.quad_id = 1
 	return self
 end
@@ -77,6 +97,10 @@ end
 
 function Self:getQuad()
 	return self.quads[self.quad_id]
+end
+
+function Self:isDone()
+  return self.quad_id == #self.quads  
 end
 
 return Self

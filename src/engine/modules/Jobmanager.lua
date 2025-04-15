@@ -37,4 +37,8 @@ function Self:every(time, f, ...)
 	self:insert(cron.every(time, f, ...))
 end
 
-return Jobs
+function Self:clear()
+  self.jobs = {}  
+end
+
+return Self

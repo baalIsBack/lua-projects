@@ -2,6 +2,7 @@ local Super = require 'applications.dummy.gui.windows.Process'
 local Self = Super:clone("DebugkWindow")
 
 Self.ID_NAME = "debug"
+Self.IMG = love.graphics.newImage("submodules/lua-projects-private/gfx/win_icons_png/w2k_unknown_drive-3.png")
 
 function Self:init(args)
   args.w = 320

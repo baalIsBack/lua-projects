@@ -1,10 +1,9 @@
 local Super = require 'engine.Prototype'
 local Self = Super:clone("FileManager")
 
-local function makeLoot(content, weight, amountMin, amountMax)
-  return {content = content, weight = weight, amountMin = amountMin, amountMax = amountMax,}
-  
-end
+local lootTableDefinitions = require 'src.applications.dummy.system.LootTableDefinitions'
+local lootTables, namedLootTables = lootTableDefinitions[1], lootTableDefinitions[2]
+
 
 function Self:init(args)
   self.main = args.main
@@ -13,15 +12,7 @@ function Self:init(args)
   
   self.currentcontents = nil
 
-  self.lootTable = {}
-  table.insert(self.lootTable, makeLoot("Icon_Folder", 500, 1, 1))
-  table.insert(self.lootTable, makeLoot("Icon_File_Document", 2500, 0, 1))
-  table.insert(self.lootTable, makeLoot("Icon_Brick", 2500, 1, 1))
-  table.insert(self.lootTable, makeLoot("Icon_File_Image", 2500, 1, 1))
-  table.insert(self.lootTable, makeLoot("Icon_Mail", 10, 1, 1))
-  table.insert(self.lootTable, makeLoot("Icon_Terminal", 10, 1, 1))
-  table.insert(self.lootTable, makeLoot("Icon_Program", 1000, 1, 1))
-  table.insert(self.lootTable, makeLoot("Icon_Archive", 1000, 1, 1))
+  self.lootTable = namedLootTables["folder"]
 
   self.alias_table = nil
 
@@ -30,29 +21,14 @@ function Self:init(args)
   return self
 end
 
-function Self:determineType(content)
-  if content == "Icon_Folder" then
-    return "folder"
-  elseif content == "Icon_File_Document" then
-    return "document"
-  elseif content == "Icon_Brick" then
-    return "file"
-  elseif content == "Icon_File_Image" then
-    return "image"
-  elseif content == "Icon_Mail" then
-    return "program"
-  elseif content == "Icon_Terminal" then
-    return "program"
-  elseif content == "Icon_Program" then
-    return "program"
-  elseif content == "Icon_Archive" then
-    return "archive"
-  end
-  return "unknown"
+function Self:setLootTable(name)
+  assert(namedLootTables[name], "Loot table not found: " .. name)
+  self.lootTable = namedLootTables[name]
 end
 
 function Self:determineContentQuantity()
-  return math.random(0, self.main.values:get("files_icon_quantity"))
+  local r = math.random(self.lootTable.minAmount, self.lootTable.maxAmount * self.main.values:get("files_icon_quantity"))
+  return r
 end
 
 function Self:determineContents()
@@ -60,8 +36,8 @@ function Self:determineContents()
   self.currentcontents = {}
   for i=1, self:determineContentQuantity(), 1 do
     local lootID = self.alias_table()
-    local content = self.lootTable[lootID].content
-    local amount = math.random(self.lootTable[lootID].amountMin, self.lootTable[lootID].amountMax)
+    local content = self.lootTable.loot[lootID].content
+    local amount = math.random(self.lootTable.loot[lootID].amountMin, self.lootTable.loot[lootID].amountMax)
     
     for j=1, amount, 1 do
       local loot = content
@@ -70,12 +46,27 @@ function Self:determineContents()
       end
     end
   end
+  print(#self.lootTable.requiredLoot)
+
+  for i, loot in ipairs(self.lootTable.requiredLoot) do
+    local amount = math.random(loot.amountMin, loot.amountMax)
+    for j=1, amount, 1 do
+      if loot then
+        table.insert(self.currentcontents, loot.content)
+      end
+    end
+  end
+
+
+  local table_shuffle = require 'lib.shuffle'
+  table_shuffle(self.currentcontents)
+
   return self.currentcontents
 end
 
 function Self:reloadAliasTable()
   local alias_t = {}
-  for i, v in ipairs(self.lootTable) do
+  for i, v in ipairs(self.lootTable.loot) do
     table.insert(alias_t, v.weight)
   end
   self.alias_table = require 'lib.alias_table':new(alias_t)

@@ -3,6 +3,7 @@ local Self = Super:clone("ContactsWindow")
 
 
 Self.ID_NAME = "contacts"
+Self.IMG = love.graphics.newImage("submodules/lua-projects-private/gfx/win_icons_png/w98_cardfile-1.png")
 
 function Self:init(args)
   args.w = 320

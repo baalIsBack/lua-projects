@@ -49,6 +49,15 @@ function Self:textinput(text)
   end
 end
 
+
+
+function Self:mousemoved(x, y, dx, dy, istouch)
+  local active_scene = self:getActiveScene()
+  if active_scene and active_scene.mousemoved then
+    active_scene:mousemoved(x, y, dx, dy, istouch)
+  end
+end
+
 function Self:getActiveScene()
 	local x = self.scenes[self.activeSceneId]
 	--assert(x, "No Active Scene for Scene!")

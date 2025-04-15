@@ -9,10 +9,10 @@ CONTACTS[1] = {
   birthday = "REDACTED",
   address = "REDACTED",
   requirements = {
-    [require'applications.dummy.gui.elements.Icon_Brick'] = 1,
+    [require'applications.dummy.system.plugins.base.files.Icon_File_System'] = 1,
   },
   rewards = {
-    [require'applications.dummy.gui.elements.Icon_File_Document'] = 10,
+    [require'applications.dummy.system.plugins.base.files.Icon_File_Document'] = 10,
   },
 }
 CONTACTS[2] = {
@@ -21,10 +21,10 @@ CONTACTS[2] = {
   birthday = "REDACTED",
   address = "REDACTED",
   requirements = {
-    [require'applications.dummy.gui.elements.Icon_Brick'] = 2,
+    [require'applications.dummy.system.plugins.base.files.Icon_File_System'] = 2,
   },
   rewards = {
-    [require'applications.dummy.gui.elements.Icon_File_Document'] = 22,
+    [require'applications.dummy.system.plugins.base.files.Icon_File_Document'] = 22,
   },
 }
 CONTACTS[3] = {
@@ -33,12 +33,12 @@ CONTACTS[3] = {
   birthday = "REDACTED",
   address = "REDACTED",
   requirements = {
-    [require'applications.dummy.gui.elements.Icon_File_Image'] = 10,
-    [require'applications.dummy.gui.elements.Icon_Brick'] = 100,
+    [require'applications.dummy.system.plugins.base.files.Icon_File_Image'] = 10,
+    [require'applications.dummy.system.plugins.base.files.Icon_File_System'] = 100,
   },
   rewards = {
-    [require'applications.dummy.gui.elements.Icon_File_Image'] = 10,
-    [require'applications.dummy.gui.elements.Icon_File_Document'] = 2,
+    [require'applications.dummy.system.plugins.base.files.Icon_File_Image'] = 10,
+    [require'applications.dummy.system.plugins.base.files.Icon_File_Document'] = 2,
   },
 }
 

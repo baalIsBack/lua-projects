@@ -143,7 +143,7 @@ function Self:draw()
 end
 
 function Self:checkCallbacks()
-  local mx, my = require 'engine.Screen':getMousePosition()
+  local mx, my = require 'engine.Mouse':getPosition()
   local isMouseDown = love.mouse.isDown(1)
   local isMouseColliding = CHECK_COLLISION(mx, my, 0, 0, self:getX()-self.w/2, self:getY()-self.h/2, self.w, self.h)
   local wasStillColliding = self._isStillColliding
@@ -158,19 +158,19 @@ function Self:checkCallbacks()
   self._isStillClicking = self._isStillClicking and isMouseDown
   self._isStillDragging = self._isStillDragging and isMouseDown
 
-  if isMouseColliding and deltaColliding and isLeaf then
+  if isMouseColliding and deltaColliding and isLeaf and not self.mouseDisabled then
     self._isStillColliding = true--begin collision tracking
     self.callbacks:call("onMouseEnter", {self, mx, my})
   end
-  if self._isStillColliding then
+  if self._isStillColliding and not self.mouseDisabled then
     self.callbacks:call("onHover", {self, mx, my})
   end
-  if not isMouseColliding and deltaColliding then
+  if not isMouseColliding and deltaColliding and not self.mouseDisabled then
     self._isStillColliding = false--end collision tracking
     self.callbacks:call("onMouseExit", {self, mx, my})
   end
 
-  if isMouseColliding and isMouseDown and deltaClicking and isLeaf then
+  if isMouseColliding and isMouseDown and deltaClicking and isLeaf and not self.mouseDisabled then
     self._isStillClicking = true--begin click
     self._isStillDragging = true--begin drag
     self.callbacks:call("onMousePressed", {self, mx, my})
@@ -179,20 +179,20 @@ function Self:checkCallbacks()
     self._dragStartY = my
   end
   
-  if not isMouseDown and deltaClicking and isMouseColliding and wasStillClicking then
+  if not isMouseDown and deltaClicking and isMouseColliding and wasStillClicking and not self.mouseDisabled then
     self:setFocus()
     self.callbacks:call("onClicked", {self, mx, my})
   end
-  if ((not isMouseDown and deltaClicking) or (isMouseDown and deltaColliding)) and self._isStillClicking then
+  if ((not isMouseDown and deltaClicking) or (isMouseDown and deltaColliding)) and self._isStillClicking and not self.mouseDisabled then
     self._isStillClicking = false--end click
     self.callbacks:call("onMouseReleased", {self, mx, my})
   end
 
-  if not isMouseDown and deltaClicking and self.wasStillDragging then
+  if not isMouseDown and deltaClicking and self.wasStillDragging and not self.mouseDisabled then
     self.callbacks:call("onDragEnd", {self, mx, my})
   end
 
-  if self._isStillDragging then
+  if self._isStillDragging and not self.mouseDisabled then
     self.callbacks:call("onDrag", {self, mx - self._dragStartX, my - self._dragStartY})
     self._dragStartX = mx
     self._dragStartY = my
@@ -234,7 +234,7 @@ end
 --[[
 function Self:checkCallbacks_old()
   local calledCallback = false
-  local mx, my = require 'engine.Screen':getMousePosition()
+  local mx, my = require 'engine.Mouse':getPosition()
   if love.mouse.isDown(1) then
     if CHECK_COLLISION(mx, my, 1, 1, self:getX()-self.w/2, self:getY()-self.h/2, self.w, self.h) then
       if self._dragStartX == nil then
@@ -360,6 +360,27 @@ function Self:setFocus()
   CLEAR(self.FOCUS_LIST)
   self._hasFocus = true
   table.insert(self.FOCUS_LIST, self)
+end
+
+function Self:getTopBorder()
+  return self:getY() - self.h/2
+end
+
+function Self:getBottomBorder()
+  return self:getY() + self.h/2
+end
+
+function Self:getLeftBorder()
+  return self:getX() - self.w/2
+end
+
+function Self:getRightBorder()
+  return self:getX() + self.w/2
+end
+
+function Self:mousemoved(x, y, dx, dy, istouch)
+  self.contents:callall("mousemoved", x, y, dx, dy, istouch)
+  
 end
 
 return Self

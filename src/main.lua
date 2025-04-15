@@ -29,6 +29,7 @@ local scenemanager
 --cron = require 'engine.cron'
 --Scenemanager = require 'engine.Scenemanager'
 --Animation = require 'engine.Animation'
+local IMG_MOUSE = love.graphics.newImage("submodules/lua-projects-private/gfx/Mini Pixel Pack 3/Effects/Sparkle (16 x 16).png")
 
 
 function love.load()
@@ -41,9 +42,28 @@ function love.load()
 	scenemanager = require 'engine.Scenemanager':new()
 
   scenemanager:register("Main", require'applications.dummy.Main':new())
+  
+  --scenemanager:register("Main", require'applications.shadertest.Main':new())
+  --scenemanager:register("Main", require'applications.battlenetwork.Main':new())
+  
+  --scenemanager:register("Main", require'applications.farm.Main':new())
   --scenemanager:register("Main", require'applications.hex.Main':new())
   --scenemanager:register("Main", require'applications.space.Main':new())
   
+end
+
+debug.getregistry().Quad.flip = function (self, x, y)
+  local vpx, vpy, vpw, vph = self:getViewport()
+  local vpsx, vpsy = self:getTextureDimensions()
+  if x then
+    vpx = -vpx - vpw
+    vpsx = -vpsx
+  end
+  if y then
+    vpy = -vpy - vph
+    vpsy = -vpsy
+  end
+  self:setViewport(vpx, vpy, vpw, vph, vpsx, vpsy)
 end
 
 function love.update(dt)
@@ -54,6 +74,12 @@ function love.update(dt)
 		dt = dt - 0.2
 	end
 	scenemanager:update(dt)
+
+  --quit if esc is pressed
+  if love.keyboard.isDown("escape") then
+    love.event.quit()
+  end
+
 end
 
 function love.draw()
@@ -79,4 +105,8 @@ end
 
 function love.textinput(text)
   scenemanager:textinput(text)
+end
+
+function love.mousemoved( x, y, dx, dy, istouch )
+  scenemanager:mousemoved( x, y, dx, dy, istouch )
 end

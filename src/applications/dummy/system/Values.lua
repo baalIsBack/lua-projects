@@ -9,20 +9,13 @@ function Self:init(args)
   Super.init(self)
   
   self.values = {}
+
+  self.defaults = {}
   
   self:setDefaults()
 
   self.callbacks:declare("onSet")
   self.callbacks:register("onSet", function(selff, name, value)
-    if name == "currently_collected_Image" and value > 0 then
-      self.main.processes:getProcess("stat"):addNewUniqueStat(require('applications.dummy.gui.elements.Icon_File_Image'), "currently_collected_Image")
-    end
-    if name == "currently_collected_Document" and value > 0 then
-      self.main.processes:getProcess("stat"):addNewUniqueStat(require('applications.dummy.gui.elements.Icon_File_Document'), "currently_collected_Document")
-    end
-    if name == "currently_collected_Brick" and value > 0 then
-      self.main.processes:getProcess("stat"):addNewUniqueStat(require('applications.dummy.gui.elements.Icon_Brick'), "currently_collected_Brick")
-    end
   end)
 
   return self
@@ -74,89 +67,105 @@ function Self:setDefaults()
 
   self:setOnce("employee_id", math.random(45642, 99999))
   self:setOnce("cash", 0)
-  self:setOnce("currently_collected_Image", 0)
-  self:setOnce("currently_collected_Brick", 0)
-  self:setOnce("currently_collected_Document", 0)
-  self:setOnce("currently_collected_Program", 0)
-  self:setOnce("opened_Image", 0)
-  self:setOnce("opened_Brick", 0)
-  self:setOnce("opened_Document", 0)
-  self:setOnce("opened_Program", 0)
-  self:setOnce("files_icon_quantity", 5)
+  self:setOnce("files_icon_quantity", 1)
   self:setOnce("virus_value", 0)--viruses contracted but not noticed
   self:setOnce("virus_found", 0)--viruses found by antivirus
-  self:setOnce("virus_finder_speed", 1)--takes val/100 seconds to find a virus
-  self:setOnce("mail_send_speed", 1)--takes val/100 seconds to send a mail
-  self:setOnce("contact_send_speed", 1)--takes val/100 seconds to send files to contact
+  self:set("virus_finder_speed", 10)--takes val/100 seconds to find a virus
+  self:set("mail_send_speed", 50)--takes val/100 seconds to send a mail
+  self:set("contact_send_speed", 10)--takes val/100 seconds to send files to contact
   self:setOnce("experience", 0)
 
-  self:setOnce("ram_total_size", 10)
-  self:setOnce("rom_total_size", 10)
+  self:setOnce("ram_usage_total", 10)
+  self:setOnce("rom_usage_total", 10)
+  self:setOnce("cycles_usage_total", 0)
 
-  self:setOnce("ram_current_used", 0)
-  self:setOnce("rom_current_used", 0)
+  self:setOnce("ram_usage_current", 0)
+  self:setOnce("rom_usage_current", 0)
+  self:setOnce("cycles_usage_current", 0)
 
   self:setOnce("install_time_calc", 0.1)
   self:setOnce("rom_usage_calc", 0.1)
   self:setOnce("ram_usage_calc", 0.1)
+  self:setOnce("cycles_usage_calc", 0.1)
 
   self:setOnce("install_time_terminal", 0.1)
   self:setOnce("rom_usage_terminal", 0.1)
   self:setOnce("ram_usage_terminal", 0.1)
+  self:setOnce("cycles_usage_terminal", 0.1)
 
   self:setOnce("install_time_mail", 0.1)
   self:setOnce("rom_usage_mail", 0.1)
   self:setOnce("ram_usage_mail", 0.1)
+  self:setOnce("cycles_usage_mail", 0.1)
 
   self:setOnce("install_time_editor", 0.1)
   self:setOnce("rom_usage_editor", 0.1)
   self:setOnce("ram_usage_editor", 0.1)
+  self:setOnce("cycles_usage_editor", 0.1)
 
   self:setOnce("install_time_files", 0.1)
   self:setOnce("rom_usage_files", 0.1)
   self:setOnce("ram_usage_files", 0.1)
+  self:setOnce("cycles_usage_files", 0.1)
 
   self:setOnce("install_time_processes", 0.1)
   self:setOnce("rom_usage_processes", 0.1)
   self:setOnce("ram_usage_processes", 0.1)
+  self:setOnce("cycles_usage_processes", 0.1)
 
   self:setOnce("install_time_ressources", 0.1)
   self:setOnce("rom_usage_ressources", 0.1)
   self:setOnce("ram_usage_ressources", 0.1)
+  self:setOnce("cycles_usage_ressources", 0.1)
 
   self:setOnce("install_time_stat", 0.1)
   self:setOnce("rom_usage_stat", 0.1)
   self:setOnce("ram_usage_stat", 0.1)
+  self:setOnce("cycles_usage_stat", 0.1)
 
   self:setOnce("install_time_contacts", 0.1)
   self:setOnce("rom_usage_contacts", 0.1)
   self:setOnce("ram_usage_contacts", 0.1)
+  self:setOnce("cycles_usage_contacts", 0.1)
   
   self:setOnce("install_time_antivirus", 0.1)
   self:setOnce("rom_usage_antivirus", 0.1)
   self:setOnce("ram_usage_antivirus", 0.1)
+  self:setOnce("cycles_usage_antivirus", 0.1)
   
   self:setOnce("install_time_network", 0.1)
   self:setOnce("rom_usage_network", 0.1)
   self:setOnce("ram_usage_network", 0.1)
+  self:setOnce("cycles_usage_network", 0.1)
+  
+  self:setOnce("install_time_patcher", 0.1)
+  self:setOnce("rom_usage_patcher", 0.1)
+  self:setOnce("ram_usage_patcher", 0.1)
+  self:setOnce("cycles_usage_patcher", 0.1)
   
   self:setOnce("install_time_debug", 0)
   self:setOnce("rom_usage_debug", 0)
   self:setOnce("ram_usage_debug", 0)
+  self:setOnce("cycles_usage_debug", 0.1)
   
   self:setOnce("install_time_popup", 0.1)
   self:setOnce("rom_usage_popup", 0.1)
   self:setOnce("ram_usage_popup", 0.1)
+  self:setOnce("cycles_usage_popup", 0.1)
 
   
   self:setOnce("install_time_battle", 0.1)
   self:setOnce("rom_usage_battle", 0.1)
   self:setOnce("ram_usage_battle", 0.1)
+  self:setOnce("cycles_usage_battle", 0.1)
 
 
 
-  self:set("ram_current_used", 0) -- since all programs shut down each restart
+  self:set("ram_usage_current", 0) -- since all programs shut down each restart
 
+  for i, v in ipairs(self.defaults) do
+    self:setOnce(v[1], v[2])
+  end
 
   self.safe = false
 end

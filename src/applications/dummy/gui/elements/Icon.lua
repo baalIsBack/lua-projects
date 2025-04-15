@@ -4,11 +4,12 @@ local Self = Super:clone("Icon")
 Self.ID_NAME = "noid"
 Self.NAME = "noname"
 Self.IMG = love.graphics.newImage("submodules/lua-projects-private/gfx/win_icons_png/w98_directory_closed.png")
+Self.filetype = "unknown"
 
 function Self:init(args)
+  args.w = args.w or 64
+  args.h = args.h or 64
   Super.init(self, args)
-
-  self.filetype = args.filetype or "unknown"
 
   self.pos_y = args.pos_y or 0
   self.pos_x = args.pos_x or 0
@@ -71,12 +72,12 @@ end
 function Self:open()
   if not self.hasBeenOpened then
     local id, count
-    id = "opened_" .. self.NAME
+    id = "opened_" .. self.ID_NAME
     count = self.main.values:get(id) or 0
     self.main.values:set(id, count + 1)
 
     
-    id = "currently_collected_" .. self.NAME
+    id = "currently_collected_" .. self.ID_NAME
     count = self.main.values:get(id) or 0
     self.main.values:set(id, count + 1)
 
@@ -84,6 +85,18 @@ function Self:open()
     return true
   end
   return false
+end
+
+
+
+function Self:loadStatics(main)
+  main.values.safe = true
+  table.insert(main.values.defaults, {"opened_"..self.ID_NAME, 0})
+  table.insert(main.values.defaults, {"currently_collected_"..self.ID_NAME, 0})
+  
+  
+  
+  main.values.safe = false
 end
 
 return Self

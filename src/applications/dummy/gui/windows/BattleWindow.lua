@@ -213,9 +213,6 @@ function Self:reloadText()
   if self.battle:isOver() then
     self.choice1_button.enabled = false
     self.choice2_button.enabled = false
-  else
-    self.choice1_button.enabled = true
-    self.choice2_button.enabled = true
   end
 
   --self.enemyhp:setText("Enemy HP: " .. self.battle.enemy.hp)

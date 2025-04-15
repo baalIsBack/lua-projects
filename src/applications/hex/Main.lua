@@ -38,7 +38,7 @@ function Self:draw()
 end
 
 function Self:update(dt)
-  local mx, my = require 'engine.Screen':getMousePosition()
+  local mx, my = require 'engine.Mouse':getPosition()
   if love.mouse.isDown(1) then
     local h = pixel_to_hex(self.layout, Point(mx, my))
     h = hex_round(h)

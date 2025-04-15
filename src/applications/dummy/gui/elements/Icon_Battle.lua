@@ -9,7 +9,7 @@ Self.NAME = "Buster"
 function Self:init(args)
   Super.init(self, args)
 
-  self:setTargetApp(self.main.processes.battle)
+  self.targetPrototype = require 'applications.dummy.system.Battle'
   
 
 

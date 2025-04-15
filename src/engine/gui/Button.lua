@@ -27,8 +27,7 @@ function Self:init(args)
   if self.text and not prior_w then
     self.w = self.text:getWidth() + 6
   end
-
-
+  
 	return self
 end
 

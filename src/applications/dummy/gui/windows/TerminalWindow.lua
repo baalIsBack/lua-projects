@@ -3,6 +3,7 @@ local Self = Super:clone("TerminalWindow")
 
 
 Self.ID_NAME = "terminal"
+Self.IMG = love.graphics.newImage("submodules/lua-projects-private/gfx/win_icons_png/w98_console_prompt.png")
 
 function Self:init(args)
   args.w = 320
@@ -20,6 +21,7 @@ function Self:init(args)
   self.maximum_visible_lines = 17
 
 
+
   self.font_color = args.font_color or {1, 1, 1}
 
   self.sound_pool = {}
@@ -31,6 +33,10 @@ function Self:init(args)
     love.graphics.rectangle("fill", math.floor( -(self.w/2)-2 ), math.floor( -(self.h/2) ), self.w, self.h-4)
   end
 
+  self.callbacks:register("onActivate", function(self)
+    self.input = ""
+    self.accepting_input = true
+  end)
 
   self.callbacks:register("keypressed", function(self, key, scancode, isrepeat)
     

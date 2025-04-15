@@ -17,8 +17,8 @@ function Self:init(args)
 
   self.callbacks:declare("onFilled")
   
-
-  self:insert(require 'engine.gui.Text':new{main=self.main, x=0, y=0, text=self.title, color={1,1,1}, alignment="center"})
+  self.font = FONTS["mono16"]
+  --self:insert(require 'engine.gui.Text':new{main=self.main, x=0, y=0, text=self.title, color={1,1,1}, alignment="center", font = FONTS["mono16"]})
 
   self.callbacks:register("update", function(self, dt)
     if self.running then
@@ -60,6 +60,7 @@ function Self:draw()
   love.graphics.setColor(1, 1, 1)
   local font = love.graphics.getFont()
   local str = string.format("%.0f%%", self.progress*100)
+  love.graphics.setFont(self.font)
   love.graphics.print(str, -font:getWidth(str)/2, -font:getHeight(str)/2)
   
   self.contents:callall("draw")

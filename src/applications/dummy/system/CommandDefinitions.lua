@@ -65,7 +65,7 @@ newCommand({
   aliases = {},
   unlocked = true,
   effect = function(terminal, commands)
-    terminal.window.font_color = {tonumber(commands[1]) or 1, tonumber(commands[2]) or 1, tonumber(commands[3]) or 1}
+    terminal.window.font_color = {tonumber(commands[2]) or 1, tonumber(commands[3]) or 1, tonumber(commands[4]) or 1}
   end
 })
 
@@ -86,7 +86,7 @@ newCommand({
   aliases = {},
   unlocked = true,
   effect = function(terminal, commands)
-    terminal:initiateInstall(commands[1])
+    terminal:install(commands[2])
   end
 })
 
@@ -96,7 +96,7 @@ newCommand({
   aliases = {},
   unlocked = true,
   effect = function(terminal, commands)
-    terminal:initiateUninstall(commands[1])
+    terminal:uninstall(commands[2])
   end
 })
 
@@ -106,12 +106,12 @@ newCommand({
   aliases = {},
   unlocked = true,
   effect = function(terminal, commands)
-    if terminal.main.apps:isInstalled(commands[1]) then
-      local target_process = terminal.main.processes:getProcess(commands[1])
+    if terminal.main.apps:isInstalled(commands[2]) then
+      local target_process = terminal.main.processes:getProcess(commands[2])
       terminal.main.processes:openProcess(target_process)
-      terminal:appendLog("Opened " .. commands[1])
+      terminal:appendLog("Opened " .. commands[2])
     else
-      terminal:appendLog("Could not open program: " .. commands[1])
+      terminal:appendLog("Could not open program: " .. commands[2])
     end
   end
 })
@@ -122,7 +122,7 @@ newCommand({
   aliases = {},
   unlocked = true,
   effect = function(terminal, commands)
-    terminal:appendLog(terminal.main.values:get("rom_current_used") .. "MB/" .. terminal.main.values:get("rom_total_size") .. "MB")
+    terminal:appendLog(terminal.main.values:get("rom_usage_current") .. "MB/" .. terminal.main.values:get("rom_usage_total") .. "MB")
   end
 })
 
@@ -132,12 +132,12 @@ newCommand({
   aliases = {},
   unlocked = true,
   effect = function(terminal, commands)
-    if terminal.main.processes:isActive(commands[1]) then
-      local target_process = terminal.main.processes:getProcess(commands[1])
+    if terminal.main.processes:isActive(commands[2]) then
+      local target_process = terminal.main.processes:getProcess(commands[2])
       terminal.main.processes:closeProcess(target_process)
-      terminal:appendLog("Closed " .. commands[1])
+      terminal:appendLog("Closed " .. commands[2])
     else
-      terminal:appendLog("Could not close program: " .. commands[1])
+      terminal:appendLog("Could not close program: " .. commands[2])
     end
   end
 })
@@ -194,7 +194,11 @@ newCommand({
     if targetMail then
       mailWindow:openMail(targetMail)
       terminal.main.mails:readMail(targetMail)
-      terminal:appendLog("Read mail " .. i)
+      local str = ""
+      .. targetMail:getSender() .. "\n"
+      .. targetMail:getSubject() .. "\n"
+      .. targetMail:getContent()
+      terminal:appendLog(str)
     else
       terminal:appendLog("Could not read mail " .. i)
     end
@@ -272,7 +276,7 @@ newCommand({
 newCommand({
   prefix = "files",
   command = "open",
-  aliases = {"execute", "exe", "run", "do", "launch", "start"},
+  aliases = {"execute", "exe", "run", "do", "launch", "start", "cd"},
   unlocked = true,
   effect = function(terminal, commands)
     local filesWindow = terminal.main.processes:getProcess("files")
@@ -352,6 +356,16 @@ newCommand({
     else
       terminal:appendLog("Could not terminate process " .. commands[3])
     end
+  end
+})
+
+newCommand({
+  prefix = "",
+  command = "loottable",
+  aliases = {},
+  unlocked = true,
+  effect = function(terminal, commands)
+    terminal.main.filemanager:setLootTable(commands[2])
   end
 })
 

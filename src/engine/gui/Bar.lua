@@ -22,7 +22,7 @@ function Self:init(args)
   end)
 
   self.callbacks:register("onDrag", function(selff, dx, dy)
-    local _x, _y = require 'engine.Screen':getMousePosition()
+    local _x, _y = require 'engine.Mouse':getPosition()
     if self:isLeaf(_x-dx, _y-dy) then
       if self.legalDrag then
         self.parent.x = self.parent.x + dx

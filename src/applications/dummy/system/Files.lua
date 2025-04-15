@@ -13,9 +13,9 @@ function Self:init(args)
   return self
 end
 
-function Self:add(file_name)
+function Self:add(file_name, chance)
   if not self.required_files[file_name] then
-    self.required_files[file_name] = true
+    self.required_files[file_name] = chance
   end
 end
 
@@ -27,13 +27,17 @@ end
 
 function Self:getRandomRequiredFile()
   local ls = {}
-  for k, v in pairs(self.required_files) do
-    if v ~= nil then
-      table.insert(ls, k)
+  for name, chance in pairs(self.required_files) do
+    if chance ~= nil then
+      table.insert(ls, {name, chance})
+      print("aaa", name, chance)
     end
   end
-  local a = ls[math.random(1, #ls)]
-  return a
+  local result = ls[math.random(1, #ls)]
+  if result == nil then
+    return nil, nil
+  end
+  return result[1], result[2]
 end
 
 function Self:serialize()

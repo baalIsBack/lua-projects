@@ -100,7 +100,7 @@ end
 local counter = 0
 function Self:update(dt)
   counter = counter + dt
-  local mx, my = require 'engine.Screen':getMousePosition()
+  local mx, my = require 'engine.Mouse':getPosition()
 
   self.multiplayer:listen()
   

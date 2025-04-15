@@ -152,8 +152,8 @@ function Self:finalize()
   end
   print("first time")
 
-  self.main.apps:install("terminal")
-  self.main.apps:install("mail")
+  self.main.apps:installByAppName("terminal")
+  self.main.apps:installByAppName("mail")
   self.main.mails:addMailFromID(1)
   
   self:save()

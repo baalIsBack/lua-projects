@@ -82,7 +82,7 @@ MAILS[4] = {
   required_solve_flags = {},--{"file_opened_merchandise"},
   required_solve_notes = {},
   onRead = function(mail, main)
-    main.files:add("merchandise")
+    main.files:add("merchandise", 1)
   end,
   onReply = function(mail, main, text) end,
   reward = 0.5,
@@ -90,7 +90,7 @@ MAILS[4] = {
 MAILS[5] = {
   sender = "Company",
   subject = "New Job",
-  content = "Dear Worker, \n\nfor your next job we require you to send 5 brick files. You can use the automatic reply generation system (args).\n\nYou will earn 0.50$.\n\n\nBest regards,\nHR",
+  content = "Dear Worker, \n\nfor your next job we require you to send 5 system files. You can use the automatic reply generation system (args).\n\nYou will earn 0.50$.\n\n\nBest regards,\nHR",
   redeemable = 1,
   redeems_required_for_next_quest = 1,--redeemable+nö
   source_quests = {4},
@@ -99,7 +99,7 @@ MAILS[5] = {
   required_unlock_flags = {},
   expected_reply = "Here are the files:[...]",
   required_solve_function = function(self, main)
-    if (main.values:get("currently_collected_Brick") or 0) >= 5 then
+    if (main.values:get("currently_collected_system") or 0) >= 5 then
       return true
     end
     return false
@@ -108,8 +108,8 @@ MAILS[5] = {
   required_solve_notes = {},
   onRead = function(mail, main) end,
   onReply = function(mail, main, text)
-    local val = main.values:get("currently_collected_Brick")
-    main.values:set("currently_collected_Brick", val -5)
+    local val = main.values:get("currently_collected_system")
+    main.values:set("currently_collected_system", val -5)
   end,
   reward = 0.5,
 }
@@ -125,7 +125,7 @@ MAILS[6] = {
   required_unlock_flags = {},
   expected_reply = "Here are the files:[...]",
   required_solve_function = function(self, main)
-    if (main.values:get("currently_collected_Document") or 0) >= 5 then
+    if (main.values:get("currently_collected_document") or 0) >= 5 then
       return true
     end
     return false
@@ -134,8 +134,8 @@ MAILS[6] = {
   required_solve_notes = {},
   onRead = function(mail, main) end,
   onReply = function(mail, main, text)
-    local val = main.values:get("currently_collected_Document")
-    main.values:set("currently_collected_Document", val -5)
+    local val = main.values:get("currently_collected_document")
+    main.values:set("currently_collected_document", val -5)
   end,
   reward = 0.5,
 }
@@ -151,7 +151,7 @@ MAILS[7] = {
   required_unlock_flags = {},
   expected_reply = "Here are the files:[...]",
   required_solve_function = function(self, main)
-    if (main.values:get("currently_collected_Image") or 0) >= 5 then
+    if (main.values:get("currently_collected_image") or 0) >= 5 then
       return true
     end
     return false
@@ -160,8 +160,8 @@ MAILS[7] = {
   required_solve_notes = {},
   onRead = function(mail, main) end,
   onReply = function(mail, main, text)
-    local val = main.values:get("currently_collected_Image")
-    main.values:set("currently_collected_Image", val -5)
+    local val = main.values:get("currently_collected_image")
+    main.values:set("currently_collected_image", val -5)
     main.contacts:triggerUnlock(1)
     main.contacts:triggerUnlock(2)
     main.contacts:triggerUnlock(3)

@@ -97,9 +97,12 @@ function Self:install(app_name)
     return
   end
   self.main.flags:set("installed_"..app_name, true)
-  self.main.apps:install(app_name)
+  if self.main.apps:installByAppName(app_name) then
+    self:appendLog("Success! " .. app_name .. " was installed.")
+  else
+    self:appendLog("Error during installation.")
+  end
   --self.main["install_"..app_name](self.main, app_name)
-  self:appendLog("Success! " .. app_name .. " was installed.")
 end
 
 function Self:initiateUninstall(app_name)

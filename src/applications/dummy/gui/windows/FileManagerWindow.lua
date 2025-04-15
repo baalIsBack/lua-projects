@@ -65,19 +65,26 @@ function Self:addIcon(icon_type, info)
     w = 64,
     h = 64,
     name = require'engine.randomnoun'(),
-    filetype = self.main.filemanager:determineType(icon_type),
     --img = love.graphics.newImage("submodules/lua-projects-private/gfx/win_icons_png/w98_console_prompt.png"),
   }
 
   local icon = nil
-  local requiredFile = self.main.files:getRandomRequiredFile()
-  icon = require('applications.dummy.gui.elements.' .. icon_type):new(proto_t)
+  local requiredFile, requiredFileChance = self.main.files:getRandomRequiredFile()
+  
+  --do first try through pcall, if it does not work use the other require
+  local success, value = pcall(function() return require('applications.dummy.gui.elements.' .. icon_type) end)
+  
+  if not success then
+    value = require('applications.dummy.system.plugins.base.files.' .. icon_type)
+  end
+  icon = value:new(proto_t)
+  print("LOADED,", icon:type())
   
   if icon then
     icon.text.color = {0, 0, 0}
   end
   if icon_type == "Icon_File_Document" then
-    if not info.generatedRequiredFile and requiredFile and math.random(0, 3-1) <= 0 then
+    if not info.generatedRequiredFile and requiredFile and math.random(0, 100000)/100000 > (1-requiredFileChance) then
       icon:setName(requiredFile)
       icon.callbacks:register("onClicked", function(selff)
         self.main.flags:set("file_opened_"..icon.name)
@@ -117,9 +124,8 @@ end
 
 function Self:generateIcons()
   local loot = self.main.filemanager:determineContents()
-  table.insert(loot, "Icon_Folder")--has to be there or player gets stuck
-  local table_shuffle = require 'lib.shuffle'
-  table_shuffle(loot)
+  --table.insert(loot, "Icon_Folder")--has to be there or player gets stuck
+  
   local info = {}
   for i, loot_type in ipairs(loot) do
     self:addIcon(loot_type, info)

@@ -16,7 +16,7 @@ function Self:init(args)
     x = 0-8,
     y = 0+8,
     w = self.w-16-16,
-    h = self.h-16-16,
+    h = self.h-16-16+8,
     items = {}
   }
   self:insert(self.list)
@@ -39,24 +39,41 @@ function Self:init(args)
   
 
   self.callbacks:register("update", function(self, dt)
+    self:clearStats()
+    self:checkStats()
+    for i=#self.trackables, 1, -1 do
+      local v = self.trackables[i]
+      if self.main.values:get("currently_collected_"..v.proto.ID_NAME) == 0 then
+        self.list:remove(v.node)
+        table.remove(self.trackables, i)
+      end
+    end
     for i, v in ipairs(self.trackables) do
-      v.node.text_node:setText("  " .. v.proto.NAME .. " x " .. self.main.values:get("currently_collected_"..v.value_id))
+      v.node.text_node:setText("  " .. v.proto.NAME .. " x " .. self.main.values:get("currently_collected_"..v.proto.ID_NAME))
     end
   end)
   
   return self
 end
 
+function Self:clearStats()
+  for i, v in ipairs(self.trackables) do
+    self.list:remove(v.node)
+  end
+  self.trackables = {}
+end
+
+
+function Self:checkStats()
+  for appName, appPrototype in pairs(self.main.apps.knownApps) do
+    if self.main.values:get("opened_" .. appName) > 0 then
+      self:addNewUniqueStat(appPrototype)
+    end
+  end
+end
+
 function Self:finalize()
-  if self.main.values:get("opened_Image") > 0 then
-    self:addNewUniqueStat(require('applications.dummy.gui.elements.Icon_File_Image'))
-  end
-  if self.main.values:get("opened_Brick") > 0 then
-    self:addNewUniqueStat(require('applications.dummy.gui.elements.Icon_Brick'))
-  end
-  if self.main.values:get("opened_Document") > 0 then
-    self:addNewUniqueStat(require('applications.dummy.gui.elements.Icon_File_Document'))
-  end
+  self:checkStats()
 end
 
 function Self:addNewUniqueStat(proto, value_id)

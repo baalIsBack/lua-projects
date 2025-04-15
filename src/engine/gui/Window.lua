@@ -22,12 +22,9 @@ function Self:init(args)
   self.bar.close_button.text:setFont(FONTS["dialog"])
   self.bar.close_button.text.x = 1
   self.bar.close_button.text.y = -2
-  self.bar.close_button.callbacks:register("onClicked", function(x, y)
-    self.main.processes:closeProcess(self)
-  end)
   self.bar:insert(self.bar.close_button)
   self.callbacks:register("onMousePressed", function(self)
-    local mx, my = require 'engine.Screen':getMousePosition()
+    local mx, my = require 'engine.Mouse':getPosition()
     if self:isTopNode(mx, my) then
       self:getTopNode("Window"):bringToFront(self)
       --self:setFocus()
@@ -105,7 +102,7 @@ function Self:isTopWindow(x, y)
 end
 
 function Self:checkCallbacks()
-  local mx, my = require 'engine.Screen':getMousePosition()
+  local mx, my = require 'engine.Mouse':getPosition()
   local isMouseDown = love.mouse.isDown(1)
   local isMouseColliding = CHECK_COLLISION(mx, my, 0, 0, self:getX()-self.w/2, self:getY()-self.h/2, self.w, self.h)
   local wasStillColliding = self._isStillColliding

@@ -26,6 +26,21 @@ function Self:init(args)
 
   self.translation = {x = 0, y = 0}
 
+
+  self.export_button = require 'engine.gui.Button':new{main=self.main, text = "Export", x = self.w/2 - 50/2 - 4, y = -self.h/2 + 16 + 14/2 + 4, w = 50, h = 14,}
+  self:insert(self.export_button)
+  self.export_button.callbacks:register("onClicked", function()
+    love.system.setClipboardText(self.main.patcher:exportStructureToString())
+  end)
+
+  self.import_button = require 'engine.gui.Button':new{main=self.main, text = "Import", x = self.w/2 - 50/2 - 4, y = -self.h/2 + 16 + 14/2 + 4 + 14+4, w = 50, h = 14,}
+  self:insert(self.import_button)
+  self.import_button.callbacks:register("onClicked", function()
+    local str = love.system.getClipboardText()
+    self.main.patcher:importStructureFromString(str)
+  end)
+  
+
   return self
 end
 
@@ -79,8 +94,30 @@ function Self:draw()
     for r, w in pairs(v) do
       for s, hex in pairs(w) do
         local corners = polygon_corners_flattened(p.layout, hex)
+        love.graphics.push()
         love.graphics.polygon("line", corners)
-
+        love.graphics.pop()
+      end
+    end
+  end
+  for q, v in pairs(p.connections) do
+    for r, w in pairs(v) do
+      for s, hex in pairs(w) do
+        --local corners = polygon_corners_flattened(p.layout, hex)
+        local hexPosition = hex_to_pixel(p.layout, hex)
+        love.graphics.push()
+        love.graphics.circle("line", hexPosition.x, hexPosition.y, 5)
+        for i = 1, 6, 1 do
+          if hex.links[i] then
+            love.graphics.push()
+            love.graphics.translate(hexPosition.x, hexPosition.y)
+            love.graphics.rotate(i * 2 * math.pi / 6)
+            love.graphics.translate(-hexPosition.x, -hexPosition.y)
+            love.graphics.line(hexPosition.x, hexPosition.y, hexPosition.x+p.layout.size.x, hexPosition.y)
+            love.graphics.pop()
+          end
+        end
+        love.graphics.pop()
       end
     end
   end
@@ -98,20 +135,60 @@ end
 
 
 function Self:_update(dt)
-  local p = self.main.patcher
   local mx, my = require 'engine.Mouse':getPosition()
   local rmx, rmy = mx - self.x - self.translation.x, my - self.y - self.translation.y
-  if love.mouse.isDown(2) then
-    local h = pixel_to_hex(p.layout, Point(rmx, rmy))
-    h = hex_round(h)
-    if not p.hexes[h.q] then
-      p.hexes[h.q] = {}
+  if love.keyboard.isDown("a") then
+    if not self.main.patcher:getHex(rmx, rmy) then
+      self.main.patcher:makeHex(rmx, rmy)
     end
-    if not p.hexes[h.q][h.r] then
-      p.hexes[h.q][h.r] = {}
+  end
+  if love.keyboard.isDown("s") then
+    self.main.patcher:removeHex(rmx, rmy)
+  end
+  if love.keyboard.isDown("q") then
+    if not self.main.patcher:getTransition(rmx, rmy) then
+      self.main.patcher:makeTransition(rmx, rmy)
     end
-    if not p.hexes[h.q][h.r][h.s] then
-      p.hexes[h.q][h.r][h.s] = h
+  end
+  if love.keyboard.isDown("w") then
+    self.main.patcher:removeTransition(rmx, rmy)
+  end
+  
+  
+  if love.keyboard.isDown("1") then
+    local trans = self.main.patcher:getTransition(rmx, rmy)
+    if trans then
+      trans.links[1] = not trans.links[1]
+    end
+  end
+  if love.keyboard.isDown("2") then
+    local trans = self.main.patcher:getTransition(rmx, rmy)
+    if trans then
+      trans.links[2] = not trans.links[2]
+    end
+  end
+  if love.keyboard.isDown("3") then
+    local trans = self.main.patcher:getTransition(rmx, rmy)
+    if trans then
+      trans.links[3] = not trans.links[3]
+    end
+  end
+  if love.keyboard.isDown("4") then
+    local trans = self.main.patcher:getTransition(rmx, rmy)
+    if trans then
+      trans.links[4] = not trans.links[4]
+    end
+  end
+  if love.keyboard.isDown("5") then
+    local trans = self.main.patcher:getTransition(rmx, rmy)
+    if trans then
+      trans.links[5] = not trans.links[5]
+    end
+  end
+  if love.keyboard.isDown("6") then
+    local trans = self.main.patcher:getTransition(rmx, rmy)
+    if trans then
+      trans.links[6] = not trans.links[6]
     end
   end
 end

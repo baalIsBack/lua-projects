@@ -1,8 +1,8 @@
 local Super = require 'engine.Prototype'
 local Self = Super:clone("Terminal")
 
-local a = require 'applications.dummy.system.CommandDefinitions'
-local COMMANDS, PROGRAM_COMMANDS = a[1], a[2]
+local COMMAND_DEFINITIONS = require 'applications.dummy.system.CommandDefinitions'
+local COMMANDS, PROGRAM_COMMANDS = COMMAND_DEFINITIONS[1], COMMAND_DEFINITIONS[2]
 
 function Self:init(args)
   self.main = args.main
@@ -10,6 +10,7 @@ function Self:init(args)
   Super.init(self)
   self.window = nil
   self.log = {}
+
 
   return self
 end

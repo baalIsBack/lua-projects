@@ -75,6 +75,10 @@ function hex_round (h)
     return Hex(qi, ri, si)
 end
 
+function hex_equal(a, b)
+  return hex_distance(a, b) == 0
+end
+
 function hex_lerp (a, b, t)
     return Hex(a.q * (1.0 - t) + b.q * t, a.r * (1.0 - t) + b.r * t, a.s * (1.0 - t) + b.s * t)
 end

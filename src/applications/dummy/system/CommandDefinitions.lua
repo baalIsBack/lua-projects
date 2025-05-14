@@ -256,7 +256,7 @@ newCommand({
   effect = function(terminal, commands)
     local filesWindow = terminal.main.processes:getProcess("files")
 
-    local files = terminal.main.filemanager
+    local files = terminal.main.fileserver
     local str = ""
     str = str .. left_pad("ID", 4, " ") .. "  "
     str = str .. left_pad("Name", 12, " ") .. "  "
@@ -280,7 +280,7 @@ newCommand({
   unlocked = true,
   effect = function(terminal, commands)
     local filesWindow = terminal.main.processes:getProcess("files")
-    local files = terminal.main.filemanager
+    local files = terminal.main.fileserver
     if not filesWindow.icons[tonumber(commands[3])] then
       terminal:appendLog("Could not open file " .. commands[3])
       return
@@ -365,7 +365,7 @@ newCommand({
   aliases = {},
   unlocked = true,
   effect = function(terminal, commands)
-    terminal.main.filemanager:setLootTable(commands[2])
+    terminal.main.fileserver:setLootTable(commands[2])
   end
 })
 

@@ -152,6 +152,11 @@ function Self:setDefaults()
   self:setOnce("rom_usage_popup", 0.1)
   self:setOnce("ram_usage_popup", 0.1)
   self:setOnce("cycles_usage_popup", 0.1)
+  
+  self:setOnce("install_time_filemanager", 0.1)
+  self:setOnce("rom_usage_filemanager", 0.1)
+  self:setOnce("ram_usage_filemanager", 0.1)
+  self:setOnce("cycles_usage_filemanager", 0.1)
 
   
   self:setOnce("install_time_battle", 0.1)

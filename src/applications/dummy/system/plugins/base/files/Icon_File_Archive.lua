@@ -15,7 +15,7 @@ function Self:init(args)
   self.callbacks:register("onClicked", function(selff)
     --self.main.files:remove(self.name)
     if self:tryUnlock() then
-      self.main.filemanager:setLootTable("zip")
+      self.main.fileserver:setLootTable("zip")
       self.main.processes:getProcess("files"):switchLocation()--self:open()
     end
   end)

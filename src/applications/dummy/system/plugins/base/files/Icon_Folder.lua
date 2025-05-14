@@ -12,7 +12,7 @@ function Self:init(args)
 
 
   self.callbacks:register("onClicked", function(selff)
-    self.main.filemanager:setLootTable("folder")
+    self.main.fileserver:setLootTable("folder")
     self.main.processes:getProcess("files"):switchLocation()
   end)
   

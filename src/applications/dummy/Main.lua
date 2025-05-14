@@ -128,6 +128,7 @@ function Self:init()
   self.mails = require 'applications.dummy.system.Mails':new{main=self}
   self.notes = require 'applications.dummy.system.Notes':new{main=self}
   self.terminal = require 'applications.dummy.system.Terminal':new{main=self}
+  self.fileserver = require 'applications.dummy.system.FileServer':new{main=self}
   self.filemanager = require 'applications.dummy.system.FileManager':new{main=self}
   self.processes = require 'applications.dummy.system.Processes':new{main=self}
   self.apps = require 'applications.dummy.system.Apps':new{main=self}

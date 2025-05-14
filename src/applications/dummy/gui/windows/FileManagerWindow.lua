@@ -1,8 +1,8 @@
 local Super = require 'applications.dummy.gui.windows.Process'
-local Self = Super:clone("DummyWindow")
+local Self = Super:clone("FileManagerWindow")
 
 
-Self.ID_NAME = "files"
+Self.ID_NAME = "filemanager"
 
 function Self:init(args)
   args.w = 320+32+32
@@ -29,82 +29,29 @@ function Self:init(args)
   end)
   
   self.callbacks:register("update", function()
-    self:reevaluateIcons()
+    self:repositionIcons()
   end)
 
-  self:switchLocation()
-
+  
   return self
 end
 
-function Self:reevaluateIcons()
+
+
+function Self:repositionIcons()
   for i, v in ipairs(self.icons) do
-    if v.pos_y - self.y_scroll < 0 or v.pos_y - self.y_scroll >= self.icon_count_height then
-      v:setReal(false)
-    else
-      v:setReal(true)
-    end
-    --v:setReal(true)
-    --v:setName(v.pos_y)
-    v.x = ((v.pos_x)-2)*(64+4)-16
+    
+    v.x = ((i)-3)*(64+4)-16
     v.y = (math.floor((i-1)/self.icon_count_width)-1)*(64) - (self.y_scroll*64)
   end
 end
 
-function Self:addIcon(icon_type, info)
-  local pos = #self.icons
-  local pos_x = (pos)%(self.icon_count_width)
-  local pos_y = math.floor((pos)/self.icon_count_width)
+function Self:addIcon(icon)
+  
+  
 
-  local proto_t = {
-    main = self.main,
-    --x = ((pos_x)-2)*(64+4)-16,
-    --y = (pos_y-1)*(64+4),
-    pos_x = pos_x,
-    pos_y = pos_y,
-    w = 64,
-    h = 64,
-    name = require'engine.randomnoun'(),
-    --img = love.graphics.newImage("submodules/lua-projects-private/gfx/win_icons_png/w98_console_prompt.png"),
-  }
-
-  local icon = nil
-  local requiredFile, requiredFileChance = self.main.files:getRandomRequiredFile()
-  
-  --do first try through pcall, if it does not work use the other require
-  local success, value = pcall(function() return require('applications.dummy.gui.elements.' .. icon_type) end)
-  
-  if not success then
-    value = require('applications.dummy.system.plugins.base.files.' .. icon_type)
-  end
-  icon = value:new(proto_t)
-  print("LOADED,", icon:type())
-  
-  if icon then
-    icon.text.color = {0, 0, 0}
-  end
-  if icon_type == "Icon_File_Document" then
-    if not info.generatedRequiredFile and requiredFile and math.random(0, 100000)/100000 > (1-requiredFileChance) then
-      icon:setName(requiredFile)
-      icon.callbacks:register("onClicked", function(selff)
-        self.main.flags:set("file_opened_"..icon.name)
-        self.main.files:remove(icon.name)
-      end)
-      info.generatedRequiredFile = true
-      icon.text.color = {1, 0, 1}
-    end
-  elseif icon_type == "Icon_Mail" then
-    icon:setName("Mail")
-  elseif icon_type == "Icon_Terminal" then
-    icon:setName("Terminal")
-  end
-
-  if icon then
-    icon.pos = pos
-    self:insert(icon)
-    table.insert(self.icons, icon)
-  end
-  
+  self:insert(icon)
+  table.insert(self.icons, icon)
 end
 
 
@@ -113,23 +60,6 @@ function Self:removeAllIcons()
     self.contents:remove(v)
   end
   self.icons = {}
-end
-
-function Self:switchLocation()
-  self.y_scroll = 0
-  self:removeAllIcons()
-  self:generateIcons()
-  self:reevaluateIcons()
-end
-
-function Self:generateIcons()
-  local loot = self.main.filemanager:determineContents()
-  --table.insert(loot, "Icon_Folder")--has to be there or player gets stuck
-  
-  local info = {}
-  for i, loot_type in ipairs(loot) do
-    self:addIcon(loot_type, info)
-  end
 end
 
 

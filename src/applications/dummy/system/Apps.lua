@@ -76,8 +76,11 @@ function Self:loadAppIcons()
 
   self.editor = self:makeIcon('applications.dummy.system.plugins.base.files.Icon_Editor', 0, 2)
 
-  self.files = self:makeIcon('applications.dummy.system.plugins.base.files.Icon_FileManager', 0, 3)
+  self.files = self:makeIcon('applications.dummy.system.plugins.base.files.Icon_FileServer', 0, 3)
   self.files:setTargetApp(self.main.processes.files)
+
+  self.filemanager = self:makeIcon('applications.dummy.system.plugins.base.files.Icon_FileManager', 0, 3)
+  self.filemanager:setTargetApp(self.main.processes.filemanager)
 
   self.processes = self:makeIcon('applications.dummy.system.plugins.base.files.Icon_Processes', 0, 4)
   self.processes:setTargetApp(self.main.processes.processes)

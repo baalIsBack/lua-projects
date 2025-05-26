@@ -13,7 +13,7 @@ function Self:init(args)
 
 
   self.callbacks:register("onClicked", function(selff)
-    self.main.processes:getProcess("files"):switchLocation()
+    self.main.processes:getProcess("fileserver"):switchLocation()
   end)
   
   

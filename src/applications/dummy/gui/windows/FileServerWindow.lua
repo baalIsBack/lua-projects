@@ -2,7 +2,7 @@ local Super = require 'applications.dummy.gui.windows.Process'
 local Self = Super:clone("FileServerWindow")
 
 
-Self.ID_NAME = "files"
+Self.ID_NAME = "fileserver"
 
 function Self:init(args)
   args.w = 320+32+32
@@ -69,7 +69,7 @@ function Self:addIcon(icon_type, info)
   }
 
   local icon = nil
-  local requiredFile, requiredFileChance = self.main.files:getRandomRequiredFile()
+  local requiredFile, requiredFileChance = self.main.fileserver:getRandomRequiredFile()
   
   --do first try through pcall, if it does not work use the other require
   local success, value = pcall(function() return require('applications.dummy.gui.elements.' .. icon_type) end)
@@ -117,13 +117,14 @@ end
 
 function Self:switchLocation()
   self.y_scroll = 0
+  print("oioi")
   self:removeAllIcons()
   self:generateIcons()
   self:reevaluateIcons()
 end
 
 function Self:generateIcons()
-  local loot = self.main.fileserver:determineContents()
+  local loot = self.main.filegenerator:determineContents()
   --table.insert(loot, "Icon_Folder")--has to be there or player gets stuck
   
   local info = {}

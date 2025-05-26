@@ -1,5 +1,5 @@
 local Super = require 'engine.Prototype'
-local Self = Super:clone("Processes")
+local Self = Super:clone("Apps")
 
 
 
@@ -16,7 +16,7 @@ function Self:init(args)
   self.knownApps = {}
   self.installedApps = {}
   
-  --self:loadAppIcons()
+  
 
   self.usedDesktopSlots = {}
 
@@ -36,6 +36,9 @@ function Self:registerApp(appPackage)
   --self[app.ID_NAME] = app
   --app ::icon
   --process ::window
+  
+
+
   return true
 end
 
@@ -64,49 +67,49 @@ function Self:makeIcon(icon_type_name, x, y)
 end
 
 function Self:loadAppIcons()
-  self.calc = self:makeIcon('applications.dummy.system.plugins.base.files.Icon_Calc', 0, 6)
+  self.calc = self:makeIcon('applications.dummy.system.plugins.base.apps.Icon_Calc', 0, 6)
 
-  self.stat = self:makeIcon('applications.dummy.system.plugins.base.files.Icon_Stat', 1, 0)
+  self.stat = self:makeIcon('applications.dummy.system.plugins.base.apps.Icon_Stat', 1, 0)
   self.stat:setTargetApp(self.main.processes.stat)
 
-  self.mail = self:makeIcon('applications.dummy.system.plugins.base.files.Icon_Mail', 0, 0)
+  self.mail = self:makeIcon('applications.dummy.system.plugins.base.apps.Icon_Mail', 0, 0)
 
-  self.terminal = self:makeIcon('applications.dummy.system.plugins.base.files.Icon_Terminal', 0, 1)
+  self.terminal = self:makeIcon('applications.dummy.system.plugins.base.apps.Icon_Terminal', 0, 1)
   self.terminal:setTargetApp(self.main.processes.terminal)
 
-  self.editor = self:makeIcon('applications.dummy.system.plugins.base.files.Icon_Editor', 0, 2)
+  self.editor = self:makeIcon('applications.dummy.system.plugins.base.apps.Icon_Editor', 0, 2)
 
-  self.files = self:makeIcon('applications.dummy.system.plugins.base.files.Icon_FileServer', 0, 3)
+  self.files = self:makeIcon('applications.dummy.system.plugins.base.apps.Icon_FileServer', 0, 3)
   self.files:setTargetApp(self.main.processes.files)
 
-  self.filemanager = self:makeIcon('applications.dummy.system.plugins.base.files.Icon_FileManager', 0, 3)
+  self.filemanager = self:makeIcon('applications.dummy.system.plugins.base.apps.Icon_FileManager', 0, 3)
   self.filemanager:setTargetApp(self.main.processes.filemanager)
 
-  self.processes = self:makeIcon('applications.dummy.system.plugins.base.files.Icon_Processes', 0, 4)
+  self.processes = self:makeIcon('applications.dummy.system.plugins.base.apps.Icon_Processes', 0, 4)
   self.processes:setTargetApp(self.main.processes.processes)
 
-  self.ressources = self:makeIcon('applications.dummy.system.plugins.base.files.Icon_Ressources', 0, 5)
+  self.ressources = self:makeIcon('applications.dummy.system.plugins.base.apps.Icon_Ressources', 0, 5)
   self.ressources:setTargetApp(self.main.processes.ressources)
 
-  --self.antivirus = self:makeIcon('applications.dummy.system.plugins.base.files.Icon_Antivirus', 0, 5)
+  --self.antivirus = self:makeIcon('applications.dummy.system.plugins.base.apps.Icon_Antivirus', 0, 5)
   --self.antivirus:setTargetApp(self.main.processes.antivirus)
 
-  self.network = self:makeIcon('applications.dummy.system.plugins.base.files.Icon_Network', 0, 5)
+  self.network = self:makeIcon('applications.dummy.system.plugins.base.apps.Icon_Network', 0, 5)
   self.network:setTargetApp(self.main.processes.network)
 
-  self.patcher = self:makeIcon('applications.dummy.system.plugins.base.files.Icon_Patcher', 0, 5)
+  self.patcher = self:makeIcon('applications.dummy.system.plugins.base.apps.Icon_Patcher', 0, 5)
   self.patcher:setTargetApp(self.main.processes.patcher)
 
-  self.debug = self:makeIcon('applications.dummy.system.plugins.base.files.Icon_Debug', 0, 5)
+  self.debug = self:makeIcon('applications.dummy.system.plugins.base.apps.Icon_Debug', 0, 5)
   self.debug:setTargetApp(self.main.processes.debug)
 
-  self.contacts = self:makeIcon('applications.dummy.system.plugins.base.files.Icon_Contacts', 0, 5)
+  self.contacts = self:makeIcon('applications.dummy.system.plugins.base.apps.Icon_Contacts', 0, 5)
   self.contacts:setTargetApp(self.main.processes.contacts)
 
-  self.battle = self:makeIcon('applications.dummy.system.plugins.base.files.Icon_Battle', 0, 5)
-  self.battle:setTargetApp(self.main.processes.battle)
-  self.main:insert(self.main.processes:getProcess(self.battle.ID_NAME))
-  self.contents:insert(self.battle.ID_NAME)
+ -- self.battle = self:makeIcon('applications.dummy.system.plugins.base.apps.Icon_Battle', 0, 5)
+  --self.battle:setTargetApp(self.main.processes.battle)
+  --self.main:insert(self.main.processes:getProcess(self.battle.ID_NAME))
+  --self.contents:insert(self.battle.ID_NAME)
 end
 
 function Self:installByApp(icon)

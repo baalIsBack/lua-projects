@@ -80,7 +80,10 @@ function Self:open()
     id = "currently_collected_" .. self.ID_NAME
     count = self.main.values:get(id) or 0
     self.main.values:set(id, count + 1)
-    self.main.processes:getProcess("filemanager"):addIcon(self:clone())
+
+    local filemanagerwindow = self.main.processes:getProcess("filemanager")
+    print(filemanagerwindow)
+    filemanagerwindow:addIcon(self:clone())
 
     self.hasBeenOpened = true
     return true

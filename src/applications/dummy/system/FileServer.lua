@@ -1,8 +1,8 @@
 local Super = require 'engine.Prototype'
-local Self = Super:clone("FileServer")
+local Self = Super:clone("Files")
 
-local lootTableDefinitions = require 'src.applications.dummy.system.LootTableDefinitions'
-local lootTables, namedLootTables = lootTableDefinitions[1], lootTableDefinitions[2]
+
+
 
 
 function Self:init(args)
@@ -10,78 +10,48 @@ function Self:init(args)
   self.hasSerialization = true
   Super.init(self)
   
-  self.currentcontents = nil
-
-  self.lootTable = namedLootTables["folder"]
-
-  self.alias_table = nil
-
-  self:determineContents()
+  self.required_files = {}
 
   return self
 end
 
-function Self:setLootTable(name)
-  assert(namedLootTables[name], "Loot table not found: " .. name)
-  self.lootTable = namedLootTables[name]
+function Self:add(file_name, chance)
+  if not self.required_files[file_name] then
+    self.required_files[file_name] = chance
+  end
 end
 
-function Self:determineContentQuantity()
-  local r = math.random(self.lootTable.minAmount, self.lootTable.maxAmount * self.main.values:get("files_icon_quantity"))
-  return r
+function Self:remove(file_name)
+  if self.required_files[file_name] then
+    self.required_files[file_name] = nil
+  end
 end
 
-function Self:determineContents()
-  self:reloadAliasTable()
-  self.currentcontents = {}
-  for i=1, self:determineContentQuantity(), 1 do
-    local lootID = self.alias_table()
-    local content = self.lootTable.loot[lootID].content
-    local amount = math.random(self.lootTable.loot[lootID].amountMin, self.lootTable.loot[lootID].amountMax)
-    
-    for j=1, amount, 1 do
-      local loot = content
-      if loot then
-        table.insert(self.currentcontents, loot)
-      end
+function Self:getRandomRequiredFile()
+  local ls = {}
+  for name, chance in pairs(self.required_files) do
+    if chance ~= nil then
+      table.insert(ls, {name, chance})
+      print("aaa", name, chance)
     end
   end
-  print(#self.lootTable.requiredLoot)
-
-  for i, loot in ipairs(self.lootTable.requiredLoot) do
-    local amount = math.random(loot.amountMin, loot.amountMax)
-    for j=1, amount, 1 do
-      if loot then
-        table.insert(self.currentcontents, loot.content)
-      end
-    end
+  local result = ls[math.random(1, #ls)]
+  if result == nil then
+    return nil, nil
   end
-
-
-  local table_shuffle = require 'lib.shuffle'
-  table_shuffle(self.currentcontents)
-
-  return self.currentcontents
-end
-
-function Self:reloadAliasTable()
-  local alias_t = {}
-  for i, v in ipairs(self.lootTable.loot) do
-    table.insert(alias_t, v.weight)
-  end
-  self.alias_table = require 'lib.alias_table':new(alias_t)
-  
+  return result[1], result[2]
 end
 
 function Self:serialize()
-  local t = {
-    
-  }
+  local t = self.required_files
   return t
 end
 
 function Self:deserialize(raw)
-  
+  --self.required_files = raw
+  --print("Deserialized files:", self.required_files)
+  --asd()
+  --TODO
   return self
 end
 

@@ -35,7 +35,7 @@ function Self:addOkButton()
     local text = require 'engine.gui.Text':new{main=self.main, text = "OK", color={0,0,0}, x = 0, y = -2, wrapLimit = 64, alignment = "center"}
     button:insert(text)
     button.callbacks:register("onClicked", function()
-      self.main.processes:closeProcess(self)
+      self.main.processes:killProcess(self)
       self:deactivate()
     end)
   end

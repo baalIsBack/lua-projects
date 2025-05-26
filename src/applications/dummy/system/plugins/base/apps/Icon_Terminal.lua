@@ -9,7 +9,7 @@ Self.targetPrototype = require 'src.applications.dummy.gui.windows.TerminalWindo
 function Self:init(args)
   Super.init(self, args)
 
-
+  print("!!!!!!!!", self.main.processes.terminal)
   self:setTargetApp(self.main.processes.terminal)
 
   

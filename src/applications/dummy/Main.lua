@@ -123,11 +123,11 @@ function Self:init()
   self.flags = require 'applications.dummy.system.Flags':new{main=self}
 
 
-  self.files = require 'applications.dummy.system.Files':new{main=self}
   self.contacts = require 'applications.dummy.system.Contacts':new{main=self}
   self.mails = require 'applications.dummy.system.Mails':new{main=self}
   self.notes = require 'applications.dummy.system.Notes':new{main=self}
   self.terminal = require 'applications.dummy.system.Terminal':new{main=self}
+  self.filegenerator = require 'applications.dummy.system.FileGenerator':new{main=self}
   self.fileserver = require 'applications.dummy.system.FileServer':new{main=self}
   self.filemanager = require 'applications.dummy.system.FileManager':new{main=self}
   self.processes = require 'applications.dummy.system.Processes':new{main=self}
@@ -135,6 +135,8 @@ function Self:init()
   self.antivirus = require 'applications.dummy.system.Antivirus':new{main=self}
   self.patcher = require 'applications.dummy.system.Patcher':new{main=self}
   
+
+  self.apps:loadAppIcons()
   --self:install_calc()
 
   -- Create plugin manager

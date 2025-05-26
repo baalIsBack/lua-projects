@@ -13,35 +13,11 @@ function Self:init(args)
   self.callbacks:declare("onOpen")
   self.callbacks:declare("onClose")
 
-  
-
   --self:loadApps()
-
 
   return self
 end
 
-function Self:makeWindow(window_type_name, x, y)
-  local _x = math.random(self.w/2 + 50, 640 - self.w/2 - 50)
-  local _y = math.random(self.h/2 + 50, 480 - self.h/2 - 50)
-  
-  return require(window_type_name):new{
-    main = self.main,
-    x = x or _x,
-    y = y or _y,
-    _isReal = false,
-  }
-end
-
-function Self:getActiveProcesses()
-  local list = {}
-  for i, process in ipairs(self.contents.content_list) do
-    if process:isReal() then
-      table.insert(list, process)
-    end
-  end
-  return list
-end
 
 function Self:loadApps()
   self.stat = self:makeWindow('applications.dummy.gui.windows.StatWindow', 300, 300)
@@ -49,7 +25,7 @@ function Self:loadApps()
   self.mail = self:makeWindow('applications.dummy.gui.windows.MailWindow', 200, 200)
   self.terminal = self:makeWindow('applications.dummy.gui.windows.TerminalWindow', 250, 250)
   self.editor = self:makeWindow('applications.dummy.gui.windows.EditorWindow', 250, 250)
-  self.files = self:makeWindow('applications.dummy.gui.windows.FileServerWindow', 250, 250)
+  self.fileserver = self:makeWindow('applications.dummy.gui.windows.FileServerWindow', 250, 250)
   self.filemanager = self:makeWindow('applications.dummy.gui.windows.FileManagerWindow', 250, 250)
   self.processes = self:makeWindow('applications.dummy.gui.windows.ProcessesWindow', 250, 250)
   self.ressources = self:makeWindow('applications.dummy.gui.windows.RessourcesWindow', 250, 250)
@@ -69,7 +45,7 @@ function Self:loadApps()
   self.contents:insert(self.mail)
   self.contents:insert(self.terminal)
   self.contents:insert(self.editor)
-  self.contents:insert(self.files)
+  self.contents:insert(self.fileserver)
   self.contents:insert(self.filemanager)
   self.contents:insert(self.processes)
   self.contents:insert(self.ressources)
@@ -81,6 +57,32 @@ function Self:loadApps()
   self.contents:insert(self.battle)
   self.contents:insert(self.softcenter)
 end
+
+
+function Self:makeWindow(window_type_name, x, y)
+  local w, h = 0, 0
+  local _x = math.random(w/2 + 50, 640 - w/2 - 50)
+  local _y = math.random(h/2 + 50, 480 - h/2 - 50)
+  
+  return require(window_type_name):new{
+    main = self.main,
+    x = x or _x,
+    y = y or _y,
+    _isReal = false,
+  }
+end
+
+function Self:getActiveProcesses()
+  local list = {}
+  for i, process in ipairs(self.contents.content_list) do
+    if process:isReal() then
+      table.insert(list, process)
+    end
+  end
+  return list
+end
+
+
 
 function Self:canOpenProcessPrototype(app_window_prototype)
   -- Check if app_window is nil
@@ -121,6 +123,7 @@ function Self:canOpenProcess(app_window)
 end
 
 function Self:openProcess(app_window)
+  print(self:canOpenProcess(app_window) , self:canOpenProcess(app_window) and not app_window:isOpen())
   if self:canOpenProcess(app_window) and not app_window:isOpen() then
     self.main.values:inc("ram_usage_current", self.main.values:get("ram_usage_"..app_window.ID_NAME))
     self.callbacks:call("onOpen", {self, app_window})
@@ -132,10 +135,22 @@ function Self:openProcess(app_window)
   return false
 end
 
-function Self:closeProcess(app_window)
+function Self:killProcess(app_window)
   for i, process in ipairs(self.contents.content_list) do
     if process == app_window then
       table.remove(self.contents.content_list, i)
+      break
+    end
+  end
+  self.main.values:inc("ram_usage_current", -self.main.values:get("ram_usage_"..app_window.ID_NAME))
+  self.callbacks:call("onClose", {self, app_window})
+  app_window:close()
+end
+
+function Self:closeProcess(app_window)
+  for i, process in ipairs(self.contents.content_list) do
+    if process == app_window then
+      --table.remove(self.contents.content_list, i)
       break
     end
   end
@@ -150,8 +165,8 @@ end
 
 function Self:getProcess(name)
   for i, process in ipairs(self.contents.content_list) do
-    if process.ID_NAME == name then
       print("IS? ", process.ID_NAME, name)
+    if process.ID_NAME == name then
       return process
     end
   end
@@ -159,28 +174,6 @@ function Self:getProcess(name)
   return nil
 end
 
-function Self:finalize()
-  self:finalizeWindows()
-end
-
-function Self:finalizeWindows()
-  self.stat:finalize()
-  self.calc:finalize()
-  self.mail:finalize()
-  self.terminal:finalize()
-  self.editor:finalize()
-  self.files:finalize()
-  self.filemanager:finalize()
-  self.processes:finalize()
-  self.ressources:finalize()
---  self.antivirus:finalize()
-  self.network:finalize()
-  self.patcher:finalize()
-  self.debug:finalize()
-  self.contacts:finalize()
-  self.battle:finalize()
-  self.softcenter:finalize()
-end
 
 -- Add this helper method to properly finalize a window
 function Self:finalizeWindow(window)
@@ -209,6 +202,7 @@ function Self:makeProcess(prototype, args)
   self.contents:insert(window)
   self:openProcess(window)
   self.main:insert(window)
+  print("MAKING", window.ID_NAME, window)
 end
 
 function Self:makePopup(args)

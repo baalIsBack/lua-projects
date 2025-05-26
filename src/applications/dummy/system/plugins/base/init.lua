@@ -44,13 +44,13 @@ function Plugin:load(system)
     })
 
     registerApp({
-      appName = "server",
+      appName = "fileserver",
       iconPrototype = require 'src.applications.dummy.system.plugins.base.apps.Icon_FileServer',
       description = "???"
     })
 
     registerApp({
-      appName = "files",
+      appName = "filemanager",
       iconPrototype = require 'src.applications.dummy.system.plugins.base.apps.Icon_FileManager',
       description = "???"
     })

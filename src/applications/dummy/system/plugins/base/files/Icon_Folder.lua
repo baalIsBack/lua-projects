@@ -12,8 +12,11 @@ function Self:init(args)
 
 
   self.callbacks:register("onClicked", function(selff)
-    self.main.fileserver:setLootTable("folder")
-    self.main.processes:getProcess("files"):switchLocation()
+    self.main.filegenerator:setLootTable("folder")
+    local window = self.main.processes:getProcess("fileserver")
+    
+    print(window.ID_NAME, window)
+    window:switchLocation()
   end)
   
   

@@ -9,8 +9,11 @@ function Self:init(args)
   Super.init(self, args)
 
   self.callbacks:register("onClicked", function(selff)
-    self:makeTargetApp()
+    --self:makeTargetApp()
+    print("--", self.main.processes:openProcess(self.targetApp))
   end)
+
+  self:makeTargetApp()
   
   return self
 end

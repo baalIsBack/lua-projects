@@ -136,16 +136,8 @@ function Self:init()
   self.patcher = require 'applications.dummy.system.Patcher':new{main=self}
   
 
-  self.apps:loadAppIcons()
-  --self:install_calc()
-
-  -- Create plugin manager
   self.pluginManager = require 'applications.dummy.system.PluginManager':new{main=self}
-  
-  -- Discover and load plugins
   self.pluginManager:loadDiscoveredPlugins()
-  
-  -- Load and enable all plugins
   self.pluginManager:loadAllPlugins()
   self.pluginManager:enableAllPlugins()
 

@@ -1,10 +1,18 @@
 local Super = require 'engine.gui.Button'
 local Self = Super:clone("Icon")
 
-Self.ID_NAME = "noid"
-Self.NAME = "noname"
+Self.INTERNAL_NAME = "noid"
+Self.DISPLAY_NAME = "noname"
 Self.IMG = love.graphics.newImage("submodules/lua-projects-private/gfx/win_icons_png/w98_directory_closed.png")
 Self.filetype = "unknown"
+
+function Self:VALUE_OPEN_COUNT()
+  return "opened_" .. self.INTERNAL_NAME
+end
+
+function Self:VALUE_CURRENTLY_COLLECTED_COUNT()
+  return "currently_collected_" .. self.INTERNAL_NAME
+end
 
 function Self:init(args)
   args.w = args.w or 64
@@ -16,7 +24,7 @@ function Self:init(args)
 
   
   
-  self.name = args.name or self.NAME
+  self.name = args.name or self.DISPLAY_NAME
   
   self.z = -1
   
@@ -72,18 +80,26 @@ end
 function Self:open()
   if not self.hasBeenOpened then
     local id, count
-    id = "opened_" .. self.ID_NAME
-    count = self.main.values:get(id) or 0
-    self.main.values:set(id, count + 1)
+    
+    --[[HIER TODO this one right here
+    suche nach vorkommen von ".values:get("und
+    ".values:set(" (Im zweifel auch indem du dich
+    in die calls reinhookst und dort die calls 
+    abfaengst mit error()) und ersetze alles mit
+    statischen variablen namen so wie hier:]]
+
+
+
+    count = self.main.values:get(self:VALUE_OPEN_COUNT()) or 0
+    self.main.values:set(self:VALUE_OPEN_COUNT(), count + 1)
 
     
-    id = "currently_collected_" .. self.ID_NAME
-    count = self.main.values:get(id) or 0
-    self.main.values:set(id, count + 1)
+    count = self.main.values:get(self:VALUE_CURRENTLY_COLLECTED_COUNT()) or 0
+    self.main.values:set(self:VALUE_CURRENTLY_COLLECTED_COUNT(), count + 1)
 
-    local filemanagerwindow = self.main.processes:getProcess("filemanager")
-    print(filemanagerwindow)
-    filemanagerwindow:addIcon(self:clone())
+    --local filemanagerwindow = self.main.processes:getProcess("filemanager")
+    self.main.systems.filemanager.contents:insert(self)
+    --filemanagerwindow:addIcon(self:clone())
 
     self.hasBeenOpened = true
     return true
@@ -95,8 +111,8 @@ end
 
 function Self:loadStatics(main)
   main.values.safe = true
-  table.insert(main.values.defaults, {"opened_"..self.ID_NAME, 0})
-  table.insert(main.values.defaults, {"currently_collected_"..self.ID_NAME, 0})
+  table.insert(main.values.defaults, {Self.VALUE_OPEN_COUNT, 0})
+  table.insert(main.values.defaults, {Self.VALUE_CURRENTLY_COLLECTED_COUNT, 0})
   
   
   

@@ -4,6 +4,8 @@ local Self = Super:clone("Window")
 function Self:init(args)
   Super.init(self, args)
 
+  -- Add the onDropped callback declaration
+  self.callbacks:declare("onDropped")
   
   self.alwaysOnTop = args.alwaysOnTop
   self.w = args.w
@@ -16,21 +18,23 @@ function Self:init(args)
 
   self._wasDown = false
   self._isDown = false
-  self.bar = require 'engine.gui.Bar':new{main=args.main,x = 0, y = -self.h/2 - 8+16 , w = self.w, h = 32, title = self.title}
-  self:insert(self.bar)
-  self.bar.close_button = require 'engine.gui.Button':new{main=self.main,x = self.bar.w/2 - 8, y = 0, w = 10, h = 10, text = "x", text_color = {0,0,0}}
-  self.bar.close_button.text:setFont(FONTS["dialog"])
-  self.bar.close_button.text.x = 1
-  self.bar.close_button.text.y = -2
-  self.bar:insert(self.bar.close_button)
-  self.callbacks:register("onMousePressed", function(self)
-    local mx, my = require 'engine.Mouse':getPosition()
-    if self:isTopNode(mx, my) then
-      self:getTopNode("Window"):bringToFront(self)
-      --self:setFocus()
-    end
-  end)
 
+  if not args.noBar then
+    self.bar = require 'engine.gui.Bar':new{main=args.main,x = 0, y = -self.h/2 - 8+16 , w = self.w, h = 32, title = self.title}
+    self:insert(self.bar)
+    self.bar.close_button = require 'engine.gui.Button':new{main=self.main,x = self.bar.w/2 - 8, y = 0, w = 10, h = 10, text = "x", text_color = {0,0,0}}
+    self.bar.close_button.text:setFont(FONTS["dialog"])
+    self.bar.close_button.text.x = 1
+    self.bar.close_button.text.y = -2
+    self.bar:insert(self.bar.close_button)
+    self.callbacks:register("onMousePressed", function(self)
+      local mx, my = require 'engine.Mouse':getPosition()
+      if self:isTopNode(mx, my) then
+        self:getTopNode("Window"):bringToFront(self)
+        --self:setFocus()
+      end
+    end)
+  end
   
 
 	return self
@@ -111,6 +115,8 @@ function Self:checkCallbacks()
   local deltaColliding = isMouseColliding ~= self._isStillColliding
   local deltaClicking = isMouseDown ~= self.wasMouseDown
   local isLeaf = self:isLeaf(mx, my)
+  local isTopWindow = self:isTopWindow(mx, my)
+  
   self._isStillColliding = self._isStillColliding and isMouseColliding
   self._isStillClicking = self._isStillClicking and isMouseDown
   self._isStillDragging = self._isStillDragging and isMouseDown
@@ -136,7 +142,7 @@ function Self:checkCallbacks()
     self._dragStartY = my
   end
   if not isMouseDown and deltaClicking and isMouseColliding and wasStillClicking then
-    if self:isTopWindow(mx, my) and not self:hasFocus() then self:setFocus() end
+    if isTopWindow and not self:hasFocus() then self:setFocus() end
     self.callbacks:call("onClicked", {self, mx, my})
   end
   if (not isMouseDown and deltaClicking) or (isMouseDown and deltaColliding) then
@@ -157,6 +163,7 @@ function Self:checkCallbacks()
 
   self.wasMouseDown = isMouseDown
   self.wasColliding = isMouseColliding
+  self.wasStillDragging = wasStillDragging -- Store this for next frame
 end
 
 

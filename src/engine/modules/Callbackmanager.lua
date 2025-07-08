@@ -33,6 +33,7 @@ end
 --TODO email antworten hinzufügen
 function Callbackmanager:call(name, params_new)
   assert(type(params_new) == "table", "Callbackmanager:call : params_new has to be a table.")
+	assert(self.callbacks[name], "Callbackmanager:register : No such callback: " .. name)
 	if self.callbacks[name] then
 		for i, c in ipairs(self.callbacks[name]) do
 			c.params.__call = c.params

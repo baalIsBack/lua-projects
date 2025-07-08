@@ -1,7 +1,7 @@
 local Super = require 'applications.dummy.gui.windows.Process'
 local Self = Super:clone("BattleWindow")
 
-Self.ID_NAME = "battle"
+Self.INTERNAL_NAME = "battle"
 
 function Self:init(args)
   args.w = 48*3
@@ -183,7 +183,7 @@ function Self:init(args)
 
   self.battle.callbacks:register("onGameOver", function(selff)
     self.main.values:inc("experience", self.battle.sum_values_player)
-    self.main.values:set("virus_found", self:expectedRestViruses())
+    self.main.values:set(VALUE_VIRUS_FOUND_COUNT, self:expectedRestViruses())
   end)
 
 
@@ -192,7 +192,7 @@ function Self:init(args)
 end
 
 function Self:expectedRestViruses()
-  local current_virus_found = self.main.values:get("virus_found")
+  local current_virus_found = self.main.values:get(VALUE_VIRUS_FOUND_COUNT)
   local new_virus_found = current_virus_found
   if self.battle.sum_values_bot > 0 then
     new_virus_found = current_virus_found + math.max(self.virus_amount + 1, self.virus_amount * (1.2+(self.battle.sum_values_bot / 1000)))

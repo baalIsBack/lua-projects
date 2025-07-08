@@ -43,6 +43,14 @@ function hex_neighbor (hex, direction)
     return hex_add(hex, hex_direction(direction))
 end
 
+function hex_neighbors (hex)
+  local results = {}
+  for direction = 0, 5 do
+    table.insert(results, hex_add(hex, hex_direction(direction)))
+  end
+  return results
+end
+
 hex_diagonals = {Hex(2, -1, -1), Hex(1, -2, 1), Hex(-1, -1, 2), Hex(-2, 1, 1), Hex(-1, 2, -1), Hex(1, 1, -2)}
 function hex_diagonal_neighbor (hex, direction)
     return hex_add(hex, hex_diagonals[1+direction])
@@ -94,6 +102,34 @@ function hex_linedraw (a, b)
     end
     return results
 end
+
+function hex_circle(center, radius)
+  local center = center
+  local radius = radius
+  if radius == nil then
+    radius = center
+    center = Hex(0, 0, 0)
+  end
+    local results = {}
+    if radius == 0 then
+        table.insert(results, center)
+        return results
+    end
+
+    -- Start at one hex in direction 4, scaled by radius
+    local hex = hex_add(center, hex_scale(hex_direction(4), radius))
+
+    -- Walk around the ring
+    for dir = 0, 5 do
+        for i = 1, radius do
+            table.insert(results, hex)
+            hex = hex_neighbor(hex, dir)
+        end
+    end
+
+    return results
+end
+
 
 
 

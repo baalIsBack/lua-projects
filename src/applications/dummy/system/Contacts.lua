@@ -62,7 +62,7 @@ function Self:canSolve(contact)
   local requirements = contact:getRequirements()
   local collected_value
   for requirement, quantity in pairs(requirements) do
-    collected_value = self.main.values:get("currently_collected_" .. requirement.ID_NAME)
+    collected_value = self.main.values:get("currently_collected_" .. requirement.INTERNAL_NAME)
     if collected_value < quantity then
       return false
     end
@@ -81,7 +81,7 @@ function Self:replycontact(contact)
   local requirements = contact:getRequirements()
   local collected_value
   for requirement, quantity in pairs(requirements) do
-    collected_value = self.main.values:inc("currently_collected_" .. requirement.ID_NAME, -quantity)
+    collected_value = self.main.values:inc("currently_collected_" .. requirement.INTERNAL_NAME, -quantity)
   end
   self:giveRewards(contact)
   return true
@@ -90,7 +90,7 @@ end
 function Self:giveRewards(contact)
   local rewards = contact:getRewards()
   for reward, quantity in pairs(rewards) do
-    self.main.values:inc("currently_collected_" .. reward.ID_NAME, quantity)
+    self.main.values:inc("currently_collected_" .. reward.INTERNAL_NAME, quantity)
   end
 end
 

@@ -27,11 +27,18 @@ function Self:defaultCreationFunction(x, y)
   }
 end
 
+function Self:isValidPosition(x, y)
+  return x > 0 and x <= self.width and y > 0 and y <= self.height
+end
+
 function Self:getTile(x, y)
   return self.internalGrid[y][x]
 end
 
 function Self:setTile(tile, x, y)
+  assert(tile, "Tile cannot be nil")
+  assert(x > 0 and x <= self.width, "X coordinate out of bounds: " .. x)
+  assert(y > 0 and y <= self.height, "Y coordinate out of bounds: " .. y)
   self.internalGrid[y][x] = tile
 end
 

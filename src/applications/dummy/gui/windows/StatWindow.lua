@@ -2,7 +2,7 @@ local Super = require 'applications.dummy.gui.windows.Process'
 local Self = Super:clone("CalcWindow")
 
 
-Self.ID_NAME = "stat"
+Self.INTERNAL_NAME = "stat"
 
 function Self:init(args)
   args.w = 320
@@ -43,13 +43,13 @@ function Self:init(args)
     self:checkStats()
     for i=#self.trackables, 1, -1 do
       local v = self.trackables[i]
-      if self.main.values:get("currently_collected_"..v.proto.ID_NAME) == 0 then
+      if self.main.values:get("currently_collected_"..v.proto.INTERNAL_NAME) == 0 then
         self.list:remove(v.node)
         table.remove(self.trackables, i)
       end
     end
     for i, v in ipairs(self.trackables) do
-      v.node.text_node:setText("  " .. v.proto.NAME .. " x " .. self.main.values:get("currently_collected_"..v.proto.ID_NAME))
+      v.node.text_node:setText("  " .. v.proto.DISPLAY_NAME .. " x " .. self.main.values:get("currently_collected_"..v.proto.INTERNAL_NAME))
     end
   end)
   
@@ -80,7 +80,7 @@ function Self:addNewUniqueStat(proto, value_id)
   local node, t
 
   for i, v in ipairs(self.trackables) do
-    if v.value_id == proto.NAME then
+    if v.value_id == proto.DISPLAY_NAME then
       return
     end
   end
@@ -109,7 +109,7 @@ function Self:addNewUniqueStat(proto, value_id)
   node:insert(t)
   node.text_node = t
   self.list:insert(node)
-  table.insert(self.trackables, {node = node, value_id=proto.NAME, proto=proto})
+  table.insert(self.trackables, {node = node, value_id=proto.DISPLAY_NAME, proto=proto})
 end
 
 

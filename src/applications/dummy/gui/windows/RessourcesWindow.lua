@@ -2,7 +2,7 @@ local Super = require 'applications.dummy.gui.windows.Process'
 local Self = Super:clone("DummyWindow")
 
 
-Self.ID_NAME = "ressources"
+Self.INTERNAL_NAME = "ressources"
 
 function Self:init(args)
   args.w = 320

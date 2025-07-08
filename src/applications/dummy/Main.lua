@@ -79,6 +79,39 @@ function mid_pad(str, length, char)
   end
 end
 
+Icon_Calc = require 'applications.dummy.apps.Icon_Calc'
+Icon_Contacts = require 'applications.dummy.apps.Icon_Contacts'
+Icon_Debug = require 'applications.dummy.apps.Icon_Debug'
+Icon_Editor = require 'applications.dummy.apps.Icon_Editor'
+Icon_FileManager = require 'applications.dummy.apps.Icon_FileManager'
+Icon_FileServer = require 'applications.dummy.apps.Icon_FileServer'
+Icon_Mail = require 'applications.dummy.apps.Icon_Mail'
+Icon_Network = require 'applications.dummy.apps.Icon_Network'
+Icon_Patcher = require 'applications.dummy.apps.Icon_Patcher'
+Icon_Processes = require 'applications.dummy.apps.Icon_Processes'
+Icon_Ressources = require 'applications.dummy.apps.Icon_Ressources'
+Icon_SoftwareCenter = require 'applications.dummy.apps.Icon_SoftwareCenter'
+Icon_Stat = require 'applications.dummy.apps.Icon_Stat'
+Icon_Terminal = require 'applications.dummy.apps.Icon_Terminal'
+Icon_Battle = require 'applications.dummy.apps.Icon_Battle'
+
+ContactsWindow = require 'applications.dummy.gui.windows.ContactsWindow'
+DebugWindow = require 'applications.dummy.gui.windows.DebugWindow'
+EditorWindow = require 'applications.dummy.gui.windows.EditorWindow'
+FileManagerWindow = require 'applications.dummy.gui.windows.FileManagerWindow'
+FileServerWindow = require 'applications.dummy.gui.windows.FileServerWindow'
+MailWindow = require 'applications.dummy.gui.windows.MailWindow'
+NetworkWindow = require 'applications.dummy.gui.windows.NetworkWindow'
+PatcherWindow = require 'applications.dummy.gui.windows.PatcherWindow'
+ProcessesWindow = require 'applications.dummy.gui.windows.ProcessesWindow'
+RessourcesWindow = require 'applications.dummy.gui.windows.RessourcesWindow'
+StatWindow = require 'applications.dummy.gui.windows.StatWindow'
+TerminalWindow = require 'applications.dummy.gui.windows.TerminalWindow'
+AntivirusWindow = require 'applications.dummy.gui.windows.AntivirusWindow'
+BattleWindow = require 'applications.dummy.gui.windows.BattleWindow'
+
+Icon_Antivirus = require 'applications.dummy.apps.Icon_Antivirus'
+
 function Self:init()
   Super.init(self)
 
@@ -111,9 +144,16 @@ function Self:init()
 
   require 'engine.Screen':setScale(1, 1)
 
+  
+  self.desktop = require 'applications.dummy.Desktop':new{main=self}
+  self.contents:insert(self.desktop)
+
   MAX_Z = 0
 
   local button, button_text
+
+  self.systems = require 'applications.dummy.Systems':new(self)
+
 
   self.timedmanager = require 'engine.TimedManager':new()
   self.gamestate = require 'applications.dummy.Savemanager':new{main=self}
@@ -123,80 +163,50 @@ function Self:init()
   self.flags = require 'applications.dummy.system.Flags':new{main=self}
 
 
-  self.contacts = require 'applications.dummy.system.Contacts':new{main=self}
+  --self.contacts = require 'applications.dummy.system.Contacts':new{main=self}
   self.mails = require 'applications.dummy.system.Mails':new{main=self}
   self.notes = require 'applications.dummy.system.Notes':new{main=self}
   self.terminal = require 'applications.dummy.system.Terminal':new{main=self}
   self.filegenerator = require 'applications.dummy.system.FileGenerator':new{main=self}
   self.fileserver = require 'applications.dummy.system.FileServer':new{main=self}
-  self.filemanager = require 'applications.dummy.system.FileManager':new{main=self}
   self.processes = require 'applications.dummy.system.Processes':new{main=self}
   self.apps = require 'applications.dummy.system.Apps':new{main=self}
   self.antivirus = require 'applications.dummy.system.Antivirus':new{main=self}
   self.patcher = require 'applications.dummy.system.Patcher':new{main=self}
   
 
-  self.pluginManager = require 'applications.dummy.system.PluginManager':new{main=self}
-  self.pluginManager:loadDiscoveredPlugins()
-  self.pluginManager:loadAllPlugins()
-  self.pluginManager:enableAllPlugins()
-
+  
   love.graphics.setFont(FONT_DEFAULT)
 
 
-  local osbar = require 'applications.dummy.gui.elements.OSBar':new{y = 480-16+4, color = {0/255, 1/255, 129/255}, main=self,}
-  self:insert(osbar)
+
 
   self.gamestate:finalize()
   --self.processes:finalizeWindows()
 
 
   self.values:set("ram_usage_current", 0)
-  
+
+  self:insert(Icon_Mail:new{main=self, x=32, y=32})
+  self:insert(Icon_FileServer:new{main=self, x=32*4, y=32})
+  self:insert(Icon_FileManager:new{main=self, x=32*8, y=32*4})
+  self:insert(Icon_FileManager:new{main=self, x=32*8, y=32})
+  self:insert(Icon_Antivirus:new{main=self, x=32*3, y=32*4})
+  self:insert(Icon_Processes:new{main=self, x=32*5, y=32*5})
+  self:insert(Icon_Battle:new{main=self, x=32*8, y=32*8})
   
 
   return self
 end
 
 function Self:draw()
-  table.sort(self.contents.content_list, function(a, b)
-    if a.alwaysOnTop and not b.alwaysOnTop then
-        return false
-    elseif not a.alwaysOnTop and b.alwaysOnTop then
-        return true
-    else
-        return a.z < b.z
-    end
-  end)
-  --sort self.content.content_list by z and ensure that if any node has the alwaysOnTop flag set it will be first
-  
-
-
-  love.graphics.setBackgroundColor(32/255, 140/255, 112/255)
   self.contents:callall("draw")
-  local x_dist = 32
-  local y_dist = 32
-  for x = 0, 640-x_dist, x_dist do
-    --love.graphics.line(x, 0, x, 480)
-  end
-  for y = 0, 480-y_dist, y_dist do
-    --love.graphics.line(0, y, 640, y)
-  end
 
   require 'engine.Mouse':draw()
 
 end
 
 function Self:update(dt)
-  table.sort(self.contents.content_list, function(a, b)
-    if a.alwaysOnTop and not b.alwaysOnTop then
-      return false
-    elseif not a.alwaysOnTop and b.alwaysOnTop then
-      return true
-    else
-      return a.z < b.z
-    end
-  end)
   
   -- Update plugins
   if self.pluginManager then
@@ -224,15 +234,12 @@ function Self:mousemoved( x, y, dx, dy, istouch )
 end
 
 function Self:insert(node)
-  self.contents:insert(node)
+  self.desktop.contents:insert(node)
   node.main = self
-  if node:type() ~= node:super():type() then
-    ddd()
-  end
 end
 
 function Self:remove(node)
-  self.contents:remove(node)
+  self.desktop.contents:remove(node)
 end
 
 function Self:getCurrentRam()

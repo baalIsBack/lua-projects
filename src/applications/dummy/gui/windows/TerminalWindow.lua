@@ -2,7 +2,7 @@ local Super = require 'applications.dummy.gui.windows.Process'
 local Self = Super:clone("TerminalWindow")
 
 
-Self.ID_NAME = "terminal"
+Self.INTERNAL_NAME = "terminal"
 Self.IMG = love.graphics.newImage("submodules/lua-projects-private/gfx/win_icons_png/w98_console_prompt.png")
 
 function Self:init(args)

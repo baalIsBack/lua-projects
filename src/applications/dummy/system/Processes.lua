@@ -91,14 +91,14 @@ function Self:canOpenProcessPrototype(app_window_prototype)
     return false
   end
   
-  -- Check if the window has an ID_NAME
-  if not app_window_prototype.ID_NAME then
-    print("Warning: Window has no ID_NAME: " .. tostring(app_window_prototype))
+  -- Check if the window has an INTERNAL_NAME
+  if not app_window_prototype.INTERNAL_NAME then
+    print("Warning: Window has no INTERNAL_NAME: " .. tostring(app_window_prototype))
     return false
   end
   
   local ram_usage_current = self.main.values:get("ram_usage_current")
-  local ram_usage = self.main.values:get("ram_usage_"..app_window_prototype.ID_NAME)
+  local ram_usage = self.main.values:get("ram_usage_"..app_window_prototype.INTERNAL_NAME)
   local ram_usage_total = self.main.values:get("ram_usage_total")
   return (ram_usage_current + ram_usage <= ram_usage_total+0.0001)
 end
@@ -110,22 +110,22 @@ function Self:canOpenProcess(app_window)
     return false
   end
   
-  -- Check if the window has an ID_NAME
-  if not app_window.ID_NAME then
-    print("Warning: Window has no ID_NAME: " .. tostring(app_window))
+  -- Check if the window has an INTERNAL_NAME
+  if not app_window.INTERNAL_NAME then
+    print("Warning: Window has no INTERNAL_NAME: " .. tostring(app_window))
     return false
   end
   
   local ram_usage_current = self.main.values:get("ram_usage_current")
-  local ram_usage = self.main.values:get("ram_usage_"..app_window.ID_NAME)
+  local ram_usage = self.main.values:get("ram_usage_"..app_window.INTERNAL_NAME)
   local ram_usage_total = self.main.values:get("ram_usage_total")
   return (ram_usage_current + ram_usage <= ram_usage_total+0.0001)
 end
 
 function Self:openProcess(app_window)
-  print(self:canOpenProcess(app_window) , self:canOpenProcess(app_window) and not app_window:isOpen())
+  print("deep", self:canOpenProcess(app_window) , self:canOpenProcess(app_window) and not app_window:isOpen())
   if self:canOpenProcess(app_window) and not app_window:isOpen() then
-    self.main.values:inc("ram_usage_current", self.main.values:get("ram_usage_"..app_window.ID_NAME))
+    self.main.values:inc("ram_usage_current", self.main.values:get("ram_usage_"..app_window.INTERNAL_NAME))
     self.callbacks:call("onOpen", {self, app_window})
     app_window:activate()
     app_window:bringToFront()
@@ -142,7 +142,7 @@ function Self:killProcess(app_window)
       break
     end
   end
-  self.main.values:inc("ram_usage_current", -self.main.values:get("ram_usage_"..app_window.ID_NAME))
+  self.main.values:inc("ram_usage_current", -self.main.values:get("ram_usage_"..app_window.INTERNAL_NAME))
   self.callbacks:call("onClose", {self, app_window})
   app_window:close()
 end
@@ -150,11 +150,11 @@ end
 function Self:closeProcess(app_window)
   for i, process in ipairs(self.contents.content_list) do
     if process == app_window then
-      --table.remove(self.contents.content_list, i)
+      table.remove(self.contents.content_list, i)
       break
     end
   end
-  self.main.values:inc("ram_usage_current", -self.main.values:get("ram_usage_"..app_window.ID_NAME))
+  self.main.values:inc("ram_usage_current", -self.main.values:get("ram_usage_"..app_window.INTERNAL_NAME))
   self.callbacks:call("onClose", {self, app_window})
   app_window:close()
 end
@@ -165,8 +165,8 @@ end
 
 function Self:getProcess(name)
   for i, process in ipairs(self.contents.content_list) do
-      print("IS? ", process.ID_NAME, name)
-    if process.ID_NAME == name then
+      print("IS? ", process.INTERNAL_NAME, name)
+    if process.INTERNAL_NAME == name then
       return process
     end
   end
@@ -202,7 +202,7 @@ function Self:makeProcess(prototype, args)
   self.contents:insert(window)
   self:openProcess(window)
   self.main:insert(window)
-  print("MAKING", window.ID_NAME, window)
+  print("MAKING", window.INTERNAL_NAME, window)
 end
 
 function Self:makePopup(args)
@@ -236,7 +236,7 @@ function Self:isProcessRunning(prototype)
   -- Check if any process is using this prototype
   for _, process in ipairs(activeProcesses) do
     -- Compare prototype names to check if they're the same type
-    if process.ID_NAME == prototype.ID_NAME or process.__proto == prototype then
+    if process.INTERNAL_NAME == prototype.INTERNAL_NAME or process.__proto == prototype then
       return true
     end
   end

@@ -1,7 +1,7 @@
 local Super = require 'applications.dummy.gui.windows.Process'
 local Self = Super:clone("PopupWindow")
 
-Self.ID_NAME = "popup"
+Self.INTERNAL_NAME = "popup"
 Self.IMG = love.graphics.newImage("submodules/lua-projects-private/gfx/win_icons_png/w98_msg_warning-0.png")
 
 function Self:init(args)

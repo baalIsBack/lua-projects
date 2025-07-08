@@ -71,7 +71,7 @@ function Self:init(args)
     end
   end)
 
-  local virus_count = self.main.values:get("virus_found")
+  local virus_count = self.main.values:get(VALUE_VIRUS_FOUND_COUNT) or 0
   for i=1, virus_count do
     self:makeVirus()
   end

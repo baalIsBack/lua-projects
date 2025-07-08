@@ -58,6 +58,35 @@ function Self:mousemoved(x, y, dx, dy, istouch)
   end
 end
 
+function Self:mousereleased( x, y, button, istouch, presses )
+  local active_scene = self:getActiveScene()
+  if active_scene and active_scene.mousereleased then
+    active_scene:mousereleased( x, y, button, istouch, presses )
+  end
+end
+
+function Self:mousepressed( x, y, button, istouch, presses )
+  local active_scene = self:getActiveScene()
+  if active_scene and active_scene.mousepressed then
+    active_scene:mousepressed( x, y, button, istouch, presses )
+  end
+end
+
+function Self:keyreleased(key, scancode)
+  local active_scene = self:getActiveScene()
+  if active_scene and active_scene.keyreleased then
+    active_scene:keyreleased(key, scancode)
+  end
+end
+
+
+function Self:wheelmoved(x, y)
+  local active_scene = self:getActiveScene()
+  if active_scene and active_scene.wheelmoved then
+    active_scene:wheelmoved(x, y)
+  end
+end
+
 function Self:getActiveScene()
 	local x = self.scenes[self.activeSceneId]
 	--assert(x, "No Active Scene for Scene!")

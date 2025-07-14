@@ -2,7 +2,7 @@ local Super = require 'applications.dummy.gui.windows.Process'
 local Self = Super:clone("FileServerWindow")
 
 
-Self.ID_NAME = "fileserver"
+Self.INTERNAL_NAME = "fileserver"
 
 function Self:init(args)
   args.w = 320+32+32
@@ -75,7 +75,8 @@ function Self:addIcon(icon_type, info)
   local success, value = pcall(function() return require('applications.dummy.gui.elements.' .. icon_type) end)
   
   if not success then
-    value = require('applications.dummy.system.plugins.base.files.' .. icon_type)
+    print("Failed to load icon type:", icon_type, "Error:", value)
+    value = require('applications.dummy.files.' .. icon_type)
   end
   icon = value:new(proto_t)
   print("LOADED,", icon:type())

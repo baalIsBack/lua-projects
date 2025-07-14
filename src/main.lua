@@ -9,7 +9,12 @@
 if arg[2] == "debug" or os.getenv("LOCAL_LUA_DEBUGGER_VSCODE") == "1" then
 	require 'lldebugger'.start()
 end
-
+function assert(cond, p)
+  if not cond then
+    print("Assertion failed: " .. tostring(p))
+    err()
+  end
+end
 
 love.graphics.setDefaultFilter("nearest", "nearest")
 
@@ -41,14 +46,20 @@ function love.load()
 	--love.graphics.setFont(FONT)
 	scenemanager = require 'engine.Scenemanager':new()
 
-  scenemanager:register("Main", require'applications.dummy.Main':new())
+--  scenemanager:register("Main", require'applications.dummy.Main':new())
+--  scenemanager:register("Main", require'applications.filefighter.Main':new())
+  --scenemanager:register("Main", require'applications.idle_factory.Main':new())
   
   --scenemanager:register("Main", require'applications.shadertest.Main':new())
   --scenemanager:register("Main", require'applications.battlenetwork.Main':new())
   
   --scenemanager:register("Main", require'applications.farm.Main':new())
-  --scenemanager:register("Main", require'applications.hex.Main':new())
   --scenemanager:register("Main", require'applications.space.Main':new())
+  
+
+  --scenemanager:register("Main", require'applications.hex.Main':new())
+  --scenemanager:register("Main", require'applications.idle_clicker.Main':new())
+  scenemanager:register("Main", require'applications.explorer.Main':new())
   
 end
 
@@ -107,6 +118,24 @@ function love.textinput(text)
   scenemanager:textinput(text)
 end
 
-function love.mousemoved( x, y, dx, dy, istouch )
-  scenemanager:mousemoved( x, y, dx, dy, istouch )
+function love.mousereleased( x, y, button, istouch, presses )
+  scenemanager:mousereleased( x, y, button, istouch, presses )
+end
+
+function love.mousepressed( x, y, button, istouch, presses )
+  scenemanager:mousepressed( x, y, button, istouch, presses )
+  
+end
+
+function love.mousemoved(x, y, dx, dy, istouch)
+  scenemanager:mousemoved(x, y, dx, dy, istouch)
+  
+end
+
+function love.keyreleased(key, scancode)
+	scenemanager:keyreleased(key, scancode)
+end
+
+function love.wheelmoved(x, y)
+	scenemanager:wheelmoved(x, y)
 end

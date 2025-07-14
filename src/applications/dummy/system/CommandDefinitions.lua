@@ -330,7 +330,7 @@ newCommand({
       str = ""
       str = str .. left_pad(""..i, 4, " ") .. "  "
       str = str .. left_pad(""..trackable.process.title, 12, " ") .. "  "
-      str = str .. left_pad(""..terminal.main.values:get("ram_usage_"..trackable.process.ID_NAME), 8, " ") .. "  "
+      str = str .. left_pad(""..terminal.main.values:get("ram_usage_"..trackable.process.INTERNAL_NAME), 8, " ") .. "  "
       terminal:appendLog(str)
     end
   end

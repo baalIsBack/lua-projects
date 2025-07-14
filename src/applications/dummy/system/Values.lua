@@ -1,6 +1,10 @@
 local Super = require 'engine.Prototype'
 local Self = Super:clone("Values")
 
+VALUE_VIRUS_FOUND_COUNT = "virus_found"
+VALUE_CASH_COUNT = "cash"
+VALUE_RAM_USAGE_CURRENT = "ram_usage_current"
+VALUE_RAM_USAGE_TOTAL = "ram_usage_total"
 
 function Self:init(args)
   self.main = args.main
@@ -22,10 +26,6 @@ function Self:init(args)
 end
 
 function Self:set(name, value)
-  if self.values[name] == nil and not self.safe then
-    print("Warning: Unknown value "..name)
-    asdd()
-  end
   self.values[name] = value
   self.callbacks:call("onSet", {self, name, value})
 end
@@ -42,10 +42,6 @@ function Self:exists(name)
 end
 
 function Self:get(name)
-  if self.values[name] == nil then
-    print("Warning: Value "..name.." not found")
-    asdd()
-  end
   return self.values[name]
 end
 

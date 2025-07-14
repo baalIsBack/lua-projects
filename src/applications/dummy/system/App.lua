@@ -3,7 +3,7 @@ local Self = Super:clone("App")
 
 
 Self.INTERNAL_ID = "app"
-Self.NAME = "App"
+Self.DISPLAY_NAME = "App"
 
 function Self:init(args)
   self.main = args.main  

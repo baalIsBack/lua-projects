@@ -137,12 +137,12 @@ function Self:load()
   self.main.terminal:deserialize(master.terminal)
   self.main.mails:deserialize(master.mails)
   self.main.flags:deserialize(master.flags)
-  self.main.filemanager:deserialize(master.filemanager)
+  --self.main.filemanager:deserialize(master.filemanager)
   self.main.filegenerator:deserialize(master.filegenerator)
   self.main.fileserver:deserialize(master.fileserver)
   self.main.values:deserialize(master.values or {})
   self.main.apps:deserialize(master.apps or {})
-  self.main.contacts:deserialize(master.contacts or {})
+  --self.main.contacts:deserialize(master.contacts or {})
 
   return firstTime
 end

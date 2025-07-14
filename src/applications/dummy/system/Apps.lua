@@ -31,9 +31,9 @@ end
 
 function Self:registerApp(appPackage)
   assertAppPackage(appPackage)
-  local app_name = appPackage.appName or appPackage.app.ID_NAME
+  local app_name = appPackage.appName or appPackage.app.INTERNAL_NAME
   self.knownApps[app_name] = appPackage.iconPrototype
-  --self[app.ID_NAME] = app
+  --self[app.INTERNAL_NAME] = app
   --app ::icon
   --process ::window
   
@@ -43,7 +43,7 @@ function Self:registerApp(appPackage)
 end
 
 function Self:unregisterApp(app)
-  local app_name = app_name or app.ID_NAME
+  local app_name = app_name or app.INTERNAL_NAME
 end
 
 function Self:getFreeDesktopSlot()
@@ -108,12 +108,12 @@ function Self:loadAppIcons()
 
  -- self.battle = self:makeIcon('applications.dummy.system.plugins.base.apps.Icon_Battle', 0, 5)
   --self.battle:setTargetApp(self.main.processes.battle)
-  --self.main:insert(self.main.processes:getProcess(self.battle.ID_NAME))
-  --self.contents:insert(self.battle.ID_NAME)
+  --self.main:insert(self.main.processes:getProcess(self.battle.INTERNAL_NAME))
+  --self.contents:insert(self.battle.INTERNAL_NAME)
 end
 
 function Self:installByApp(icon)
-  local app_name = icon.ID_NAME
+  local app_name = icon.INTERNAL_NAME
   if self.main.values:get("rom_usage_current") + self.main.values:get("rom_usage_"..app_name) > self.main.values:get("rom_usage_total") then
     return false
   end
@@ -139,7 +139,7 @@ end
 
 function Self:installedApp(app_name)
   for i, v in ipairs(self.installedApps) do
-    if v.ID_NAME == app_name then
+    if v.INTERNAL_NAME == app_name then
       return true
     end
   end
@@ -151,7 +151,7 @@ function Self:uninstall(app_name)
   end
   local icon = self:getApp(app_name)
   for i, v in ipairs(self.installedApps) do
-    if v.ID_NAME == app_name then
+    if v.INTERNAL_NAME == app_name then
       table.remove(self.installedApps, i)
       break
     end
@@ -184,7 +184,7 @@ function Self:installByAppName(name)
     h = 64,
   }
 
-  local app_name = icon.ID_NAME
+  local app_name = icon.INTERNAL_NAME
   if self.main.values:get("rom_usage_current") + self.main.values:get("rom_usage_"..app_name) > self.main.values:get("rom_usage_total") then
     return false
   end
@@ -228,7 +228,7 @@ end
 
 function Self:getApp(app_name)
   for i, v in ipairs(self.installedApps) do
-    if v.ID_NAME == app_name then
+    if v.INTERNAL_NAME == app_name then
       return v
     end
   end

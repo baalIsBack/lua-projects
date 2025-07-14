@@ -2,7 +2,7 @@ local Super = require 'applications.dummy.gui.windows.Process'
 local Self = Super:clone("EditorWindow")
 
 
-Self.ID_NAME = "editor"
+Self.INTERNAL_NAME = "editor"
 
 function Self:init(args)
   args.w = 320/2

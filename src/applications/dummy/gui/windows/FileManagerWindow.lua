@@ -2,7 +2,7 @@ local Super = require 'applications.dummy.gui.windows.Process'
 local Self = Super:clone("FileManagerWindow")
 
 
-Self.ID_NAME = "filemanager"
+Self.INTERNAL_NAME = "filemanager"
 
 function Self:init(args)
   args.w = 320+32+32

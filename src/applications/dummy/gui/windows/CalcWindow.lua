@@ -2,7 +2,7 @@ local Super = require 'applications.dummy.gui.windows.Process'
 local Self = Super:clone("CalcWindow")
 
 
-Self.ID_NAME = "calc"
+Self.INTERNAL_NAME = "calc"
 Self.IMG = love.graphics.newImage("submodules/lua-projects-private/gfx/win_icons_png/w98_calendar-3.png")
 
 function Self:init(args)

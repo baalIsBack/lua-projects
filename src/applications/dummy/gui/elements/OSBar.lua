@@ -24,16 +24,16 @@ function Self:init(args)
   self:insert(self.text_currency)
   
 
-  local ram_text = string.format("%.2f", self.main:getCurrentRam()) .. "MB/" .. string.format("%.2f", self.main:getMaxRam()) .. "MB"
+  local ram_text = string.format("%.2f", (self.main:getCurrentRam() or 0)) .. "MB/" .. string.format("%.2f", self.main:getMaxRam()) .. "MB"
   self.text_ram = require("engine.gui.Text"):new{main=self.main, x=0, y=0, text=ram_text, color={1,1,1}, alignment="center"}
   self:insert(self.text_ram)
 
 
   self.callbacks:register("update", function(selff, dt)
-    local new_currency_string = string.format("%.2f", self.main.values:get("cash"))
+    local new_currency_string = string.format("%.2f", self.main.values:get(VALUE_CASH_COUNT))
     self.text_currency:setText(new_currency_string .. "$")
 
-    local new_ram_string = string.format("%.2f", self.main:getCurrentRam()) .. "MB/" .. string.format("%.2f", self.main:getMaxRam()) .. "MB"
+    local new_ram_string = string.format("%.2f", self.main:getCurrentRam() or 0) .. "MB/" .. string.format("%.2f", self.main:getMaxRam()) .. "MB"
     self.text_ram:setText(new_ram_string)
   end)
 

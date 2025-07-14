@@ -1,7 +1,7 @@
 local Super = require 'applications.dummy.gui.windows.Process'
 local Self = Super:clone("NetworkWindow")
 
-Self.ID_NAME = "network"
+Self.INTERNAL_NAME = "network"
 
 function Self:init(args)
   args.w = 320

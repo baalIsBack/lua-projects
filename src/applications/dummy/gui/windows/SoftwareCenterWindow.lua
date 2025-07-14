@@ -2,7 +2,7 @@ local Super = require 'applications.dummy.gui.windows.Process'  -- Make sure thi
 local Self = Super:clone("SoftwareCenterWindow")
 
 Self.TITLE = "Software Center"
-Self.ID_NAME = "softcenter"
+Self.INTERNAL_NAME = "softcenter"
 Self.w = 360
 Self.h = 240
 

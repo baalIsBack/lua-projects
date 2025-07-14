@@ -6,8 +6,13 @@ local IMG = love.graphics.newImage("submodules/lua-projects-private/gfx/Mouse.pn
 function Self:init(args)
   Super.init(self, args)
   
+  self.relative = false
 
-  love.mouse.setRelativeMode( true )
+  if self.relative then
+    love.mouse.setRelativeMode( true )
+  else
+    love.mouse.setRelativeMode( false )
+  end
 
   self.x = 640/2
   self.y = 480/2
@@ -24,7 +29,9 @@ end
 function Self:draw()
   love.graphics.setColor(1, 1, 1)
   --love.graphics.circle("fill", self.x, self.y, 5)
-  love.graphics.draw(IMG, self.x, self.y)
+  if self.relative then
+    love.graphics.draw(IMG, self.x, self.y)
+  end
 end
 
 function Self:mousemoved(x, y, dx, dy, istouch)
@@ -34,6 +41,9 @@ function Self:mousemoved(x, y, dx, dy, istouch)
 end
 
 function Self:setPosition(x, y)
+  if not self.relative then
+    err()
+  end
   self.x = x
   self.y = y
 end

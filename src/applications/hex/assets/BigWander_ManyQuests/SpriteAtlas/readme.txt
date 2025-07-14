@@ -1,0 +1,1 @@
+Note that the sprite atlas does not include the scroll animations (for formatting reasons it made much more sense to keep them separate from the main icons) - You can find them in the Spritesheets folder under "Scrolls" :)

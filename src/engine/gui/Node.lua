@@ -2,6 +2,7 @@ local Super = require 'engine.Prototype'
 local Self = Super:clone("Node")
 
 Self.FOCUS_LIST = {}
+MAX_Z = 0
 
 function Self:init(args)
   assert(args.main, "Node requires a main argument")
@@ -20,6 +21,7 @@ function Self:init(args)
   
   self.callbacks:declare("onMouseEnter")
   self.callbacks:declare("onHover")
+  self.callbacks:declare("onHoverStatic")  -- New static hover callback
   self.callbacks:declare("onMouseExit")
   self.callbacks:declare("onMousePressed")
   self.callbacks:declare("onClicked")
@@ -61,6 +63,52 @@ function Self:init(args)
 
   self._hasFocus = false
 
+  if args.hasTooltip then
+    self.callbacks:register("onHoverStatic", function()
+    -- Check if a tooltip already exists
+    if not self._tooltipWindow then
+      -- Create tooltip window
+      local tooltip = require 'engine.gui.Window':new{
+        main = self.main,
+        w = 160,
+        h = 80,
+        title = "Process Info",
+        x = self:getX() + 40, -- Position next to button
+        y = self:getY() + 10,
+        closeButton = false,
+        titlebar = false,
+        border = true,
+        noBar = true,
+      }
+      
+      -- Add description text
+      local description = require 'engine.gui.Text':new{
+        main = self.main,
+        x = 0,
+        y = 0,
+        text = args.tooltipText or "No description available.",
+        color = {0, 0, 0},
+        alignment = "center",
+      }
+      tooltip:insert(description)
+      
+      -- Add window to the main interface
+      self.main:insert(tooltip)
+      
+      -- Store reference to tooltip on button
+      self._tooltipWindow = tooltip
+      
+      -- Register exit handler to close tooltip when mouse leaves
+      tooltip.callbacks:register("onMouseExit", function()
+        if self._tooltipWindow then
+          self.main:remove(self._tooltipWindow)
+          self._tooltipWindow = nil
+        end
+      end)
+    end
+  end)
+  end
+
 
   if args._isReal ~= nil then--unreal nodes are not drawn or interacted with
     self._isReal = args._isReal
@@ -84,6 +132,12 @@ function Self:init(args)
 
   self.color = args.color or {1, 1, 1}
 
+  -- Add these new properties
+  self._hoverTimer = 0
+  self._hoverDelay = args.hoverDelay or 0.8  -- Default 800ms static hover delay
+  self._lastMouseX = 0
+  self._lastMouseY = 0
+  self._hoverStaticTriggered = false
 	return self
 end
 
@@ -152,11 +206,14 @@ function Self:checkCallbacks()
   local deltaColliding = isMouseColliding ~= self._isStillColliding
   local deltaClicking = isMouseDown ~= self.wasMouseDown
   local isTopNode = self:isTopNode(mx, my)
-  local isWindowTopNode = self:getTopNode("Window").isWindow and self:getTopNode("Window"):isTopWindow(mx, my)
+  local isWindowTopNode = (self:getTopNode("Window").isWindow and self:getTopNode("Window"):isTopWindow(mx, my))
   local isLeaf = self:isLeaf(mx, my) and (isTopNode or isWindowTopNode)
   self._isStillColliding = self._isStillColliding and isMouseColliding and isLeaf
   self._isStillClicking = self._isStillClicking and isMouseDown
-  self._isStillDragging = self._isStillDragging and isMouseDown
+  
+  if isMouseDown then
+    self._isStillDragging = self._isStillDragging and isMouseDown
+  end
 
   if isMouseColliding and deltaColliding and isLeaf and not self.mouseDisabled then
     self._isStillColliding = true--begin collision tracking
@@ -164,7 +221,30 @@ function Self:checkCallbacks()
   end
   if self._isStillColliding and not self.mouseDisabled then
     self.callbacks:call("onHover", {self, mx, my})
+    
+    -- Handle static hover detection
+    if mx == self._lastMouseX and my == self._lastMouseY then
+      -- Mouse is stationary, increment timer
+      self._hoverTimer = self._hoverTimer + love.timer.getDelta()
+      
+      if self._hoverTimer >= self._hoverDelay and not self._hoverStaticTriggered then
+        -- Timer threshold reached, trigger static hover
+        self._hoverStaticTriggered = true
+        self.callbacks:call("onHoverStatic", {self, mx, my, self._hoverTimer})
+      end
+    else
+      -- Mouse moved, reset timer
+      self._hoverTimer = 0
+      self._hoverStaticTriggered = false
+      self._lastMouseX = mx
+      self._lastMouseY = my
+    end
+  else
+    -- Not hovering, reset timer state
+    self._hoverTimer = 0
+    self._hoverStaticTriggered = false
   end
+  
   if not isMouseColliding and deltaColliding and not self.mouseDisabled then
     self._isStillColliding = false--end collision tracking
     self.callbacks:call("onMouseExit", {self, mx, my})
@@ -188,7 +268,9 @@ function Self:checkCallbacks()
     self.callbacks:call("onMouseReleased", {self, mx, my})
   end
 
-  if not isMouseDown and deltaClicking and self.wasStillDragging and not self.mouseDisabled then
+  -- FIX: This is the critical change - properly handle drag end
+  if wasStillDragging and (not isMouseDown or (deltaClicking and not isMouseDown)) and not self.mouseDisabled then
+    self._isStillDragging = false -- End dragging
     self.callbacks:call("onDragEnd", {self, mx, my})
   end
 
@@ -207,10 +289,22 @@ function Self:isTopNode(x, y)
   if not self.z then
     return false
   end
-  for index, otherNode in ipairs(self.main.contents.content_list) do
+  
+  for index, otherNode in ipairs(self.main.desktop.contents.content_list) do
     if otherNode ~= self and otherNode._isReal and otherNode:hasPointCollision(x, y) then
-      if (otherNode.z >= self.z and self.alwaysOnTop == otherNode.alwaysOnTop) or (otherNode.alwaysOnTop and not self.alwaysOnTop) then
+      -- CRITICAL FIX: Any window (z >= 0) blocks desktop icons (z < 0)
+      -- This ensures complete window blocking for desktop icons
+      if otherNode.isWindow and otherNode.z >= 0 and self.z < 0 then
         return false
+      end
+      
+      -- Enhanced z-order comparison that properly handles alwaysOnTop
+      -- This follows the same logic as isTopWindow for consistency
+      if otherNode.z and self.z then
+        if (otherNode.z > self.z and self.alwaysOnTop == otherNode.alwaysOnTop) or 
+           (otherNode.alwaysOnTop and not self.alwaysOnTop) then
+          return false
+        end
       end
     end
   end
@@ -381,6 +475,15 @@ end
 function Self:mousemoved(x, y, dx, dy, istouch)
   self.contents:callall("mousemoved", x, y, dx, dy, istouch)
   
+end
+
+function Self:mousereleased( x, y, button, istouch, presses )
+  local mx, my = require 'engine.Mouse':getPosition()
+  if self:hasPointCollision(mx, my) then
+      self.callbacks:call("onMouseReleased", {self, x, y, button, istouch, presses})
+
+  end
+  self.contents:callall("mousereleased", x, y, button, istouch, presses )
 end
 
 return Self
